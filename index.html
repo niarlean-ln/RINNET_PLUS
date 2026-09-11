@@ -50,7 +50,7 @@
       backdrop-filter: blur(10px);
     }
 
-    /* --- SIDEBAR & NAV--- */
+    /* --- SIDEBAR & NAV --- */
     .sidebar {
       width: 260px;
       height: 100vh;
@@ -213,10 +213,9 @@
       <div class="nav flex-column my-3">
         <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
         <a class="nav-link" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
-        <a class="nav-link" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Stok Reseller</a>
-        <a class="nav-link" href="#" onclick="switchMenu('penjualan')"><i class="fa-solid fa-cart-shopping"></i>Penjualan Voucher</a>
+        <a class="nav-link admin-only" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Input Data Reseller (Admin)</a>
+        <a class="nav-link" href="#" onclick="switchMenu('penjualan')"><i class="fa-solid fa-cart-shopping"></i>Input Penjualan Harian</a>
         
-        <!-- MENU BARU -->
         <a class="nav-link" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
         <a class="nav-link" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form Kasbon</a>
 
@@ -279,13 +278,13 @@
         <!-- TABEL REKAP 1: DATA INPUTAN RESELLER OLEH ADMIN -->
         <div class="card card-custom p-3 p-md-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Rekap Inputan Data Reseller (Admin)</h5>
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Rekap Inputan Data Reseller & Stok (Admin)</h5>
             <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblDashReseller', 'Rekap_Input_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
           </div>
           <div class="table-responsive">
             <table class="table table-hover" id="tblDashReseller">
               <thead>
-                <tr><th>Server</th><th>Nama Reseller</th><th>WhatsApp</th><th>Status Stok</th></tr>
+                <tr><th>Server</th><th>Nama Reseller</th><th>WhatsApp</th><th>Petugas Lapangan</th><th>Total Voucher Diterima</th></tr>
               </thead>
               <tbody id="bodyDashReseller"></tbody>
             </table>
@@ -295,13 +294,13 @@
         <!-- TABEL REKAP 2: LAPORAN INPUTAN TRANSAKSI PENJUALAN RESELLER -->
         <div class="card card-custom p-3 p-md-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-receipt me-2 text-primary"></i>Laporan Penjualan Reseller (Realtime)</h5>
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-receipt me-2 text-primary"></i>Laporan Penjualan Harian Reseller</h5>
             <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblDashSales', 'Laporan_Penjualan_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
           </div>
           <div class="table-responsive">
             <table class="table table-striped" id="tblDashSales">
               <thead>
-                <tr><th>Server</th><th>Reseller</th><th>Qty Terjual</th><th>Total Omset</th></tr>
+                <tr><th>Tanggal</th><th>Server</th><th>Reseller</th><th>Qty Terjual</th><th>Total Omset</th></tr>
               </thead>
               <tbody id="bodyDashSales"></tbody>
             </table>
@@ -309,7 +308,7 @@
         </div>
       </section>
 
-      <!-- MENU BARU: DATA KARYAWAN -->
+      <!-- MENU DATA KARYAWAN -->
       <section id="menu-karyawan" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen Data Karyawan</h3>
         <div class="row g-4">
@@ -353,7 +352,7 @@
         </div>
       </section>
 
-      <!-- MENU BARU: FORM KASBON -->
+      <!-- MENU FORM KASBON -->
       <section id="menu-kasbon" class="page-section d-none">
         <h3 class="fw-800 mb-4">Form & Catatan Kasbon Karyawan</h3>
         <div class="row g-4">
@@ -445,26 +444,19 @@
         </div>
       </section>
 
-      <!-- MENU 3: STOK RESELLER -->
+      <!-- MENU 3: INPUT DATA RESELLER (KHUSUS ADMIN) -->
       <section id="menu-reseller" class="page-section d-none">
-        <h3 class="fw-800 mb-4">Input Data Reseller & Stok Voucher</h3>
+        <h3 class="fw-800 mb-4">Form Admin: Input Reseller & Penyerahan Voucher Lapangan</h3>
         <div class="card card-custom p-4 mb-4">
-          <h5 class="fw-bold mb-3">Form Input Stok Reseller</h5>
+          <h5 class="fw-bold mb-3">Form Pendaftaran Reseller & Penyerahan Stok Petugas</h5>
           <form onsubmit="simpanStokReseller(event)" class="row g-3">
             <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="stkServer" class="form-control" required></div>
             <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Reseller</label><input type="text" id="stkReseller" class="form-control" required></div>
-            <div class="col-12 col-md-3"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="stkWA" class="form-control" required></div>
-            <div class="col-12 col-md-3">
-              <label class="form-label small fw-bold">Status Voucher</label>
-              <select id="stkStatus" class="form-select">
-                <option value="Masuk">Masuk</option>
-                <option value="Terjual">Terjual</option>
-                <option value="Error">Error</option>
-              </select>
-            </div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">WhatsApp Reseller</label><input type="text" id="stkWA" class="form-control" required></div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Petugas Lapangan</label><input type="text" id="stkPetugas" class="form-control" placeholder="Petugas yang menyerahkan" required></div>
             
             <div class="col-12"><hr class="my-1"></div>
-            <h6 class="fw-bold mb-1 text-primary">Voucher Harian & Mingguan:</h6>
+            <h6 class="fw-bold mb-1 text-primary">Data Alokasi Voucher Harian & Mingguan:</h6>
             <div class="col-6 col-md-2"><label class="small">2K</label><input type="number" id="v2k" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">3K</label><input type="number" id="v3k" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">4K</label><input type="number" id="v4k" class="form-control" value="0"></div>
@@ -472,30 +464,30 @@
             <div class="col-6 col-md-2"><label class="small">6K</label><input type="number" id="v6k" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">25K (Mggu)</label><input type="number" id="v25k" class="form-control" value="0"></div>
 
-            <h6 class="fw-bold mb-1 text-primary mt-3">Voucher Bulanan (50k - 200k):</h6>
+            <h6 class="fw-bold mb-1 text-primary mt-3">Alokasi Voucher Bulanan:</h6>
             <div class="col-6 col-md-2"><label class="small">Bulanan 1HP</label><input type="number" id="b1hp" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">Bulanan 2HP</label><input type="number" id="b2hp" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">Bulanan 3HP</label><input type="number" id="b3hp" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">Bulanan 4HP</label><input type="number" id="b4hp" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">Bulanan 5HP</label><input type="number" id="b5hp" class="form-control" value="0"></div>
 
-            <div class="col-12 mt-4"><button type="submit" class="btn btn-primary px-4 fw-bold">Simpan Record Stok</button></div>
+            <div class="col-12 mt-4"><button type="submit" class="btn btn-primary px-4 fw-bold">Simpan Data Reseller & Stok</button></div>
           </form>
         </div>
 
         <div class="card card-custom p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Tabel Rekap Stok Reseller</h5>
+            <h5 class="fw-bold mb-0">Tabel Master Reseller & Penyerahan Voucher</h5>
             <div class="btn-group">
-              <button class="btn btn-sm btn-outline-success rounded-pill px-3 me-2" onclick="exportToExcel('tblStok', 'Stok_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
-              <button class="btn btn-sm btn-outline-danger rounded-pill px-3 superadmin-only d-none" onclick="exportAndPurgeTable('reseller_stock', 'tblStok', 'Stok_Reseller')"><i class="fa-solid fa-download me-1"></i>Export & Hapus Data</button>
+              <button class="btn btn-sm btn-outline-success rounded-pill px-3 me-2" onclick="exportToExcel('tblStok', 'Master_Reseller_Stok')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+              <button class="btn btn-sm btn-outline-danger rounded-pill px-3 superadmin-only d-none" onclick="exportAndPurgeTable('reseller_stock', 'tblStok', 'Master_Reseller_Stok')"><i class="fa-solid fa-download me-1"></i>Export & Hapus Data</button>
             </div>
           </div>
           <div class="table-responsive">
             <table class="table table-bordered table-sm text-center" id="tblStok">
               <thead>
                 <tr>
-                  <th>Server</th><th>Reseller</th><th>Status</th>
+                  <th>Server</th><th>Reseller</th><th>Petugas</th>
                   <th>2k</th><th>3k</th><th>4k</th><th>5k</th><th>6k</th><th>25k</th>
                   <th>1HP</th><th>2HP</th><th>3HP</th><th>4HP</th><th>5HP</th>
                 </tr>
@@ -506,18 +498,47 @@
         </div>
       </section>
 
-      <!-- MENU 4: PENJUALAN VOUCHER -->
+      <!-- MENU 4: INPUT PENJUALAN VOUCHER PER HARI (KHUSUS RESELLER) -->
       <section id="menu-penjualan" class="page-section d-none">
-        <h3 class="fw-800 mb-4">Laporan Penjualan Voucher Reseller</h3>
+        <h3 class="fw-800 mb-4">Form Penjualan Voucher Harian oleh Reseller</h3>
+        <div class="card card-custom p-4 mb-4">
+          <h5 class="fw-bold mb-3">Input Penjualan Hari Ini</h5>
+          <form onsubmit="simpanPenjualanHarian(event)" class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-bold">Tanggal Penjualan</label>
+              <input type="date" id="pjlTanggal" class="form-control" required>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-bold">Nama Reseller / Username</label>
+              <input type="text" id="pjlReseller" class="form-control" readonly required>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-bold">Server</label>
+              <input type="text" id="pjlServer" class="form-control" placeholder="Server Anda" required>
+            </div>
+
+            <div class="col-12"><hr class="my-1"></div>
+            <h6 class="fw-bold mb-1 text-success">Jumlah Voucher Terjual Hari Ini:</h6>
+            <div class="col-6 col-md-2"><label class="small">2K</label><input type="number" id="pj2k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">3K</label><input type="number" id="pj3k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">4K</label><input type="number" id="pj4k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">5K</label><input type="number" id="pj5k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">6K</label><input type="number" id="pj6k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">25K</label><input type="number" id="pj25k" class="form-control" value="0"></div>
+
+            <div class="col-12 mt-3"><button type="submit" class="btn btn-success px-4 fw-bold"><i class="fa-solid fa-paper-plane me-2"></i>Kirim Laporan Penjualan Harian</button></div>
+          </form>
+        </div>
+
         <div class="card card-custom p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Rincian Penjualan Reseller Per Server</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblSales', 'Laporan_Penjualan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+            <h5 class="fw-bold mb-0">Riwayat Laporan Penjualan Harian Saya</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblSales', 'Laporan_Penjualan_Harian')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
           </div>
           <div class="table-responsive">
             <table class="table table-striped" id="tblSales">
               <thead>
-                <tr><th>Server</th><th>Reseller</th><th>Voucher Terjual (Qty)</th><th>Estimasi Omset</th></tr>
+                <tr><th>Tanggal</th><th>Server</th><th>Reseller</th><th>Voucher Terjual (Qty)</th><th>Estimasi Omset</th></tr>
               </thead>
               <tbody id="bodySales"></tbody>
             </table>
@@ -525,7 +546,7 @@
         </div>
       </section>
 
-      <!-- MENU 5: PROFIL PENGGUNA -->
+      <!-- MENU 5: PROFIL PENGGUNA (UPLOAD FOTO DARI GALERI) -->
       <section id="menu-profil" class="page-section d-none">
         <h3 class="fw-800 mb-4">Profil Saya</h3>
         <div class="card card-custom p-4" style="max-width: 600px;">
@@ -533,15 +554,15 @@
             <div class="text-center mb-4">
               <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-primary mb-3" style="width: 110px; height: 110px; object-fit: cover;">
               <div>
-                <label class="form-label small fw-bold">URL Foto Profil / Avatar</label>
-                <input type="url" id="prfAvatarURL" class="form-control form-control-sm text-center" placeholder="https://link-gambar.com/foto.jpg" oninput="updateAvatarPreview(this.value)">
-                <span class="text-muted small">Masukkan link gambar/foto Anda dari internet</span>
+                <label class="form-label small fw-bold d-block">Pilih Foto Profil dari Perangkat / Galeri</label>
+                <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
+                <span class="text-muted small">Format didukung: JPG, PNG, WEBP</span>
               </div>
             </div>
 
-            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNama" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap / Username</label><input type="text" id="prfNama" class="form-control" readonly></div>
             <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-            <button type="submit" class="btn btn-primary fw-bold w-100">Update Profil & Foto</button>
+            <button type="submit" class="btn btn-primary fw-bold w-100">Simpan Foto Profil & Data</button>
           </form>
         </div>
       </section>
@@ -556,7 +577,7 @@
               <form onsubmit="simpanUserMgmt(event)">
                 <div class="mb-2"><label class="form-label small fw-bold">Username</label><input type="text" id="usrName" class="form-control" autocapitalize="none" autocorrect="off" required></div>
                 <div class="mb-2"><label class="form-label small fw-bold">Password</label><input type="password" id="usrPass" class="form-control" required></div>
-                <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="usrWA" class="form-control"></div>
+                <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="usrWA" class="form-control" required></div>
                 <div class="mb-3"><label class="form-label small fw-bold">Role</label>
                   <select id="usrRole" class="form-select">
                     <option value="SUPERADMIN">SUPERADMIN</option>
@@ -596,12 +617,13 @@
   <script>
     let activeChart = null;
     let currentUser = null;
+    let base64AvatarImage = "";
 
     function toggleSidebar() {
       document.getElementById('mainSidebar').classList.toggle('show');
     }
 
-    // --- AUTHENTICATION (SESSION STORAGE LOGOUT PRIVACY) ---
+    // --- AUTHENTICATION ---
     async function handleAuthLogin(e) {
       e.preventDefault();
       const u = document.getElementById('loginUsername').value.trim().toLowerCase();
@@ -633,13 +655,23 @@
         document.getElementById('navUserAvatar').src = user.avatar_url;
       }
 
+      // Filter hak akses UI berdasarkan role
+      if (user.role === 'SUPERADMIN' || user.role === 'ADMIN') {
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('d-none'));
+      } else {
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('d-none'));
+      }
+
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
         checkDatabaseStorageUsage();
       } else {
         document.getElementById('menuUserMgmt').classList.add('d-none');
       }
-      
+
+      // Mulai scheduler pengecekan notifikasi pengingat AI Bot Jam 9 Malam
+      initWhatsappAiBotScheduler();
+
       loadDashboardData();
     }
 
@@ -657,7 +689,7 @@
 
       document.querySelectorAll('.sidebar .nav-link').forEach(link => {
         link.classList.remove('active');
-        if (link.getAttribute('onclick').includes(menuName)) link.classList.add('active');
+        if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(menuName)) link.classList.add('active');
       });
 
       if (window.innerWidth < 992) document.getElementById('mainSidebar').classList.remove('show');
@@ -672,7 +704,44 @@
       if (menuName === 'userMgmt') loadUserData();
     }
 
-    // --- CAPACITY MONITORING & WARNING (SUPERADMIN) ---
+    // --- BOT NOTIFIKASI WHATSAPP UNTUK RESELLER (Pukul 21.00) ---
+    function initWhatsappAiBotScheduler() {
+      setInterval(() => {
+        const now = new Date();
+        // Cek jika tepat pukul 21:00 malam
+        if (now.getHours() === 21 && now.getMinutes() === 0 && now.getSeconds() === 0) {
+          triggerWhatsappReminderBot();
+        }
+      }, 1000);
+    }
+
+    async function triggerWhatsappReminderBot() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      
+      // Request daftar reseller dan penjualan hari ini
+      const { data: allResellers } = await _supabase.from('users').select('*').eq('role', 'RESELLER');
+      const { data: salesToday } = await _supabase.from('daily_sales').select('nama_reseller').eq('tanggal', todayStr);
+
+      const reportedResellers = (salesToday || []).map(s => s.nama_reseller);
+      const pendingResellers = (allResellers || []).filter(r => !reportedResellers.includes(r.username));
+
+      pendingResellers.forEach(reseller => {
+        if (reseller.whatsapp) {
+          sendWhatsappReminderApi(reseller.whatsapp, reseller.username);
+        }
+      });
+    }
+
+    function sendWhatsappReminderApi(phone, username) {
+      const message = `Halo Kak ${username}, ini Bot AI RINNET PLUS.\n\nPengingat harian: Kami mendeteksi Anda belum menginputkan data penjualan voucher harian untuk hari ini. Mohon segera input melalui aplikasi RINNET PLUS sebelum penutupan pembukuan. Terima kasih!`;
+      
+      // Integrasi pengiriman pesan via Gateway API WhatsApp (Atau fallback ke WhatsApp Web API)
+      console.log(`[AI BOT WA REMINDER] Mengirim pesan pengingat ke ${phone}:`, message);
+      // Contoh trigger API Gateway WA:
+      // fetch('https://api.whatsapp-gateway.com/send', { method: 'POST', body: JSON.stringify({ phone, message }) });
+    }
+
+    // --- CAPACITY MONITORING (SUPERADMIN) ---
     async function checkDatabaseStorageUsage() {
       const { count: srvCount } = await _supabase.from('servers').select('*', { count: 'exact', head: true });
       const { count: stkCount } = await _supabase.from('reseller_stock').select('*', { count: 'exact', head: true });
@@ -680,7 +749,6 @@
 
       const totalRecords = (srvCount || 0) + (stkCount || 0) + (ksbCount || 0);
 
-      // Ambang batas simulasi peringatan kapasitas (Misal > 500 records)
       if (totalRecords > 500) {
         document.getElementById('dbCapacityAlert').classList.remove('d-none');
       }
@@ -752,32 +820,38 @@
     async function loadDashboardData() {
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: stocks } = await _supabase.from('reseller_stock').select('*');
+      const { data: sales } = await _supabase.from('daily_sales').select('*');
 
       document.getElementById('dashTotalServer').innerText = (servers || []).length;
       let totalJual = 0, totalStok = 0;
       
       (stocks || []).forEach(s => {
-        const sum = s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k + s.b1hp + s.b2hp + s.b3hp + s.b4hp + s.b5hp;
-        if(s.status === 'Terjual') totalJual += sum;
-        else totalStok += sum;
+        totalStok += (s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k + s.b1hp + s.b2hp + s.b3hp + s.b4hp + s.b5hp);
+      });
+
+      (sales || []).forEach(s => {
+        totalJual += (s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k);
       });
 
       document.getElementById('dashTotalTerjual').innerText = totalJual;
       document.getElementById('dashTotalStok').innerText = totalStok;
 
-      document.getElementById('bodyDashReseller').innerHTML = (stocks || []).map(r => `
+      document.getElementById('bodyDashReseller').innerHTML = (stocks || []).map(r => {
+        const sum = r.v2k + r.v3k + r.v4k + r.v5k + r.v6k + r.v25k + r.b1hp + r.b2hp + r.b3hp + r.b4hp + r.b5hp;
+        return `
         <tr>
           <td><b>${r.nama_server}</b></td>
           <td>${r.nama_reseller}</td>
           <td>${r.whatsapp || '-'}</td>
-          <td><span class="badge ${r.status === 'Terjual' ? 'bg-success' : 'bg-primary'}">${r.status}</span></td>
-        </tr>
-      `).join('');
+          <td>${r.petugas_lapangan || '-'}</td>
+          <td><span class="badge bg-primary">${sum} Pcs</span></td>
+        </tr>`;
+      }).join('');
 
-      document.getElementById('bodyDashSales').innerHTML = (stocks || []).filter(s => s.status === 'Terjual').map(d => {
-        const totalQty = d.v2k + d.v3k + d.v4k + d.v5k + d.v6k + d.v25k + d.b1hp + d.b2hp + d.b3hp + d.b4hp + d.b5hp;
-        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v4k*4000) + (d.v5k*5000) + (d.v6k*6000) + (d.v25k*25000) + (d.b1hp*50000);
-        return `<tr><td><b>${d.nama_server}</b></td><td>${d.nama_reseller}</td><td>${totalQty} pcs</td><td>Rp ${estOmset.toLocaleString('id-ID')}</td></tr>`;
+      document.getElementById('bodyDashSales').innerHTML = (sales || []).map(d => {
+        const totalQty = d.v2k + d.v3k + d.v4k + d.v5k + d.v6k + d.v25k;
+        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v4k*4000) + (d.v5k*5000) + (d.v6k*6000) + (d.v25k*25000);
+        return `<tr><td>${d.tanggal}</td><td><b>${d.nama_server}</b></td><td>${d.nama_reseller}</td><td>${totalQty} pcs</td><td>Rp ${estOmset.toLocaleString('id-ID')}</td></tr>`;
       }).join('');
 
       const ctx = document.getElementById('serverChart').getContext('2d');
@@ -798,7 +872,7 @@
       });
     }
 
-    // --- OTHER CRUD LOGICS ---
+    // --- INPUT SERVER LOGIC ---
     async function simpanServer(e) {
       e.preventDefault();
       await _supabase.from('servers').insert([{
@@ -816,13 +890,14 @@
       document.getElementById('bodyServer').innerHTML = (data || []).map(s => `<tr><td>${s.nama_server}</td><td>${s.pengelola}</td><td>${s.whatsapp}</td><td>${s.wilayah}</td></tr>`).join('');
     }
 
+    // --- INPUT RESELLER (ADMIN ONLY) ---
     async function simpanStokReseller(e) {
       e.preventDefault();
       await _supabase.from('reseller_stock').insert([{
         nama_server: document.getElementById('stkServer').value,
         nama_reseller: document.getElementById('stkReseller').value,
         whatsapp: document.getElementById('stkWA').value,
-        status: document.getElementById('stkStatus').value,
+        petugas_lapangan: document.getElementById('stkPetugas').value,
         v2k: parseInt(document.getElementById('v2k').value || 0),
         v3k: parseInt(document.getElementById('v3k').value || 0),
         v4k: parseInt(document.getElementById('v4k').value || 0),
@@ -835,7 +910,7 @@
         b4hp: parseInt(document.getElementById('b4hp').value || 0),
         b5hp: parseInt(document.getElementById('b5hp').value || 0)
       }]);
-      alert('Data Stok Berhasil Disimpan!');
+      alert('Data Reseller & Penyerahan Voucher Berhasil Disimpan!');
       loadStokData();
     }
 
@@ -843,53 +918,92 @@
       const { data } = await _supabase.from('reseller_stock').select('*');
       document.getElementById('bodyStok').innerHTML = (data || []).map(d => `
         <tr>
-          <td>${d.nama_server}</td><td>${d.nama_reseller}</td><td><span class="badge bg-primary">${d.status}</span></td>
+          <td>${d.nama_server}</td><td>${d.nama_reseller}</td><td><span class="badge bg-secondary">${d.petugas_lapangan || '-'}</span></td>
           <td>${d.v2k}</td><td>${d.v3k}</td><td>${d.v4k}</td><td>${d.v5k}</td><td>${d.v6k}</td><td>${d.v25k}</td>
           <td>${d.b1hp}</td><td>${d.b2hp}</td><td>${d.b3hp}</td><td>${d.b4hp}</td><td>${d.b5hp}</td>
         </tr>
       `).join('');
     }
 
+    // --- INPUT PENJUALAN HARIAN (RESELLER) ---
+    async function simpanPenjualanHarian(e) {
+      e.preventDefault();
+      await _supabase.from('daily_sales').insert([{
+        tanggal: document.getElementById('pjlTanggal').value,
+        nama_reseller: document.getElementById('pjlReseller').value,
+        nama_server: document.getElementById('pjlServer').value,
+        v2k: parseInt(document.getElementById('pj2k').value || 0),
+        v3k: parseInt(document.getElementById('pj3k').value || 0),
+        v4k: parseInt(document.getElementById('pj4k').value || 0),
+        v5k: parseInt(document.getElementById('pj5k').value || 0),
+        v6k: parseInt(document.getElementById('pj6k').value || 0),
+        v25k: parseInt(document.getElementById('pj25k').value || 0)
+      }]);
+      alert('Laporan Penjualan Harian Berhasil Dikirim!');
+      loadPenjualanData();
+    }
+
     async function loadPenjualanData() {
-      const { data } = await _supabase.from('reseller_stock').select('*').eq('status', 'Terjual');
+      if(!currentUser) return;
+      document.getElementById('pjlTanggal').value = new Date().toISOString().split('T')[0];
+      document.getElementById('pjlReseller').value = currentUser.username;
+
+      let query = _supabase.from('daily_sales').select('*');
+      if (currentUser.role === 'RESELLER') {
+        query = query.eq('nama_reseller', currentUser.username);
+      }
+
+      const { data } = await query;
       document.getElementById('bodySales').innerHTML = (data || []).map(d => {
-        const totalQty = d.v2k + d.v3k + d.v4k + d.v5k + d.v6k + d.v25k + d.b1hp + d.b2hp + d.b3hp + d.b4hp + d.b5hp;
-        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v4k*4000) + (d.v5k*5000) + (d.v6k*6000) + (d.v25k*25000) + (d.b1hp*50000);
-        return `<tr><td>${d.nama_server}</td><td>${d.nama_reseller}</td><td>${totalQty} pcs</td><td>Rp ${estOmset.toLocaleString('id-ID')}</td></tr>`;
+        const totalQty = d.v2k + d.v3k + d.v4k + d.v5k + d.v6k + d.v25k;
+        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v4k*4000) + (d.v5k*5000) + (d.v6k*6000) + (d.v25k*25000);
+        return `<tr><td>${d.tanggal}</td><td>${d.nama_server}</td><td>${d.nama_reseller}</td><td>${totalQty} pcs</td><td>Rp ${estOmset.toLocaleString('id-ID')}</td></tr>`;
       }).join('');
+    }
+
+    // --- PROFIL & UPLOAD FOTO DARI GALERI ---
+    function previewSelectedImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          base64AvatarImage = e.target.result;
+          document.getElementById('prfAvatarPreview').src = base64AvatarImage;
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
     function loadProfilData() {
       if (!currentUser) return;
       document.getElementById('prfNama').value = currentUser.username || '';
       document.getElementById('prfWA').value = currentUser.whatsapp || '';
-      document.getElementById('prfAvatarURL').value = currentUser.avatar_url || '';
-      if(currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
-    }
-
-    function updateAvatarPreview(url) {
-      if(url) document.getElementById('prfAvatarPreview').src = url;
+      if (currentUser.avatar_url) {
+        document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
+      }
     }
 
     async function simpanProfil(e) {
       e.preventDefault();
-      const newAvatar = document.getElementById('prfAvatarURL').value;
       const newWA = document.getElementById('prfWA').value;
+      const updatePayload = { whatsapp: newWA };
 
-      const { error } = await _supabase.from('users').update({
-        avatar_url: newAvatar,
-        whatsapp: newWA
-      }).eq('id', currentUser.id);
+      if (base64AvatarImage) {
+        updatePayload.avatar_url = base64AvatarImage;
+      }
+
+      const { error } = await _supabase.from('users').update(updatePayload).eq('id', currentUser.id);
 
       if(!error) {
-        currentUser.avatar_url = newAvatar;
+        if (base64AvatarImage) currentUser.avatar_url = base64AvatarImage;
         currentUser.whatsapp = newWA;
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
-        document.getElementById('navUserAvatar').src = newAvatar;
-        alert('Profil & Foto berhasil diperbarui!');
+        if (currentUser.avatar_url) document.getElementById('navUserAvatar').src = currentUser.avatar_url;
+        alert('Foto Profil & Data berhasil disimpan!');
       }
     }
 
+    // --- USER MANAGEMENT ---
     async function simpanUserMgmt(e) {
       e.preventDefault();
       await _supabase.from('users').insert([{
@@ -909,7 +1023,7 @@
       `).join('');
     }
 
-    // --- EXPORT & PURGE LOGIC (SUPERADMIN FITUR HAPUS TERPISAH) ---
+    // --- EXPORT & PURGE LOGIC ---
     function exportToExcel(tableID, filename) {
       const table = document.getElementById(tableID);
       const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
@@ -930,7 +1044,7 @@
       }
     }
 
-    // --- CEK SESSION LOGIN (NON-AUTO LOGIN SAAT TAB DITUTUP) ---
+    // --- INITIAL SESSION CHECK ---
     document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('rinnet_user');
       const activeSession = sessionStorage.getItem('rinnet_session_user');
