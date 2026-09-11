@@ -49,6 +49,12 @@
       margin-bottom: 1rem;
     }
 
+    .brand-logo-wrap img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
     /* --- LOGIN SCREEN --- */
     .login-container {
       min-height: 100vh;
@@ -185,9 +191,9 @@
   <!-- ================= PAGE 1: LOGIN ================= -->
   <div id="pageLogin" class="login-container">
     <div class="login-card text-center">
-      <!-- Logo RINNET PLUS -->
+      <!-- Logo RINNET PLUS Fixed -->
       <div class="brand-logo-wrap">
-        <i class="fa-solid fa-cloud-bolt fs-2"></i>
+        <i class="fa-solid fa-bolt-lightning fs-2 text-white"></i>
       </div>
       <h3 class="fw-800 mb-0" style="color: var(--primary); letter-spacing: -0.5px;">RINNET PLUS</h3>
       <p class="text-muted small mb-4 fw-600">Internal Enterprise Management System</p>
@@ -216,7 +222,7 @@
     <!-- Header Mobile Toggle -->
     <div class="mobile-header d-lg-none">
       <div class="fw-bold fs-5 d-flex align-items-center gap-2">
-        <i class="fa-solid fa-cloud-bolt text-primary"></i> RINNET+
+        <i class="fa-solid fa-bolt-lightning text-primary"></i> RINNET+
       </div>
       <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
     </div>
@@ -225,7 +231,7 @@
     <nav class="sidebar" id="mainSidebar">
       <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
         <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-          <div class="bg-primary rounded-3 p-2 text-white d-inline-flex"><i class="fa-solid fa-cloud-bolt"></i></div>
+          <div class="bg-primary rounded-3 p-2 text-white d-inline-flex"><i class="fa-solid fa-bolt-lightning"></i></div>
           <span class="fw-800 fs-5 text-white tracking-wide">RINNET+</span>
         </div>
         <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
@@ -240,6 +246,7 @@
         <a class="nav-link" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
         <a class="nav-link" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form & Rekap Kasbon</a>
         <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
+        <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('monitoring')"><i class="fa-solid fa-clock-rotate-left text-info"></i>Monitoring Aktivitas</a>
         <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear"></i>Manajemen User</a>
         <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('sysPerf')"><i class="fa-solid fa-microchip text-warning"></i>Monitoring System</a>
         <a class="nav-link text-danger mt-3" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</a>
@@ -252,6 +259,13 @@
 
     <!-- Main Content Area -->
     <main class="content-area">
+
+      <!-- ALERT NOTIFIKASI LOGIN SUPERADMIN -->
+      <div id="superadminLoginAlert" class="alert alert-warning alert-dismissible fade show d-none mb-4 shadow-sm" role="alert">
+        <h6 class="alert-heading fw-bold mb-1"><i class="fa-solid fa-shield-halved me-2"></i>Notifikasi Akses / Login Masuk</h6>
+        <div id="superadminLoginAlertText" class="small"></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
 
       <!-- MENU 1: DASHBOARD -->
       <section id="menu-dashboard" class="page-section">
@@ -545,7 +559,53 @@
         </div>
       </section>
 
-      <!-- MENU 7: MANAJEMEN USER (SUPERADMIN ONLY) -->
+      <!-- MENU 7: MONITORING AKTIVITAS HARI INI (SUPERADMIN / ADMIN) -->
+      <section id="menu-monitoring" class="page-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-800 mb-1">Monitoring Pekerjaan & Akses Harian</h3>
+            <p class="text-muted small mb-0">Pantau seluruh rekapan input data, perubahan, dan log perangkat yang masuk ke sistem.</p>
+          </div>
+          <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMonitoring', 'Monitoring_Aktivitas_Pekerjaan')">
+            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+          </button>
+        </div>
+
+        <div class="card card-custom p-4">
+          <div class="row g-2 mb-3 bg-light p-3 rounded-3">
+            <div class="col-12 col-sm-4">
+              <label class="small fw-bold">Tanggal Aktivitas</label>
+              <input type="date" id="fltLogDate" class="form-control form-control-sm" onchange="loadMonitoringData()">
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="small fw-bold">Tipe Aktivitas</label>
+              <select id="fltLogType" class="form-select form-select-sm" onchange="loadMonitoringData()">
+                <option value="">-- Semua Aktivitas --</option>
+                <option value="LOGIN">Akses Login System</option>
+                <option value="INPUT_DATA">Input / Modifikasi Data</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover" id="tblMonitoring">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Pengguna (User)</th>
+                  <th>Kategori</th>
+                  <th>Detail Aktivitas / Modul</th>
+                  <th>Perangkat (Device)</th>
+                  <th>Titik Koordinat GPS</th>
+                </tr>
+              </thead>
+              <tbody id="bodyMonitoring"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- MENU 8: MANAJEMEN USER (SUPERADMIN ONLY) -->
       <section id="menu-userMgmt" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen User & Hak Akses Intern</h3>
         <div class="row g-4">
@@ -586,7 +646,7 @@
         </div>
       </section>
 
-      <!-- MENU 8: MONITORING SYSTEM (SUPERADMIN ONLY) -->
+      <!-- MENU 9: MONITORING SYSTEM (SUPERADMIN ONLY) -->
       <section id="menu-sysPerf" class="page-section d-none">
         <h3 class="fw-800 mb-1">System Health & Hardware Performance</h3>
         <p class="text-muted small mb-4">Monitoring integrasi platform Supabase, GitHub Deployment API, Server & Engine Metrics secara realtime.</p>
@@ -668,9 +728,46 @@
     let activeChart = null;
     let currentUser = null;
     let base64AvatarImage = "";
+    let userLocation = "Tidak diizinkan/Tidak tersedia";
 
     function toggleSidebar() {
       document.getElementById('mainSidebar').classList.toggle('show');
+    }
+
+    // Capture User Geolocation
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLocation = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+        },
+        () => {
+          userLocation = "Akses Lokasi Ditolak";
+        }
+      );
+    }
+
+    // Helper untuk Logging Pekerjaan / Aktivitas
+    async function logActivity(tipe, detail) {
+      if (!currentUser) return;
+      const device = navigator.userAgent;
+      const payload = {
+        waktu: new Date().toISOString(),
+        username: currentUser.username,
+        role: currentUser.role,
+        tipe: tipe,
+        detail: detail,
+        device: device,
+        koordinat: userLocation
+      };
+
+      try {
+        await _supabase.from('activity_logs').insert([payload]);
+      } catch (err) {
+        // Fallback local memory log jika tabel belum ada
+        let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+        logs.unshift(payload);
+        localStorage.setItem('rinnet_local_logs', JSON.stringify(logs));
+      }
     }
 
     // --- AUTHENTICATION ---
@@ -687,7 +784,12 @@
       }
 
       if (user.password_hash === p) {
+        currentUser = user;
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
+        
+        // Log Aktivitas Login
+        await logActivity('LOGIN', `User ${user.username} (${user.role}) berhasil masuk ke sistem.`);
+        
         initAppView(user);
       } else {
         alert('Password salah!');
@@ -705,9 +807,35 @@
 
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
+        checkSuperadminNotif();
       }
 
       loadDashboardData();
+    }
+
+    async function checkSuperadminNotif() {
+      // Menampilkan notifikasi login user/device terbaru
+      let recentLog = null;
+      try {
+        const { data } = await _supabase.from('activity_logs')
+          .select('*')
+          .eq('tipe', 'LOGIN')
+          .order('waktu', { ascending: false })
+          .limit(1);
+        if (data && data.length > 0) recentLog = data[0];
+      } catch (e) {
+        let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+        recentLog = logs.find(l => l.tipe === 'LOGIN');
+      }
+
+      if (recentLog) {
+        const alertBox = document.getElementById('superadminLoginAlert');
+        const alertText = document.getElementById('superadminLoginAlertText');
+        alertText.innerHTML = `<strong>${recentLog.username}</strong> (${recentLog.role}) baru saja mengakses sistem.<br>` +
+          `• <strong>Device:</strong> ${recentLog.device || recentLog.perangkat}<br>` +
+          `• <strong>Koordinat:</strong> ${recentLog.koordinat || 'N/A'}`;
+        alertBox.classList.remove('d-none');
+      }
     }
 
     function handleLogout() {
@@ -717,7 +845,7 @@
 
     // --- NAVIGATION ---
     function switchMenu(menuName) {
-      const sections = ['dashboard', 'karyawan', 'kasbon', 'server', 'reseller', 'profil', 'userMgmt', 'sysPerf'];
+      const sections = ['dashboard', 'karyawan', 'kasbon', 'server', 'reseller', 'profil', 'monitoring', 'userMgmt', 'sysPerf'];
       sections.forEach(s => {
         const el = document.getElementById(`menu-${s}`);
         if(el) el.classList.add('d-none');
@@ -739,6 +867,7 @@
       if (menuName === 'server') loadServerData();
       if (menuName === 'reseller') loadStokData();
       if (menuName === 'profil') loadProfilData();
+      if (menuName === 'monitoring') loadMonitoringData();
       if (menuName === 'userMgmt') loadUserData();
     }
 
@@ -796,8 +925,10 @@
 
       if(id) {
         await _supabase.from('servers').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update server: ${payload.nama_server}`);
       } else {
         await _supabase.from('servers').insert([payload]);
+        await logActivity('INPUT_DATA', `Tambah server baru: ${payload.nama_server}`);
       }
 
       alert('Data Server Berhasil Disimpan!');
@@ -816,7 +947,7 @@
           <td>${s.wilayah}</td>
           <td>
             <button class="btn btn-sm btn-warning text-white me-1" onclick="editServer('${s.id}', '${s.nama_server}', '${s.pengelola}', '${s.whatsapp}', '${s.wilayah}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('servers', '${s.id}', loadServerData)"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('servers', '${s.id}', loadServerData, 'Server ${s.nama_server}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`).join('');
     }
@@ -853,8 +984,10 @@
 
       if(id) {
         await _supabase.from('reseller_stock').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update stok voucher reseller: ${payload.nama_reseller}`);
       } else {
         await _supabase.from('reseller_stock').insert([payload]);
+        await logActivity('INPUT_DATA', `Penyerahan stok voucher ke: ${payload.nama_reseller}`);
       }
 
       alert('Penyerahan Stok Berhasil Disimpan!');
@@ -880,7 +1013,7 @@
           <td>${d.v2k}</td><td>${d.v3k}</td><td>${d.v4k}</td><td>${d.v5k}</td><td>${d.v6k}</td><td>${d.v25k}</td>
           <td>${d.b1hp}</td><td>${d.b2hp}</td><td>${d.b3hp}</td><td>${d.b4hp}</td><td>${d.b5hp}</td>
           <td>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('reseller_stock', '${d.id}', loadStokData)"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('reseller_stock', '${d.id}', loadStokData, 'Stok Reseller ${d.nama_reseller}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`).join('');
     }
@@ -897,8 +1030,10 @@
 
       if(id) {
         await _supabase.from('employees').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update data karyawan: ${payload.nama_karyawan}`);
       } else {
         await _supabase.from('employees').insert([payload]);
+        await logActivity('INPUT_DATA', `Input data karyawan baru: ${payload.nama_karyawan}`);
       }
 
       alert('Data Karyawan Berhasil Disimpan!');
@@ -916,7 +1051,7 @@
           <td>${e.whatsapp}</td>
           <td>
             <button class="btn btn-sm btn-warning text-white me-1" onclick="editKaryawan('${e.id}', '${e.employee_id}', '${e.nama_karyawan}', '${e.whatsapp}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('employees', '${e.id}', loadKaryawanData)"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('employees', '${e.id}', loadKaryawanData, 'Karyawan ${e.nama_karyawan}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`).join('');
     }
@@ -942,8 +1077,10 @@
 
       if(id) {
         await _supabase.from('kasbon').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update kasbon karyawan: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
       } else {
         await _supabase.from('kasbon').insert([payload]);
+        await logActivity('INPUT_DATA', `Input kasbon baru: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
       }
 
       alert('Kasbon Berhasil Dicatat!');
@@ -1004,7 +1141,7 @@
           <td><span class="badge bg-secondary">${k.sumber_dana}</span></td>
           <td>${k.keterangan}</td>
           <td>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData)"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Kasbon ${k.nama_karyawan}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`).join('');
     }
@@ -1044,8 +1181,48 @@
       if(!error) {
         Object.assign(currentUser, updatePayload);
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
+        await logActivity('INPUT_DATA', `Memperbarui profil diri`);
         alert('Profil berhasil diperbarui!');
       }
+    }
+
+    // --- MONITORING PEKERJAAN & HARIAN ---
+    async function loadMonitoringData() {
+      let logs = [];
+      try {
+        const { data } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false });
+        logs = data || [];
+      } catch (err) {
+        logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+      }
+
+      const dateFlt = document.getElementById('fltLogDate').value;
+      const typeFlt = document.getElementById('fltLogType').value;
+
+      let filtered = logs;
+      if (dateFlt) {
+        filtered = filtered.filter(l => (l.waktu || '').startsWith(dateFlt));
+      }
+      if (typeFlt) {
+        filtered = filtered.filter(l => l.tipe === typeFlt);
+      }
+
+      document.getElementById('bodyMonitoring').innerHTML = filtered.map(l => {
+        const d = new Date(l.waktu);
+        const formatWaktu = isNaN(d) ? l.waktu : d.toLocaleString('id-ID');
+        const badgeColor = l.tipe === 'LOGIN' ? 'bg-info' : 'bg-success';
+
+        return `
+          <tr>
+            <td><small class="text-muted fw-bold">${formatWaktu}</small></td>
+            <td><b>${l.username}</b> <span class="badge bg-light text-dark">${l.role}</span></td>
+            <td><span class="badge ${badgeColor}">${l.tipe}</span></td>
+            <td>${l.detail}</td>
+            <td><small class="text-truncate d-inline-block" style="max-width: 180px;" title="${l.device}">${l.device || '-'}</small></td>
+            <td><span class="badge bg-secondary">${l.koordinat || 'Tidak diketahui'}</span></td>
+          </tr>
+        `;
+      }).join('');
     }
 
     // --- USER MANAGEMENT (SUPERADMIN) ---
@@ -1066,8 +1243,10 @@
 
       if (id) {
         await _supabase.from('users').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update user admin: ${payload.username}`);
       } else {
         await _supabase.from('users').insert([payload]);
+        await logActivity('INPUT_DATA', `Tambah user admin baru: ${payload.username}`);
       }
 
       alert('Akun User Berhasil Disimpan!');
@@ -1087,7 +1266,7 @@
           <td><span class="badge bg-primary">${u.role}</span></td>
           <td>
             <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap || ''}', '${u.email || ''}', '${u.whatsapp || ''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData)"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`).join('');
     }
@@ -1102,10 +1281,11 @@
     }
 
     // --- GENERAL DELETE HELPER ---
-    async function hapusRecord(tableName, id, reloadFn) {
+    async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
       if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
         const { error } = await _supabase.from(tableName).delete().eq('id', id);
         if (!error) {
+          await logActivity('INPUT_DATA', `Menghapus record: ${itemDesc}`);
           alert('Data berhasil dihapus!');
           reloadFn();
         } else {
