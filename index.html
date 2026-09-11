@@ -1,1525 +1,1528 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>RINNET+ - Enterprise Management System</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RINNET+ - Enterprise Management System</title>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.net/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-<!-- Fonts & Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0f172a;
+      --primary-accent: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --bg-body: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.net/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-<script src="https://cdnjs.cloudflare.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    body { 
+      background-color: var(--bg-body); 
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+    }
 
-<style>
-:root {
---primary: #0f172a;
---primary-accent: #1e293b;
---accent: #2563eb;
---accent-hover: #1d4ed8;
---bg-body: #f8fafc;
---card-bg: #ffffff;
---text-main: #0f172a;
---text-muted: #64748b;
-}
+    /* --- BRANDING RINNET+ (TEKS TYPOGRAPHY MODERN) --- */
+    .brand-text-logo {
+      position: relative;
+      display: inline-block;
+      font-weight: 900;
+      font-size: 2.2rem;
+      letter-spacing: -1px;
+      color: #0f172a;
+      line-height: 1;
+      padding-right: 18px;
+    }
 
-body { 
-  background-color: var(--bg-body); 
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  color: var(--text-main);
-}
+    .brand-text-logo .plus-sign {
+      position: absolute;
+      top: -2px;
+      right: 0;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #2563eb;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-/* --- BRANDING RINNET+ (TEKS TYPOGRAPHY MODERN) --- */
-.brand-text-logo {
-  position: relative;
-  display: inline-block;
-  font-weight: 900;
-  font-size: 2.2rem;
-  letter-spacing: -1px;
-  color: #0f172a;
-  line-height: 1;
-  padding-right: 18px;
-}
+    .brand-sidebar-logo {
+      position: relative;
+      display: inline-block;
+      font-weight: 900;
+      font-size: 1.4rem;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      line-height: 1;
+      padding-right: 14px;
+    }
 
-.brand-text-logo .plus-sign {
-  position: absolute;
-  top: -2px;
-  right: 0;
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: #2563eb;
-  background: linear-gradient(135deg, #2563eb, #38bdf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+    .brand-sidebar-logo .plus-sign {
+      position: absolute;
+      top: -2px;
+      right: 0;
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #38bdf8;
+    }
 
-.brand-sidebar-logo {
-  position: relative;
-  display: inline-block;
-  font-weight: 900;
-  font-size: 1.4rem;
-  letter-spacing: -0.5px;
-  color: #ffffff;
-  line-height: 1;
-  padding-right: 14px;
-}
+    /* --- LOGIN SCREEN --- */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top left, #1e293b, #0f172a);
+      padding: 1.5rem;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 2.5rem 2rem;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    }
 
-.brand-sidebar-logo .plus-sign {
-  position: absolute;
-  top: -2px;
-  right: 0;
-  font-size: 0.9rem;
-  font-weight: 900;
-  color: #38bdf8;
-}
+    /* --- SIDEBAR --- */
+    .sidebar {
+      width: 270px;
+      height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      background: var(--primary);
+      color: #fff;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0;
+    }
+    .sidebar .nav-link {
+      color: #94a3b8;
+      padding: 0.8rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 12px;
+      margin: 0.2rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+      color: #fff;
+      background: var(--accent);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
 
-/* --- LOGIN SCREEN --- */
-.login-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at top left, #1e293b, #0f172a);
-  padding: 1.5rem;
-}
-.login-card {
-  width: 100%;
-  max-width: 420px;
-  padding: 2.5rem 2rem;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-}
+    .profile-avatar-nav {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent);
+    }
 
-/* --- SIDEBAR --- */
-.sidebar {
-  width: 270px;
-  height: 100vh;
-  position: fixed;
-  top: 0; left: 0;
-  background: var(--primary);
-  color: #fff;
-  z-index: 1000;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-}
-.sidebar-menu {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 0;
-}
-.sidebar .nav-link {
-  color: #94a3b8;
-  padding: 0.8rem 1.25rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border-radius: 12px;
-  margin: 0.2rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.2s ease;
-}
-.sidebar .nav-link:hover, .sidebar .nav-link.active {
-  color: #fff;
-  background: var(--accent);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
+    /* --- CONTENT AREA --- */
+    .content-area {
+      margin-left: 270px;
+      padding: 2rem;
+      min-height: 100vh;
+    }
 
-.profile-avatar-nav {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--accent);
-}
+    .page-section {
+      animation: fadeInUp 0.3s ease forwards;
+    }
 
-/* --- CONTENT AREA --- */
-.content-area {
-  margin-left: 270px;
-  padding: 2rem;
-  min-height: 100vh;
-}
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-.page-section {
-  animation: fadeInUp 0.3s ease forwards;
-}
+    .card-custom {
+      border: none;
+      border-radius: 16px;
+      background: var(--card-bg);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    }
+    
+    .chart-container-scroll {
+      position: relative;
+      width: 100%;
+      overflow-x: auto;
+    }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+    .table-responsive {
+      border-radius: 12px;
+    }
+    .table {
+      vertical-align: middle;
+      font-size: 0.875rem;
+    }
+    .table thead th {
+      background-color: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.725rem;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e2e8f0;
+    }
 
-.card-custom {
-  border: none;
-  border-radius: 16px;
-  background: var(--card-bg);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
-}
+    .status-badge {
+      padding: 0.35em 0.75em;
+      border-radius: 50rem;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
 
-.chart-container-scroll {
-  position: relative;
-  width: 100%;
-  overflow-x: auto;
-}
+    .app-credit {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-align: center;
+      padding: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
 
-.table-responsive {
-  border-radius: 12px;
-}
-.table {
-  vertical-align: middle;
-  font-size: 0.875rem;
-}
-.table thead th {
-  background-color: #f8fafc;
-  color: #475569;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.725rem;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.status-badge {
-  padding: 0.35em 0.75em;
-  border-radius: 50rem;
-  font-weight: 700;
-  font-size: 0.75rem;
-}
-
-.app-credit {
-  font-size: 0.75rem;
-  color: #64748b;
-  text-align: center;
-  padding: 1rem;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-@media (max-width: 991px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.show { transform: translateX(0); }
-  .content-area { margin-left: 0; padding: 1.25rem; padding-top: 5rem; }
-  .mobile-header {
-    position: fixed; top: 0; left: 0; right: 0; height: 60px;
-    background: var(--primary); color: #fff; z-index: 999;
-    display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem;
-  }
-}
-</style>
+    @media (max-width: 991px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .content-area { margin-left: 0; padding: 1.25rem; padding-top: 5rem; }
+      .mobile-header {
+        position: fixed; top: 0; left: 0; right: 0; height: 60px;
+        background: var(--primary); color: #fff; z-index: 999;
+        display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ================= PAGE 1: LOGIN ================= -->
-<div id="pageLogin" class="login-container">
-  <div class="login-card text-center">
-    <!-- Logo Text RINNET(+) Tanpa Icon/Bingkai -->
-    <div class="mb-2">
-      <span class="brand-text-logo">
-        RINNET
-        <span class="plus-sign">+</span>
-      </span>
-    </div>
-    <p class="text-muted small mb-4 fw-semibold">Internal Enterprise Management System</p>
-
-    <form onsubmit="handleAuthLogin(event)">
-      <div class="text-start mb-3">
-        <label class="form-label small fw-bold text-secondary">USERNAME</label>
-        <input type="text" id="loginUsername" class="form-control form-control-lg fs-6" placeholder="Masukkan username" required>
+  <!-- ================= PAGE 1: LOGIN ================= -->
+  <div id="pageLogin" class="login-container">
+    <div class="login-card text-center">
+      <!-- Logo Text RINNET(+) Tanpa Icon/Bingkai -->
+      <div class="mb-2">
+        <span class="brand-text-logo">
+          RINNET
+          <span class="plus-sign">+</span>
+        </span>
       </div>
-      <div class="text-start mb-4">
-        <label class="form-label small fw-bold text-secondary">PASSWORD</label>
-        <input type="password" id="loginPassword" class="form-control form-control-lg fs-6" placeholder="••••••••" required>
-      </div>
-      <button type="submit" id="btnLogin" class="btn btn-primary btn-lg w-100 fw-bold fs-6 shadow-sm">MASUK SISTEM</button>
-    </form>
-
-    <div class="mt-4 pt-3 border-top text-muted small">
-      Sistem Dikembangkan Oleh <br><strong class="text-dark">Lean Naddhito</strong>
-    </div>
-  </div>
-</div>
-
-<!-- Header Mobile Toggle -->
-<div class="mobile-header d-lg-none">
-  <div class="fw-bold fs-5 d-flex align-items-center gap-2">
-    <span class="brand-sidebar-logo">
-      RINNET
-      <span class="plus-sign">+</span>
-    </span>
-  </div>
-  <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
-</div>
-
-<!-- Sidebar Navigation -->
-<nav class="sidebar" id="mainSidebar">
-  <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
-    <div class="d-flex align-items-center justify-content-center mb-2">
-      <span class="brand-sidebar-logo">
-        RINNET
-        <span class="plus-sign">+</span>
-      </span>
-    </div>
-    <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
-    <h6 class="fw-800 text-white mb-0" id="navUserName">User</h6>
-    <span class="badge bg-primary bg-opacity-25 text-primary mt-1 px-3 py-1 rounded-pill" id="userRoleBadge">Role: -</span>
-  </div>
-
-  <div class="sidebar-menu">
-    <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
-    <a class="nav-link admin-only" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
-    <a class="nav-link admin-only" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Pendaftaran & Stok Voucher</a>
-    <a class="nav-link admin-only" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
-    <a class="nav-link admin-only" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form & Rekap Kasbon</a>
-    <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
-    <a class="nav-link manager-sa-only d-none" href="#" onclick="switchMenu('monitoring')"><i class="fa-solid fa-clock-rotate-left text-info"></i>Monitoring Aktivitas</a>
-    <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear"></i>Manajemen User</a>
-    <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('sysPerf')"><i class="fa-solid fa-microchip text-warning"></i>Monitoring System</a>
-    <a class="nav-link text-danger mt-3" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</a>
-  </div>
-
-  <div class="app-credit">
-    Dibuat oleh <strong>Lean Naddhito</strong>
-  </div>
-</nav>
-
-<!-- Main Content Area -->
-<main class="content-area">
-
-  <!-- ALERT NOTIFIKASI LOGIN REALTIME OTOMATIS HILANG TEPAT 5 DETIK -->
-  <div id="userLoginAlert" class="alert alert-info alert-dismissible fade show d-none mb-4 shadow-sm border-start border-4 border-info" role="alert">
-    <div class="d-flex align-items-center justify-content-between">
-      <div>
-        <h6 class="alert-heading fw-bold mb-1"><i class="fa-solid fa-right-to-bracket me-2"></i>Notifikasi Login Realtime Masuk</h6>
-        <div id="userLoginAlertText" class="small"></div>
-      </div>
-      <button type="button" class="btn-close" onclick="closeLoginAlert()" aria-label="Close"></button>
-    </div>
-  </div>
-
-  <!-- MENU 1: DASHBOARD -->
-  <section id="menu-dashboard" class="page-section">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h3 class="fw-800 mb-1">Dashboard Management</h3>
-        <p class="text-muted small mb-0">Ringkasan statistik internal server, kasbon, dan alokasi voucher.</p>
-      </div>
-    </div>
-
-    <div class="row g-3 mb-4">
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card card-custom p-3 bg-primary text-white">
-          <span class="text-white-50 small fw-bold">TOTAL SERVER</span>
-          <h2 id="dashTotalServer" class="fw-800 my-1">0</h2>
+      <p class="text-muted small mb-4 fw-600">Internal Enterprise Management System</p>
+      
+      <form onsubmit="handleAuthLogin(event)">
+        <div class="text-start mb-3">
+          <label class="form-label small fw-bold text-secondary">USERNAME</label>
+          <input type="text" id="loginUsername" class="form-control form-control-lg fs-6" placeholder="Masukkan username" required>
         </div>
-      </div>
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card card-custom p-3 bg-dark text-white">
-          <span class="text-white-50 small fw-bold">TOTAL KARYAWAN</span>
-          <h2 id="dashTotalKaryawan" class="fw-800 my-1">0</h2>
+        <div class="text-start mb-4">
+          <label class="form-label small fw-bold text-secondary">PASSWORD</label>
+          <input type="password" id="loginPassword" class="form-control form-control-lg fs-6" placeholder="••••••••" required>
         </div>
-      </div>
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card card-custom p-3 bg-danger text-white">
-          <span class="text-white-50 small fw-bold">TOTAL KASBON BULAN INI</span>
-          <h2 id="dashTotalKasbon" class="fw-800 my-1">Rp 0</h2>
-        </div>
-      </div>
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card card-custom p-3 bg-success text-white">
-          <span class="text-white-50 small fw-bold">TOTAL VOUCHER TERSEDIA</span>
-          <h2 id="dashTotalStok" class="fw-800 my-1">0</h2>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATISTIK SKALABEL UNTUK 80 - 100+ DATA SERVER -->
-    <div class="card card-custom p-4 mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Statistik Distribusi Server Cloud</h5>
-        <small class="text-muted">Mendukung hingga 100+ Data Server</small>
-      </div>
-      <div class="chart-container-scroll">
-        <div id="chartWrapper" style="min-width: 100%; height: 320px;">
-          <canvas id="serverChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MENU 2: INPUT SERVER -->
-  <section id="menu-server" class="page-section d-none">
-    <h3 class="fw-800 mb-4">Manajemen Server Cloud</h3>
-    <div class="row g-4">
-      <div class="col-12 col-lg-4">
-        <div class="card card-custom p-4">
-          <h5 class="fw-bold mb-3">Input Server</h5>
-          <form onsubmit="simpanServer(event)">
-            <input type="hidden" id="srvId">
-            <div class="mb-2"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="srvNama" class="form-control" required></div>
-            <div class="mb-2"><label class="form-label small fw-bold">Pengelola</label><input type="text" id="srvPengelola" class="form-control" required></div>
-            <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="srvWA" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Wilayah / Cluster</label><input type="text" id="srvWilayah" class="form-control" required></div>
-            <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Server</button>
-          </form>
-        </div>
-      </div>
-      <div class="col-12 col-lg-8">
-        <div class="card card-custom p-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Daftar Server Cloud</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblServer', 'Data_Server_RINNET')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-hover" id="tblServer">
-              <thead><tr><th>Server</th><th>Pengelola</th><th>WhatsApp</th><th>Wilayah</th><th>Aksi</th></tr></thead>
-              <tbody id="bodyServer"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MENU 3: RESELLER & STOK VOUCHER -->
-  <section id="menu-reseller" class="page-section d-none">
-    <h3 class="fw-800 mb-4">Pendaftaran Reseller & Penyerahan Stok Voucher</h3>
-    <div class="card card-custom p-4 mb-4">
-      <h5 class="fw-bold mb-3">Form Input Penyerahan Voucher</h5>
-      <form onsubmit="simpanStokReseller(event)" class="row g-3">
-        <input type="hidden" id="stkId">
-        <div class="col-12 col-md-3"><label class="form-label small fw-bold">Tanggal</label><input type="date" id="stkTanggal" class="form-control" required></div>
-        <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="stkServer" class="form-control" required></div>
-        <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Reseller</label><input type="text" id="stkReseller" class="form-control" required></div>
-        <div class="col-12 col-md-3"><label class="form-label small fw-bold">Petugas Lapangan</label><input type="text" id="stkPetugas" class="form-control" required></div>
-
-        <div class="col-12"><hr class="my-1"></div>
-        <h6 class="fw-bold mb-1 text-primary">Stok Voucher Harian & Mingguan:</h6>
-        <div class="col-4 col-md-2"><label class="small">2K</label><input type="number" id="v2k" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">3K</label><input type="number" id="v3k" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">4K</label><input type="number" id="v4k" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">5K</label><input type="number" id="v5k" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">6K</label><input type="number" id="v6k" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">25K</label><input type="number" id="v25k" class="form-control" value="0"></div>
-
-        <h6 class="fw-bold mb-1 text-primary mt-3">Stok Voucher Bulanan:</h6>
-        <div class="col-4 col-md-2"><label class="small">1HP</label><input type="number" id="b1hp" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">2HP</label><input type="number" id="b2hp" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">3HP</label><input type="number" id="b3hp" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">4HP</label><input type="number" id="b4hp" class="form-control" value="0"></div>
-        <div class="col-4 col-md-2"><label class="small">5HP</label><input type="number" id="b5hp" class="form-control" value="0"></div>
-
-        <div class="col-12 mt-3"><button type="submit" class="btn btn-primary px-4 fw-bold">Simpan Penyerahan Voucher</button></div>
+        <button type="submit" id="btnLogin" class="btn btn-primary btn-lg w-100 fw-bold fs-6 shadow-sm">MASUK SISTEM</button>
       </form>
-    </div>
 
-    <div class="card card-custom p-4">
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <h5 class="fw-bold mb-0">Rekapan Pendaftaran Reseller & Stock Voucher Bulanan</h5>
-        <div class="d-flex gap-2 align-items-center">
-          <input type="month" id="filterBulanStok" class="form-control form-control-sm" onchange="loadStokData()">
-          <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblStok', 'Rekap_Pendaftaran_Reseller_Stok')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
-        </div>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-bordered table-sm text-center" id="tblStok">
-          <thead>
-            <tr>
-              <th>Tgl</th><th>Server</th><th>Reseller</th><th>Petugas</th>
-              <th>2k</th><th>3k</th><th>4k</th><th>5k</th><th>6k</th><th>25k</th>
-              <th>1HP</th><th>2HP</th><th>3HP</th><th>4HP</th><th>5HP</th><th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="bodyStok"></tbody>
-        </table>
+      <div class="mt-4 pt-3 border-top text-muted small">
+        Sistem Dikembangkan Oleh <br><strong class="text-dark">Lean Naddhito</strong>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- MENU 4: DATA KARYAWAN -->
-  <section id="menu-karyawan" class="page-section d-none">
-    <h3 class="fw-800 mb-4">Manajemen Data Karyawan</h3>
-    <div class="row g-4">
-      <div class="col-12 col-lg-4">
-        <div class="card card-custom p-4">
-          <h5 class="fw-bold mb-3">Input Data Karyawan</h5>
-          <form onsubmit="simpanKaryawan(event)">
-            <input type="hidden" id="empDbId">
-            <div class="mb-3">
-              <label class="form-label small fw-bold">ID Karyawan</label>
-              <input type="text" id="empID" class="form-control" placeholder="Contoh: EMP-001" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Nama Karyawan</label>
-              <input type="text" id="empNama" class="form-control" placeholder="Nama lengkap" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Nomor WhatsApp</label>
-              <input type="text" id="empWA" class="form-control" placeholder="08xxxxxxxxxx" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Karyawan</button>
-          </form>
+  <!-- ================= MAIN APP SYSTEM ================= -->
+  <div id="pageApp" class="d-none">
+    
+    <!-- Header Mobile Toggle -->
+    <div class="mobile-header d-lg-none">
+      <div class="fw-bold fs-5 d-flex align-items-center gap-2">
+        <span class="brand-sidebar-logo">
+          RINNET
+          <span class="plus-sign">+</span>
+        </span>
+      </div>
+      <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="mainSidebar">
+      <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <span class="brand-sidebar-logo">
+            RINNET
+            <span class="plus-sign">+</span>
+          </span>
+        </div>
+        <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
+        <h6 class="fw-800 text-white mb-0" id="navUserName">User</h6>
+        <span class="badge bg-primary bg-opacity-25 text-primary mt-1 px-3 py-1 rounded-pill" id="userRoleBadge">Role: -</span>
+      </div>
+
+      <div class="sidebar-menu">
+        <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
+        <a class="nav-link admin-only" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
+        <a class="nav-link admin-only" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Pendaftaran & Stok Voucher</a>
+        <a class="nav-link admin-only" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
+        <a class="nav-link admin-only" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form & Rekap Kasbon</a>
+        <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
+        <a class="nav-link manager-sa-only d-none" href="#" onclick="switchMenu('monitoring')"><i class="fa-solid fa-clock-rotate-left text-info"></i>Monitoring Aktivitas</a>
+        <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear"></i>Manajemen User</a>
+        <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('sysPerf')"><i class="fa-solid fa-microchip text-warning"></i>Monitoring System</a>
+        <a class="nav-link text-danger mt-3" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</a>
+      </div>
+
+      <div class="app-credit">
+        Dibuat oleh <strong>Lean Naddhito</strong>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+
+      <!-- ALERT NOTIFIKASI LOGIN REALTIME OTOMATIS HILANG TEPAT 5 DETIK -->
+      <div id="userLoginAlert" class="alert alert-info alert-dismissible fade show d-none mb-4 shadow-sm border-start border-4 border-info" role="alert">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="alert-heading fw-bold mb-1"><i class="fa-solid fa-right-to-bracket me-2"></i>Notifikasi Login Realtime Masuk</h6>
+            <div id="userLoginAlertText" class="small"></div>
+          </div>
+          <button type="button" class="btn-close" onclick="closeLoginAlert()" aria-label="Close"></button>
         </div>
       </div>
-      <div class="col-12 col-lg-8">
-        <div class="card card-custom p-4">
+
+      <!-- MENU 1: DASHBOARD -->
+      <section id="menu-dashboard" class="page-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-800 mb-1">Dashboard Management</h3>
+            <p class="text-muted small mb-0">Ringkasan statistik internal server, kasbon, dan alokasi voucher.</p>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card card-custom p-3 bg-primary text-white">
+              <span class="text-white-50 small fw-bold">TOTAL SERVER</span>
+              <h2 id="dashTotalServer" class="fw-800 my-1">0</h2>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card card-custom p-3 bg-dark text-white">
+              <span class="text-white-50 small fw-bold">TOTAL KARYAWAN</span>
+              <h2 id="dashTotalKaryawan" class="fw-800 my-1">0</h2>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card card-custom p-3 bg-danger text-white">
+              <span class="text-white-50 small fw-bold">TOTAL KASBON BULAN INI</span>
+              <h2 id="dashTotalKasbon" class="fw-800 my-1">Rp 0</h2>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card card-custom p-3 bg-success text-white">
+              <span class="text-white-50 small fw-bold">TOTAL VOUCHER TERSEDIA</span>
+              <h2 id="dashTotalStok" class="fw-800 my-1">0</h2>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATISTIK SKALABEL UNTUK 80 - 100+ DATA SERVER -->
+        <div class="card card-custom p-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Daftar Karyawan</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Statistik Distribusi Server Cloud</h5>
+            <small class="text-muted">Mendukung hingga 100+ Data Server</small>
           </div>
-          <div class="table-responsive">
-            <table class="table table-hover" id="tblKaryawan">
-              <thead><tr><th>ID Karyawan</th><th>Nama Karyawan</th><th>WhatsApp</th><th>Aksi</th></tr></thead>
-              <tbody id="bodyKaryawan"></tbody>
-            </table>
+          <div class="chart-container-scroll">
+            <div id="chartWrapper" style="min-width: 100%; height: 320px;">
+              <canvas id="serverChart"></canvas>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- MENU 5: FORM & REKAP KASBON -->
-  <section id="menu-kasbon" class="page-section d-none">
-    <h3 class="fw-800 mb-4">Form & Rekapitulasi Kasbon Karyawan</h3>
+      <!-- MENU 2: INPUT SERVER -->
+      <section id="menu-server" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Manajemen Server Cloud</h3>
+        <div class="row g-4">
+          <div class="col-12 col-lg-4">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Input Server</h5>
+              <form onsubmit="simpanServer(event)">
+                <input type="hidden" id="srvId">
+                <div class="mb-2"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="srvNama" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Pengelola</label><input type="text" id="srvPengelola" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="srvWA" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Wilayah / Cluster</label><input type="text" id="srvWilayah" class="form-control" required></div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Server</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-12 col-lg-8">
+            <div class="card card-custom p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Daftar Server Cloud</h5>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblServer', 'Data_Server_RINNET')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tblServer">
+                  <thead><tr><th>Server</th><th>Pengelola</th><th>WhatsApp</th><th>Wilayah</th><th>Aksi</th></tr></thead>
+                  <tbody id="bodyServer"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <div class="row g-3 mb-4">
-      <div class="col-12 col-md-4">
-        <div class="card card-custom p-3 border-start border-4 border-primary">
-          <span class="text-muted small fw-bold">TOTAL REKAP PER KARYAWAN (FILTERED)</span>
-          <h4 id="rekapTotalKasbonUser" class="fw-800 text-primary mb-0">Rp 0</h4>
-        </div>
-      </div>
-      <div class="col-12 col-md-4">
-        <div class="card card-custom p-3 border-start border-4 border-warning">
-          <span class="text-muted small fw-bold">ESTIMASI KASBON (2 MINGGU)</span>
-          <h4 id="rekapTotalKasbon2W" class="fw-800 text-warning mb-0">Rp 0</h4>
-        </div>
-      </div>
-      <div class="col-12 col-md-4">
-        <div class="card card-custom p-3 border-start border-4 border-success">
-          <span class="text-muted small fw-bold">TOTAL KASBON (PER BULAN)</span>
-          <h4 id="rekapTotalKasbon1M" class="fw-800 text-success mb-0">Rp 0</h4>
-        </div>
-      </div>
-    </div>
+      <!-- MENU 3: RESELLER & STOK VOUCHER -->
+      <section id="menu-reseller" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Pendaftaran Reseller & Penyerahan Stok Voucher</h3>
+        <div class="card card-custom p-4 mb-4">
+          <h5 class="fw-bold mb-3">Form Input Penyerahan Voucher</h5>
+          <form onsubmit="simpanStokReseller(event)" class="row g-3">
+            <input type="hidden" id="stkId">
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Tanggal</label><input type="date" id="stkTanggal" class="form-control" required></div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="stkServer" class="form-control" required></div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Reseller</label><input type="text" id="stkReseller" class="form-control" required></div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Petugas Lapangan</label><input type="text" id="stkPetugas" class="form-control" required></div>
+            
+            <div class="col-12"><hr class="my-1"></div>
+            <h6 class="fw-bold mb-1 text-primary">Stok Voucher Harian & Mingguan:</h6>
+            <div class="col-4 col-md-2"><label class="small">2K</label><input type="number" id="v2k" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">3K</label><input type="number" id="v3k" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">4K</label><input type="number" id="v4k" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">5K</label><input type="number" id="v5k" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">6K</label><input type="number" id="v6k" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">25K</label><input type="number" id="v25k" class="form-control" value="0"></div>
 
-    <div class="row g-4">
-      <div class="col-12 col-lg-4">
-        <div class="card card-custom p-4">
-          <h5 class="fw-bold mb-3">Input Pengajuan Kasbon</h5>
-          <form onsubmit="simpanKasbon(event)">
-            <input type="hidden" id="ksbId">
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Tanggal</label>
-              <input type="date" id="ksbTanggal" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Nama Karyawan</label>
-              <select id="ksbKaryawan" class="form-select" required>
-                <option value="">-- Pilih Karyawan --</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Jumlah Kasbon (Rp)</label>
-              <input type="number" id="ksbJumlah" class="form-control" placeholder="0" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Sumber Dana (Server)</label>
-              <select id="ksbSumber" class="form-select" required>
-                <option value="">-- Pilih Server --</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label small fw-bold">Keterangan / Alasan</label>
-              <textarea id="ksbKet" class="form-control" rows="2"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Kasbon</button>
+            <h6 class="fw-bold mb-1 text-primary mt-3">Stok Voucher Bulanan:</h6>
+            <div class="col-4 col-md-2"><label class="small">1HP</label><input type="number" id="b1hp" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">2HP</label><input type="number" id="b2hp" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">3HP</label><input type="number" id="b3hp" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">4HP</label><input type="number" id="b4hp" class="form-control" value="0"></div>
+            <div class="col-4 col-md-2"><label class="small">5HP</label><input type="number" id="b5hp" class="form-control" value="0"></div>
+
+            <div class="col-12 mt-3"><button type="submit" class="btn btn-primary px-4 fw-bold">Simpan Penyerahan Voucher</button></div>
           </form>
         </div>
-      </div>
 
-      <div class="col-12 col-lg-8">
         <div class="card card-custom p-4">
           <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <h5 class="fw-bold mb-0">Riwayat & Filter Rekapan Kasbon</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKasbon', 'Rekapan_Kasbon_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Format Excel</button>
-          </div>
-
-          <div class="row g-2 mb-3 bg-light p-3 rounded-3">
-            <div class="col-12 col-sm-4">
-              <label class="small fw-bold">Filter Karyawan</label>
-              <select id="fltKasbonKaryawan" class="form-select form-select-sm" onchange="loadKasbonData()">
-                <option value="">-- Semua Karyawan --</option>
-              </select>
-            </div>
-            <div class="col-6 col-sm-4">
-              <label class="small fw-bold">Dari Tanggal</label>
-              <input type="date" id="fltKasbonStart" class="form-control form-control-sm" onchange="loadKasbonData()">
-            </div>
-            <div class="col-6 col-sm-4">
-              <label class="small fw-bold">Sampai Tanggal</label>
-              <input type="date" id="fltKasbonEnd" class="form-control form-control-sm" onchange="loadKasbonData()">
+            <h5 class="fw-bold mb-0">Rekapan Pendaftaran Reseller & Stock Voucher Bulanan</h5>
+            <div class="d-flex gap-2 align-items-center">
+              <input type="month" id="filterBulanStok" class="form-control form-control-sm" onchange="loadStokData()">
+              <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblStok', 'Rekap_Pendaftaran_Reseller_Stok')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
             </div>
           </div>
-
           <div class="table-responsive">
-            <table class="table table-hover" id="tblKasbon">
-              <thead><tr><th>Tanggal</th><th>Karyawan</th><th>Jumlah Kasbon</th><th>Sumber Dana</th><th>Keterangan</th><th>Aksi</th></tr></thead>
-              <tbody id="bodyKasbon"></tbody>
+            <table class="table table-bordered table-sm text-center" id="tblStok">
+              <thead>
+                <tr>
+                  <th>Tgl</th><th>Server</th><th>Reseller</th><th>Petugas</th>
+                  <th>2k</th><th>3k</th><th>4k</th><th>5k</th><th>6k</th><th>25k</th>
+                  <th>1HP</th><th>2HP</th><th>3HP</th><th>4HP</th><th>5HP</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="bodyStok"></tbody>
             </table>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- MENU 6: PROFIL SAYA -->
-  <section id="menu-profil" class="page-section d-none">
-    <h3 class="fw-800 mb-4">Profil Saya</h3>
-    <div class="card card-custom p-4" style="max-width: 600px;">
-      <form onsubmit="simpanProfil(event)">
-        <div class="text-center mb-4">
-          <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-primary mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-          <div>
-            <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
-            <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
+      <!-- MENU 4: DATA KARYAWAN -->
+      <section id="menu-karyawan" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Manajemen Data Karyawan</h3>
+        <div class="row g-4">
+          <div class="col-12 col-lg-4">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Input Data Karyawan</h5>
+              <form onsubmit="simpanKaryawan(event)">
+                <input type="hidden" id="empDbId">
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">ID Karyawan</label>
+                  <input type="text" id="empID" class="form-control" placeholder="Contoh: EMP-001" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Nama Karyawan</label>
+                  <input type="text" id="empNama" class="form-control" placeholder="Nama lengkap" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Nomor WhatsApp</label>
+                  <input type="text" id="empWA" class="form-control" placeholder="08xxxxxxxxxx" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Karyawan</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-12 col-lg-8">
+            <div class="card card-custom p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Daftar Karyawan</h5>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tblKaryawan">
+                  <thead><tr><th>ID Karyawan</th><th>Nama Karyawan</th><th>WhatsApp</th><th>Aksi</th></tr></thead>
+                  <tbody id="bodyKaryawan"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MENU 5: FORM & REKAP KASBON -->
+      <section id="menu-kasbon" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Form & Rekapitulasi Kasbon Karyawan</h3>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-4">
+            <div class="card card-custom p-3 border-start border-4 border-primary">
+              <span class="text-muted small fw-bold">TOTAL REKAP PER KARYAWAN (FILTERED)</span>
+              <h4 id="rekapTotalKasbonUser" class="fw-800 text-primary mb-0">Rp 0</h4>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="card card-custom p-3 border-start border-4 border-warning">
+              <span class="text-muted small fw-bold">ESTIMASI KASBON (2 MINGGU)</span>
+              <h4 id="rekapTotalKasbon2W" class="fw-800 text-warning mb-0">Rp 0</h4>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="card card-custom p-3 border-start border-4 border-success">
+              <span class="text-muted small fw-bold">TOTAL KASBON (PER BULAN)</span>
+              <h4 id="rekapTotalKasbon1M" class="fw-800 text-success mb-0">Rp 0</h4>
+            </div>
           </div>
         </div>
 
-        <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
-        <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" placeholder="Nama Lengkap Terdaftar" required></div>
-        <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" placeholder="nama@email.com" required></div>
-        <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-        <button type="submit" class="btn btn-primary fw-bold w-100">Simpan Profil Saya</button>
-      </form>
-    </div>
-  </section>
-
-  <!-- MENU 7: MONITORING AKTIVITAS HARI INI -->
-  <section id="menu-monitoring" class="page-section d-none">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div>
-        <h3 class="fw-800 mb-1">Monitoring Pekerjaan & Aktivitas Admin</h3>
-        <p class="text-muted small mb-0">Pantau seluruh rekapan input data, perubahan, dan log perangkat pengguna sistem.</p>
-      </div>
-      <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMonitoring', 'Monitoring_Aktivitas_Pekerjaan')">
-        <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-      </button>
-    </div>
-
-    <div class="card card-custom p-4">
-      <div class="row g-2 mb-3 bg-light p-3 rounded-3">
-        <div class="col-12 col-sm-4">
-          <label class="small fw-bold">Tanggal Aktivitas</label>
-          <input type="date" id="fltLogDate" class="form-control form-control-sm" onchange="loadMonitoringData()">
-        </div>
-        <div class="col-12 col-sm-4">
-          <label class="small fw-bold">Tipe Aktivitas</label>
-          <select id="fltLogType" class="form-select form-select-sm" onchange="loadMonitoringData()">
-            <option value="">-- Semua Aktivitas --</option>
-            <option value="LOGIN">Akses Login System</option>
-            <option value="INPUT_DATA">Input / Modifikasi Data</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="table-responsive">
-        <table class="table table-hover" id="tblMonitoring">
-          <thead>
-            <tr>
-              <th>Waktu</th>
-              <th>Pengguna (User)</th>
-              <th>Kategori</th>
-              <th>Detail Aktivitas / Modul</th>
-              <th>Perangkat (Device)</th>
-              <th>Titik Koordinat GPS (GMaps)</th>
-            </tr>
-          </thead>
-          <tbody id="bodyMonitoring"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- MENU 8: MANAJEMEN USER -->
-  <section id="menu-userMgmt" class="page-section d-none">
-    <h3 class="fw-800 mb-4">Manajemen User & Hak Akses Intern</h3>
-    <div class="row g-4">
-      <div class="col-12 col-lg-4">
-        <div class="card card-custom p-4">
-          <h5 class="fw-bold mb-3">Kelola Akun User</h5>
-          <form onsubmit="simpanUserMgmt(event)">
-            <input type="hidden" id="usrDbId">
-            <div class="mb-2"><label class="form-label small fw-bold">Username</label><input type="text" id="usrName" class="form-control" required></div>
-            <div class="mb-2"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="usrFullName" class="form-control" required></div>
-            <div class="mb-2"><label class="form-label small fw-bold">Email</label><input type="email" id="usrEmail" class="form-control" required></div>
-            <div class="mb-2"><label class="form-label small fw-bold">Password</label><input type="password" id="usrPass" class="form-control" placeholder="Isi untuk ubah/buat"></div>
-            <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="usrWA" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Hak Akses / Role</label>
-              <select id="usrRole" class="form-select">
-                <option value="SUPERADMIN">SUPERADMIN</option>
-                <option value="MANAJER">MANAJER</option>
-                <option value="ADMIN">ADMIN</option>
-              </select>
+        <div class="row g-4">
+          <div class="col-12 col-lg-4">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Input Pengajuan Kasbon</h5>
+              <form onsubmit="simpanKasbon(event)">
+                <input type="hidden" id="ksbId">
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Tanggal</label>
+                  <input type="date" id="ksbTanggal" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Nama Karyawan</label>
+                  <select id="ksbKaryawan" class="form-select" required>
+                    <option value="">-- Pilih Karyawan --</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Jumlah Kasbon (Rp)</label>
+                  <input type="number" id="ksbJumlah" class="form-control" placeholder="0" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Sumber Dana (Server)</label>
+                  <select id="ksbSumber" class="form-select" required>
+                    <option value="">-- Pilih Server --</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Keterangan / Alasan</label>
+                  <textarea id="ksbKet" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Kasbon</button>
+              </form>
             </div>
-            <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Akun</button>
+          </div>
+
+          <div class="col-12 col-lg-8">
+            <div class="card card-custom p-4">
+              <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <h5 class="fw-bold mb-0">Riwayat & Filter Rekapan Kasbon</h5>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKasbon', 'Rekapan_Kasbon_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Format Excel</button>
+              </div>
+
+              <div class="row g-2 mb-3 bg-light p-3 rounded-3">
+                <div class="col-12 col-sm-4">
+                  <label class="small fw-bold">Filter Karyawan</label>
+                  <select id="fltKasbonKaryawan" class="form-select form-select-sm" onchange="loadKasbonData()">
+                    <option value="">-- Semua Karyawan --</option>
+                  </select>
+                </div>
+                <div class="col-6 col-sm-4">
+                  <label class="small fw-bold">Dari Tanggal</label>
+                  <input type="date" id="fltKasbonStart" class="form-control form-control-sm" onchange="loadKasbonData()">
+                </div>
+                <div class="col-6 col-sm-4">
+                  <label class="small fw-bold">Sampai Tanggal</label>
+                  <input type="date" id="fltKasbonEnd" class="form-control form-control-sm" onchange="loadKasbonData()">
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-hover" id="tblKasbon">
+                  <thead><tr><th>Tanggal</th><th>Karyawan</th><th>Jumlah Kasbon</th><th>Sumber Dana</th><th>Keterangan</th><th>Aksi</th></tr></thead>
+                  <tbody id="bodyKasbon"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MENU 6: PROFIL SAYA -->
+      <section id="menu-profil" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Profil Saya</h3>
+        <div class="card card-custom p-4" style="max-width: 600px;">
+          <form onsubmit="simpanProfil(event)">
+            <div class="text-center mb-4">
+              <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-primary mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+              <div>
+                <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
+                <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
+              </div>
+            </div>
+
+            <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" placeholder="Nama Lengkap Terdaftar" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" placeholder="nama@email.com" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
+            <button type="submit" class="btn btn-primary fw-bold w-100">Simpan Profil Saya</button>
           </form>
         </div>
-      </div>
-      <div class="col-12 col-lg-8">
-        <div class="card card-custom p-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Daftar Pengguna Terdaftar</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblUsers', 'Data_Pengguna_Sistem')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+      </section>
+
+      <!-- MENU 7: MONITORING AKTIVITAS HARI INI -->
+      <section id="menu-monitoring" class="page-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-800 mb-1">Monitoring Pekerjaan & Aktivitas Admin</h3>
+            <p class="text-muted small mb-0">Pantau seluruh rekapan input data, perubahan, dan log perangkat pengguna sistem.</p>
           </div>
+          <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMonitoring', 'Monitoring_Aktivitas_Pekerjaan')">
+            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+          </button>
+        </div>
+
+        <div class="card card-custom p-4">
+          <div class="row g-2 mb-3 bg-light p-3 rounded-3">
+            <div class="col-12 col-sm-4">
+              <label class="small fw-bold">Tanggal Aktivitas</label>
+              <input type="date" id="fltLogDate" class="form-control form-control-sm" onchange="loadMonitoringData()">
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="small fw-bold">Tipe Aktivitas</label>
+              <select id="fltLogType" class="form-select form-select-sm" onchange="loadMonitoringData()">
+                <option value="">-- Semua Aktivitas --</option>
+                <option value="LOGIN">Akses Login System</option>
+                <option value="INPUT_DATA">Input / Modifikasi Data</option>
+              </select>
+            </div>
+          </div>
+
           <div class="table-responsive">
-            <table class="table table-hover" id="tblUsers">
-              <thead><tr><th>Username</th><th>Nama Lengkap</th><th>Email</th><th>WhatsApp</th><th>Role</th><th>Aksi</th></tr></thead>
-              <tbody id="bodyUsers"></tbody>
+            <table class="table table-hover" id="tblMonitoring">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Pengguna (User)</th>
+                  <th>Kategori</th>
+                  <th>Detail Aktivitas / Modul</th>
+                  <th>Perangkat (Device)</th>
+                  <th>Titik Koordinat GPS (GMaps)</th>
+                </tr>
+              </thead>
+              <tbody id="bodyMonitoring"></tbody>
             </table>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- MENU 9: MONITORING SYSTEM -->
-  <section id="menu-sysPerf" class="page-section d-none">
-    <h3 class="fw-800 mb-1">System Health & Hardware Performance</h3>
-    <p class="text-muted small mb-4">Monitoring integrasi platform Supabase, GitHub Deployment API, Server & Engine Metrics secara realtime.</p>
-
-    <div class="row g-3 mb-4">
-      <div class="col-12 col-md-3">
-        <div class="card card-custom p-3 text-center border-top border-4 border-success">
-          <span class="text-muted small fw-bold">CPU USAGE</span>
-          <h3 id="sysCpuVal" class="fw-800 my-1 text-success">14%</h3>
-          <span class="status-badge bg-success bg-opacity-10 text-success">HEALTHY</span>
+      <!-- MENU 8: MANAJEMEN USER -->
+      <section id="menu-userMgmt" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Manajemen User & Hak Akses Intern</h3>
+        <div class="row g-4">
+          <div class="col-12 col-lg-4">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Kelola Akun User</h5>
+              <form onsubmit="simpanUserMgmt(event)">
+                <input type="hidden" id="usrDbId">
+                <div class="mb-2"><label class="form-label small fw-bold">Username</label><input type="text" id="usrName" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="usrFullName" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Email</label><input type="email" id="usrEmail" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Password</label><input type="password" id="usrPass" class="form-control" placeholder="Isi untuk ubah/buat"></div>
+                <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="usrWA" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Hak Akses / Role</label>
+                  <select id="usrRole" class="form-select">
+                    <option value="SUPERADMIN">SUPERADMIN</option>
+                    <option value="MANAJER">MANAJER</option>
+                    <option value="ADMIN">ADMIN</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Akun</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-12 col-lg-8">
+            <div class="card card-custom p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Daftar Pengguna Terdaftar</h5>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblUsers', 'Data_Pengguna_Sistem')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tblUsers">
+                  <thead><tr><th>Username</th><th>Nama Lengkap</th><th>Email</th><th>WhatsApp</th><th>Role</th><th>Aksi</th></tr></thead>
+                  <tbody id="bodyUsers"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="col-12 col-md-3">
-        <div class="card card-custom p-3 text-center border-top border-4 border-success">
-          <span class="text-muted small fw-bold">MEMORY (RAM)</span>
-          <h3 id="sysRamVal" class="fw-800 my-1 text-success">42%</h3>
-          <span class="status-badge bg-success bg-opacity-10 text-success">OPTIMAL</span>
+      </section>
+
+      <!-- MENU 9: MONITORING SYSTEM -->
+      <section id="menu-sysPerf" class="page-section d-none">
+        <h3 class="fw-800 mb-1">System Health & Hardware Performance</h3>
+        <p class="text-muted small mb-4">Monitoring integrasi platform Supabase, GitHub Deployment API, Server & Engine Metrics secara realtime.</p>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-3">
+            <div class="card card-custom p-3 text-center border-top border-4 border-success">
+              <span class="text-muted small fw-bold">CPU USAGE</span>
+              <h3 id="sysCpuVal" class="fw-800 my-1 text-success">14%</h3>
+              <span class="status-badge bg-success bg-opacity-10 text-success">HEALTHY</span>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <div class="card card-custom p-3 text-center border-top border-4 border-success">
+              <span class="text-muted small fw-bold">MEMORY (RAM)</span>
+              <h3 id="sysRamVal" class="fw-800 my-1 text-success">42%</h3>
+              <span class="status-badge bg-success bg-opacity-10 text-success">OPTIMAL</span>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <div class="card card-custom p-3 text-center border-top border-4 border-primary">
+              <span class="text-muted small fw-bold">SUPABASE DB LATENCY</span>
+              <h3 id="sysDbLatency" class="fw-800 my-1 text-primary">28 ms</h3>
+              <span class="status-badge bg-primary bg-opacity-10 text-primary">CONNECTED</span>
+            </div>
+          </div>
+          <div class="col-12 col-md-3">
+            <div class="card card-custom p-3 text-center border-top border-4 border-success">
+              <span class="text-muted small fw-bold">GITHUB BUILD STATUS</span>
+              <h3 id="sysGitStatus" class="fw-800 my-1 text-success">SUCCESS</h3>
+              <span class="status-badge bg-success bg-opacity-10 text-success">SYNCED</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="col-12 col-md-3">
-        <div class="card card-custom p-3 text-center border-top border-4 border-primary">
-          <span class="text-muted small fw-bold">SUPABASE DB LATENCY</span>
-          <h3 id="sysDbLatency" class="fw-800 my-1 text-primary">28 ms</h3>
-          <span class="status-badge bg-primary bg-opacity-10 text-primary">CONNECTED</span>
+
+        <div class="card card-custom p-4">
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-server me-2 text-primary"></i>Detail Status Infrastruktur Hardware & Cloud</h5>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr><th>Komponen Software/Hardware</th><th>Integrasi API</th><th>Metrik Storage / Load</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Supabase PostgreSQL Engine</b></td>
+                  <td>Database Service API v2</td>
+                  <td>Storage Total: 1.2 GB / 50 GB</td>
+                  <td><span class="badge bg-success">NORMAL</span></td>
+                </tr>
+                <tr>
+                  <td><b>GitHub Repository & Actions</b></td>
+                  <td>Deploy Branch & Webhook</td>
+                  <td>Build Status: Passing (v2.4.0)</td>
+                  <td><span class="badge bg-success">HEALTHY</span></td>
+                </tr>
+                <tr>
+                  <td><b>Server Cloud Latency</b></td>
+                  <td>Edge Node Regional</td>
+                  <td>Average Response Time: 18ms</td>
+                  <td><span class="badge bg-success">EXCELLENT</span></td>
+                </tr>
+                <tr>
+                  <td><b>Storage File Bucket</b></td>
+                  <td>Cloud Object Storage</td>
+                  <td>Bucket Usage: 450 MB / 100 GB</td>
+                  <td><span class="badge bg-success">HEALTHY</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <div class="col-12 col-md-3">
-        <div class="card card-custom p-3 text-center border-top border-4 border-success">
-          <span class="text-muted small fw-bold">GITHUB BUILD STATUS</span>
-          <h3 id="sysGitStatus" class="fw-800 my-1 text-success">SUCCESS</h3>
-          <span class="status-badge bg-success bg-opacity-10 text-success">SYNCED</span>
-        </div>
-      </div>
-    </div>
+      </section>
 
-    <div class="card card-custom p-4">
-      <h5 class="fw-bold mb-3"><i class="fa-solid fa-server me-2 text-primary"></i>Detail Status Infrastruktur Hardware & Cloud</h5>
-      <div class="table-responsive">
-        <table class="table align-middle">
-          <thead>
-            <tr><th>Komponen Software/Hardware</th><th>Integrasi API</th><th>Metrik Storage / Load</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>Supabase PostgreSQL Engine</b></td>
-              <td>Database Service API v2</td>
-              <td>Storage Total: 1.2 GB / 50 GB</td>
-              <td><span class="badge bg-success">NORMAL</span></td>
-            </tr>
-            <tr>
-              <td><b>GitHub Repository & Actions</b></td>
-              <td>Deploy Branch & Webhook</td>
-              <td>Build Status: Passing (v2.4.0)</td>
-              <td><span class="badge bg-success">HEALTHY</span></td>
-            </tr>
-            <tr>
-              <td><b>Server Cloud Latency</b></td>
-              <td>Edge Node Regional</td>
-              <td>Average Response Time: 18ms</td>
-              <td><span class="badge bg-success">EXCELLENT</span></td>
-            </tr>
-            <tr>
-              <td><b>Storage File Bucket</b></td>
-              <td>Cloud Object Storage</td>
-              <td>Bucket Usage: 450 MB / 100 GB</td>
-              <td><span class="badge bg-success">HEALTHY</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+    </main>
+  </div>
 
-</main>
-</div>
+  <script src="supabase-client.js"></script>
+  <script>
+    let activeChart = null;
+    let currentUser = null;
+    let base64AvatarImage = "";
+    let alertTimer = null;
+    
+    // BATAS MAKSIMAL SIMPAN LOG RIWAYAT (DIATUR 50 LOG SESUAI KEBUTUHAN SISTEM)
+    const MAX_LOG_LIMIT = 50; 
 
-<script src="supabase-client.js"></script>
-<script>
-let activeChart = null;
-let currentUser = null;
-let base64AvatarImage = "";
-let alertTimer = null;
-
-// BATAS MAKSIMAL SIMPAN LOG RIWAYAT (DIATUR 50 LOG SESUAI KEBUTUHAN SISTEM)
-const MAX_LOG_LIMIT = 50;
-
-function toggleSidebar() {
-  document.getElementById('mainSidebar').classList.toggle('show');
-}
-
-function getUserLocation() {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      resolve("Geolocation Tidak Didukung");
-      return;
+    function toggleSidebar() {
+      document.getElementById('mainSidebar').classList.toggle('show');
     }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
-      () => resolve("Akses Lokasi Ditolak/Tidak Aktif"),
-      { timeout: 5000 }
-    );
-  });
-}
 
-// --- LOG ACTIVITY & AUTOMATIC CLEANUP (> 50 DATA) ---
-async function logActivity(tipe, detail) {
-  if (!currentUser) return;
-
-  const loc = await getUserLocation();
-  const device = navigator.userAgent;
-  const payload = {
-    waktu: new Date().toISOString(),
-    username: currentUser.username,
-    role: currentUser.role,
-    tipe: tipe,
-    detail: detail,
-    device: device,
-    koordinat: loc
-  };
-
-  try {
-    const { error } = await _supabase.from('activity_logs').insert([payload]);
-    if (error) throw error;
-
-    // Pembersihan otomatis: Hapus data terlama jika melebihi kuota MAX_LOG_LIMIT (50)
-    await cleanupOldLogs();
-
-  } catch (err) {
-    let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
-    logs.unshift(payload);
-    if (logs.length > MAX_LOG_LIMIT) {
-      logs = logs.slice(0, MAX_LOG_LIMIT);
-    }
-    localStorage.setItem('rinnet_local_logs', JSON.stringify(logs));
-  }
-}
-
-async function cleanupOldLogs() {
-  try {
-    const { data: allLogs } = await _supabase.from('activity_logs').select('id').order('waktu', { ascending: false });
-    if (allLogs && allLogs.length > MAX_LOG_LIMIT) {
-      const idsToDelete = allLogs.slice(MAX_LOG_LIMIT).map(l => l.id);
-      await _supabase.from('activity_logs').delete().in('id', idsToDelete);
-    }
-  } catch(e) { console.log('Cleanup error:', e); }
-}
-
-// --- AUTHENTICATION ---
-async function handleAuthLogin(e) {
-  e.preventDefault();
-  const u = document.getElementById('loginUsername').value.trim().toLowerCase();
-  const p = document.getElementById('loginPassword').value;
-
-  const { data: user, error } = await _supabase.from('users').select('*').eq('username', u).single();
-
-  if (error || !user) {
-    alert('Username atau Password tidak ditemukan!');
-    return;
-  }
-
-  if (user.password_hash === p) {
-    currentUser = user;
-    sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
-
-    await logActivity('LOGIN', `User ${user.username} (${user.role}) berhasil masuk ke sistem.`);
-    initAppView(user);
-  } else {
-    alert('Password salah!');
-  }
-}
-
-function initAppView(user) {
-  currentUser = user;
-  document.getElementById('pageLogin').classList.add('d-none');
-  document.getElementById('pageApp').classList.remove('d-none');
-
-  document.getElementById('navUserName').innerText = user.nama_lengkap || user.username;
-  document.getElementById('userRoleBadge').innerText = user.role;
-  if (user.avatar_url) document.getElementById('navUserAvatar').src = user.avatar_url;
-
-  // HAK AKSES PERAN (ROLE MANAGEMENT)
-  if (user.role === 'SUPERADMIN') {
-    document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.remove('d-none'));
-  } else if (user.role === 'MANAJER') {
-    // Role Manajer dapat memantau monitoring aktivitas
-    document.querySelectorAll('.manager-sa-only').forEach(el => el.classList.remove('d-none'));
-  }
-
-  // Notifikasi realtime muncul saat ADA PERANGKAT/USER LOGIN
-  showLoginNotification(user);
-
-  // Mulai listener realtime untuk menangkap login user lain
-  listenRealtimeLogins();
-
-  loadDashboardData();
-}
-
-// --- NOTIFIKASI REALTIME LOGIN (OTOMATIS HILANG DALAM 5 DETIK) ---
-async function showLoginNotification(user, customLog = null) {
-  let recentLog = customLog;
-  if (!recentLog) {
-    try {
-      const { data } = await _supabase.from('activity_logs')
-        .select('*')
-        .eq('tipe', 'LOGIN')
-        .order('waktu', { ascending: false })
-        .limit(1);
-      if (data && data.length > 0) recentLog = data[0];
-    } catch (e) {
-      let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
-      recentLog = logs.find(l => l.tipe === 'LOGIN');
-    }
-  }
-
-  const alertBox = document.getElementById('userLoginAlert');
-  const alertText = document.getElementById('userLoginAlertText');
-
-  const targetUser = recentLog?.username || user.username;
-  const targetRole = recentLog?.role || user.role;
-  const devInfo = recentLog?.device || navigator.userAgent;
-  const coordInfo = recentLog?.koordinat || 'N/A';
-
-  alertText.innerHTML = `Perangkat/Pengguna <strong>${targetUser}</strong> (${targetRole}) baru saja masuk ke aplikasi.<br>` +
-    `• <strong>Device:</strong> <span class="text-truncate d-inline-block align-bottom" style="max-width: 250px;">${devInfo}</span><br>` +
-    `• <strong>Koordinat:</strong> ${coordInfo}`;
-
-  alertBox.classList.remove('d-none');
-
-  // Clear timer sebelumnya bila ada
-  if (alertTimer) clearTimeout(alertTimer);
-
-  // Hilang otomatis tepat dalam 5000 ms (5 detik)
-  alertTimer = setTimeout(() => {
-    closeLoginAlert();
-  }, 5000);
-}
-
-function listenRealtimeLogins() {
-  try {
-    _supabase
-      .channel('public:activity_logs')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
-        if (payload.new && payload.new.tipe === 'LOGIN') {
-          showLoginNotification(null, payload.new);
+    function getUserLocation() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve("Geolocation Tidak Didukung");
+          return;
         }
-      })
-      .subscribe();
-  } catch (e) { console.log('Realtime Error:', e); }
-}
-
-function closeLoginAlert() {
-  const alertBox = document.getElementById('userLoginAlert');
-  if (alertBox) {
-    alertBox.classList.add('d-none');
-  }
-}
-
-function handleLogout() {
-  sessionStorage.removeItem('rinnet_session_user');
-  location.reload();
-}
-
-// --- NAVIGATION ---
-function switchMenu(menuName) {
-  const sections = ['dashboard', 'karyawan', 'kasbon', 'server', 'reseller', 'profil', 'monitoring', 'userMgmt', 'sysPerf'];
-  sections.forEach(s => {
-    const el = document.getElementById(`menu-${s}`);
-    if(el) el.classList.add('d-none');
-  });
-
-  const target = document.getElementById(`menu-${menuName}`);
-  if(target) target.classList.remove('d-none');
-
-  document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(menuName)) link.classList.add('active');
-  });
-
-  if (window.innerWidth < 992) document.getElementById('mainSidebar').classList.remove('show');
-
-  if (menuName === 'dashboard') loadDashboardData();
-  if (menuName === 'karyawan') loadKaryawanData();
-  if (menuName === 'kasbon') loadKasbonData();
-  if (menuName === 'server') loadServerData();
-  if (menuName === 'reseller') loadStokData();
-  if (menuName === 'profil') loadProfilData();
-  if (menuName === 'monitoring') loadMonitoringData();
-  if (menuName === 'userMgmt') loadUserData();
-}
-
-// --- DASHBOARD & SKALABILITAS GRAFIK (80 - 100+ DATA) ---
-async function loadDashboardData() {
-  const { data: servers } = await _supabase.from('servers').select('*');
-  const { data: emps } = await _supabase.from('employees').select('*');
-  const { data: kasbons } = await _supabase.from('kasbon').select('*');
-  const { data: stocks } = await _supabase.from('reseller_stock').select('*');
-
-  const totalServerCount = (servers || []).length;
-  document.getElementById('dashTotalServer').innerText = totalServerCount;
-  document.getElementById('dashTotalKaryawan').innerText = (emps || []).length;
-
-  let sumKasbon = 0;
-  (kasbons || []).forEach(k => sumKasbon += parseFloat(k.jumlah_kasbon || 0));
-  document.getElementById('dashTotalKasbon').innerText = `Rp ${sumKasbon.toLocaleString('id-ID')}`;
-
-  let sumStok = 0;
-  (stocks || []).forEach(s => {
-    sumStok += (s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k + s.b1hp + s.b2hp + s.b3hp + s.b4hp + s.b5hp);
-  });
-  document.getElementById('dashTotalStok').innerText = sumStok;
-
-  // Disesuaikan agar muat jika ada 80 - 100+ server tanpa berdesakan
-  const chartWrapper = document.getElementById('chartWrapper');
-  if (totalServerCount > 15) {
-    chartWrapper.style.width = `${totalServerCount * 45}px`;
-  } else {
-    chartWrapper.style.width = '100%';
-  }
-
-  const ctx = document.getElementById('serverChart').getContext('2d');
-  if (activeChart) activeChart.destroy();
-
-  activeChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: (servers || []).map(s => s.nama_server),
-      datasets: [{
-        label: 'Alokasi Voucher Terdistribusi',
-        data: (servers || []).map(srv => {
-          const filterStk = (stocks || []).filter(stk => stk.nama_server === srv.nama_server);
-          return filterStk.reduce((acc, curr) => acc + (curr.v2k + curr.v3k + curr.v4k + curr.v5k + curr.v6k + curr.v25k), 0);
-        }),
-        backgroundColor: '#2563eb',
-        borderRadius: 6
-      }]
-    },
-    options: { 
-      responsive: true, 
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: {
-          ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 45, minRotation: 0 }
-        }
-      }
-    }
-  });
-}
-
-// --- MANAJEMEN SERVER ---
-async function simpanServer(e) {
-  e.preventDefault();
-  const id = document.getElementById('srvId').value;
-  const payload = {
-    nama_server: document.getElementById('srvNama').value,
-    pengelola: document.getElementById('srvPengelola').value,
-    whatsapp: document.getElementById('srvWA').value,
-    wilayah: document.getElementById('srvWilayah').value
-  };
-
-  let res;
-  if(id) {
-    res = await _supabase.from('servers').update(payload).eq('id', id);
-    await logActivity('INPUT_DATA', `Update server: ${payload.nama_server}`);
-  } else {
-    res = await _supabase.from('servers').insert([payload]);
-    await logActivity('INPUT_DATA', `Tambah server baru: ${payload.nama_server}`);
-  }
-
-  if (!res.error) {
-    alert('Data Server Berhasil Disimpan!');
-    document.getElementById('srvId').value = '';
-    e.target.reset();
-    loadServerData();
-  } else {
-    alert('Gagal menyimpan server: ' + res.error.message);
-  }
-}
-
-async function loadServerData() {
-  const { data } = await _supabase.from('servers').select('*');
-  document.getElementById('bodyServer').innerHTML = (data || []).map(s => `
-    <tr>
-      <td><b>${s.nama_server}</b></td>
-      <td>${s.pengelola}</td>
-      <td>${s.whatsapp}</td>
-      <td>${s.wilayah}</td>
-      <td>
-        <button class="btn btn-sm btn-warning text-white me-1" onclick="editServer('${s.id}', '${s.nama_server}', '${s.pengelola}', '${s.whatsapp}', '${s.wilayah}')"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn btn-sm btn-danger" onclick="hapusRecord('servers', '${s.id}', loadServerData, 'Server ${s.nama_server}')"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    </tr>`).join('');
-}
-
-function editServer(id, nama, pengelola, wa, wilayah) {
-  document.getElementById('srvId').value = id;
-  document.getElementById('srvNama').value = nama;
-  document.getElementById('srvPengelola').value = pengelola;
-  document.getElementById('srvWA').value = wa;
-  document.getElementById('srvWilayah').value = wilayah;
-}
-
-// --- RESELLER & STOCK VOUCHER ---
-async function simpanStokReseller(e) {
-  e.preventDefault();
-  const id = document.getElementById('stkId').value;
-  const payload = {
-    tanggal: document.getElementById('stkTanggal').value,
-    nama_server: document.getElementById('stkServer').value,
-    nama_reseller: document.getElementById('stkReseller').value,
-    petugas_lapangan: document.getElementById('stkPetugas').value,
-    v2k: parseInt(document.getElementById('v2k').value || 0),
-    v3k: parseInt(document.getElementById('v3k').value || 0),
-    v4k: parseInt(document.getElementById('v4k').value || 0),
-    v5k: parseInt(document.getElementById('v5k').value || 0),
-    v6k: parseInt(document.getElementById('v6k').value || 0),
-    v25k: parseInt(document.getElementById('v25k').value || 0),
-    b1hp: parseInt(document.getElementById('b1hp').value || 0),
-    b2hp: parseInt(document.getElementById('b2hp').value || 0),
-    b3hp: parseInt(document.getElementById('b3hp').value || 0),
-    b4hp: parseInt(document.getElementById('b4hp').value || 0),
-    b5hp: parseInt(document.getElementById('b5hp').value || 0)
-  };
-
-  let res;
-  if(id) {
-    res = await _supabase.from('reseller_stock').update(payload).eq('id', id);
-    await logActivity('INPUT_DATA', `Update stok voucher reseller: ${payload.nama_reseller}`);
-  } else {
-    res = await _supabase.from('reseller_stock').insert([payload]);
-    await logActivity('INPUT_DATA', `Penyerahan stok voucher ke: ${payload.nama_reseller}`);
-  }
-
-  if (!res.error) {
-    alert('Penyerahan Stok Berhasil Disimpan!');
-    document.getElementById('stkId').value = '';
-    e.target.reset();
-    loadStokData();
-  } else {
-    alert('Gagal menyimpan stok: ' + res.error.message);
-  }
-}
-
-async function loadStokData() {
-  let query = _supabase.from('reseller_stock').select('*');
-  const bulan = document.getElementById('filterBulanStok').value;
-  if (bulan) {
-    query = query.gte('tanggal', `${bulan}-01`).lte('tanggal', `${bulan}-31`);
-  }
-
-  const { data } = await query;
-  document.getElementById('bodyStok').innerHTML = (data || []).map(d => `
-    <tr>
-      <td>${d.tanggal || '-'}</td>
-      <td><b>${d.nama_server}</b></td>
-      <td>${d.nama_reseller}</td>
-      <td>${d.petugas_lapangan || '-'}</td>
-      <td>${d.v2k}</td><td>${d.v3k}</td><td>${d.v4k}</td><td>${d.v5k}</td><td>${d.v6k}</td><td>${d.v25k}</td>
-      <td>${d.b1hp}</td><td>${d.b2hp}</td><td>${d.b3hp}</td><td>${d.b4hp}</td><td>${d.b5hp}</td>
-      <td>
-        <button class="btn btn-sm btn-danger" onclick="hapusRecord('reseller_stock', '${d.id}', loadStokData, 'Stok Reseller ${d.nama_reseller}')"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    </tr>`).join('');
-}
-
-// --- MANAJEMEN KARYAWAN ---
-async function simpanKaryawan(e) {
-  e.preventDefault();
-  const id = document.getElementById('empDbId').value;
-  const payload = {
-    employee_id: document.getElementById('empID').value,
-    nama_karyawan: document.getElementById('empNama').value,
-    whatsapp: document.getElementById('empWA').value
-  };
-
-  let res;
-  if(id) {
-    res = await _supabase.from('employees').update(payload).eq('id', id);
-    await logActivity('INPUT_DATA', `Update data karyawan: ${payload.nama_karyawan}`);
-  } else {
-    res = await _supabase.from('employees').insert([payload]);
-    await logActivity('INPUT_DATA', `Input data karyawan baru: ${payload.nama_karyawan}`);
-  }
-
-  if(!res.error) {
-    alert('Data Karyawan Berhasil Disimpan!');
-    document.getElementById('empDbId').value = '';
-    e.target.reset();
-    loadKaryawanData();
-  } else {
-    alert('Gagal menyimpan karyawan: ' + res.error.message);
-  }
-}
-
-async function loadKaryawanData() {
-  const { data } = await _supabase.from('employees').select('*');
-  document.getElementById('bodyKaryawan').innerHTML = (data || []).map(e => `
-    <tr>
-      <td><b>${e.employee_id}</b></td>
-      <td>${e.nama_karyawan}</td>
-      <td>${e.whatsapp}</td>
-      <td>
-        <button class="btn btn-sm btn-warning text-white me-1" onclick="editKaryawan('${e.id}', '${e.employee_id}', '${e.nama_karyawan}', '${e.whatsapp}')"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn btn-sm btn-danger" onclick="hapusRecord('employees', '${e.id}', loadKaryawanData, 'Karyawan ${e.nama_karyawan}')"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    </tr>`).join('');
-}
-
-function editKaryawan(id, empId, nama, wa) {
-  document.getElementById('empDbId').value = id;
-  document.getElementById('empID').value = empId;
-  document.getElementById('empNama').value = nama;
-  document.getElementById('empWA').value = wa;
-}
-
-// --- KASBON & REKAPITULASI ---
-async function simpanKasbon(e) {
-  e.preventDefault();
-  const id = document.getElementById('ksbId').value;
-  const payload = {
-    tanggal: document.getElementById('ksbTanggal').value,
-    nama_karyawan: document.getElementById('ksbKaryawan').value,
-    jumlah_kasbon: parseFloat(document.getElementById('ksbJumlah').value || 0),
-    sumber_dana: document.getElementById('ksbSumber').value,
-    keterangan: document.getElementById('ksbKet').value || '-'
-  };
-
-  let res;
-  if(id) {
-    res = await _supabase.from('kasbon').update(payload).eq('id', id);
-    await logActivity('INPUT_DATA', `Update kasbon karyawan: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
-  } else {
-    res = await _supabase.from('kasbon').insert([payload]);
-    await logActivity('INPUT_DATA', `Input kasbon baru: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
-  }
-
-  if(!res.error) {
-    alert('Kasbon Berhasil Dicatat!');
-    document.getElementById('ksbId').value = '';
-    e.target.reset();
-    loadKasbonData();
-  } else {
-    alert('Gagal menyimpan kasbon: ' + res.error.message);
-  }
-}
-
-async function loadKasbonData() {
-  const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
-  const { data: srvs } = await _supabase.from('servers').select('nama_server');
-
-  document.getElementById('ksbKaryawan').innerHTML = '<option value="">-- Pilih Karyawan --</option>' + 
-    (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
-  document.getElementById('fltKasbonKaryawan').innerHTML = '<option value="">-- Semua Karyawan --</option>' + 
-    (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
-  document.getElementById('ksbSumber').innerHTML = '<option value="">-- Pilih Server --</option>' + 
-    (srvs || []).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
-
-  let query = _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
-
-  const empFlt = document.getElementById('fltKasbonKaryawan').value;
-  const startFlt = document.getElementById('fltKasbonStart').value;
-  const endFlt = document.getElementById('fltKasbonEnd').value;
-
-  if(empFlt) query = query.eq('nama_karyawan', empFlt);
-  if(startFlt) query = query.gte('tanggal', startFlt);
-  if(endFlt) query = query.lte('tanggal', endFlt);
-
-  const { data } = await query;
-
-  const today = new Date();
-  const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000));
-  const oneMonthAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
-
-  let totalFiltered = 0, total2W = 0, total1M = 0;
-
-  (data || []).forEach(k => {
-    const val = parseFloat(k.jumlah_kasbon || 0);
-    const dDate = new Date(k.tanggal);
-
-    totalFiltered += val;
-    if(dDate >= twoWeeksAgo) total2W += val;
-    if(dDate >= oneMonthAgo) total1M += val;
-  });
-
-  document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${totalFiltered.toLocaleString('id-ID')}`;
-  document.getElementById('rekapTotalKasbon2W').innerText = `Rp ${total2W.toLocaleString('id-ID')}`;
-  document.getElementById('rekapTotalKasbon1M').innerText = `Rp ${total1M.toLocaleString('id-ID')}`;
-
-  document.getElementById('bodyKasbon').innerHTML = (data || []).map(k => `
-    <tr>
-      <td>${k.tanggal}</td>
-      <td><b>${k.nama_karyawan}</b></td>
-      <td>Rp ${parseFloat(k.jumlah_kasbon).toLocaleString('id-ID')}</td>
-      <td><span class="badge bg-secondary">${k.sumber_dana}</span></td>
-      <td>${k.keterangan}</td>
-      <td>
-        <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Kasbon ${k.nama_karyawan}')"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    </tr>`).join('');
-}
-
-// --- PROFIL SAYA ---
-function loadProfilData() {
-  if (!currentUser) return;
-  document.getElementById('prfUsername').value = currentUser.username || '';
-  document.getElementById('prfNamaLengkap').value = currentUser.nama_lengkap || '';
-  document.getElementById('prfEmail').value = currentUser.email || '';
-  document.getElementById('prfWA').value = currentUser.whatsapp || '';
-  if (currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
-}
-
-function previewSelectedImage(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      base64AvatarImage = evt.target.result;
-      document.getElementById('prfAvatarPreview').src = base64AvatarImage;
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
-async function simpanProfil(e) {
-  e.preventDefault();
-  const updatePayload = {
-    nama_lengkap: document.getElementById('prfNamaLengkap').value,
-    email: document.getElementById('prfEmail').value,
-    whatsapp: document.getElementById('prfWA').value
-  };
-  if (base64AvatarImage) updatePayload.avatar_url = base64AvatarImage;
-
-  const { error } = await _supabase.from('users').update(updatePayload).eq('id', currentUser.id);
-  if(!error) {
-    Object.assign(currentUser, updatePayload);
-    sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
-    document.getElementById('navUserName').innerText = currentUser.nama_lengkap || currentUser.username;
-    await logActivity('INPUT_DATA', `Memperbarui profil diri`);
-    alert('Profil berhasil diperbarui!');
-  } else {
-    alert('Gagal memperbarui profil: ' + error.message);
-  }
-}
-
-// --- MONITORING PEKERJAAN & TITIK KOORDINAT GOOGLE MAPS ---
-async function loadMonitoringData() {
-  let logs = [];
-  try {
-    const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
-    if (error) throw error;
-    logs = data || [];
-  } catch (err) {
-    logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
-    logs = logs.slice(0, MAX_LOG_LIMIT);
-  }
-
-  const dateFlt = document.getElementById('fltLogDate').value;
-  const typeFlt = document.getElementById('fltLogType').value;
-
-  let filtered = logs;
-  if (dateFlt) {
-    filtered = filtered.filter(l => (l.waktu || '').startsWith(dateFlt));
-  }
-  if (typeFlt) {
-    filtered = filtered.filter(l => l.tipe === typeFlt);
-  }
-
-  document.getElementById('bodyMonitoring').innerHTML = filtered.map(l => {
-    const d = new Date(l.waktu);
-    const formatWaktu = isNaN(d) ? l.waktu : d.toLocaleString('id-ID');
-    const badgeColor = l.tipe === 'LOGIN' ? 'bg-info' : 'bg-success';
-
-    // FORMAT LINK INTERAKTIF KE GOOGLE MAPS
-    let gmapsLink = '<span class="badge bg-secondary">Tidak diketahui</span>';
-    if (l.koordinat && l.koordinat.includes(',')) {
-      const coordsClean = l.koordinat.replace(/\s+/g, '');
-      gmapsLink = `<a href="https://maps.google.com/?q=${coordsClean}" target="_blank" class="badge bg-primary text-decoration-none px-2 py-1"><i class="fa-solid fa-location-dot me-1"></i>${l.koordinat}</a>`;
-    }
-
-    return `
-      <tr>
-        <td><small class="text-muted fw-bold">${formatWaktu}</small></td>
-        <td><b>${l.username}</b> <span class="badge bg-light text-dark border">${l.role}</span></td>
-        <td><span class="badge ${badgeColor}">${l.tipe}</span></td>
-        <td>${l.detail}</td>
-        <td><small class="text-truncate d-inline-block" style="max-width: 180px;" title="${l.device}">${l.device || '-'}</small></td>
-        <td>${gmapsLink}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// --- USER MANAGEMENT (SUPERADMIN & MANAJER) ---
-async function simpanUserMgmt(e) {
-  e.preventDefault();
-  const id = document.getElementById('usrDbId').value;
-  const pass = document.getElementById('usrPass').value;
-
-  const payload = {
-    username: document.getElementById('usrName').value.trim().toLowerCase(),
-    nama_lengkap: document.getElementById('usrFullName').value,
-    email: document.getElementById('usrEmail').value,
-    whatsapp: document.getElementById('usrWA').value,
-    role: document.getElementById('usrRole').value
-  };
-
-  if (pass) payload.password_hash = pass;
-
-  let res;
-  if (id) {
-    res = await _supabase.from('users').update(payload).eq('id', id);
-    await logActivity('INPUT_DATA', `Update user admin/manajer: ${payload.username}`);
-  } else {
-    res = await _supabase.from('users').insert([payload]);
-    await logActivity('INPUT_DATA', `Tambah user baru: ${payload.username}`);
-  }
-
-  if (!res.error) {
-    alert('Akun User Berhasil Disimpan!');
-    document.getElementById('usrDbId').value = '';
-    e.target.reset();
-    loadUserData();
-  } else {
-    alert('Gagal menyimpan user: ' + res.error.message);
-  }
-}
-
-async function loadUserData() {
-  const { data } = await _supabase.from('users').select('*');
-  document.getElementById('bodyUsers').innerHTML = (data || []).map(u => `
-    <tr>
-      <td><b>${u.username}</b></td>
-      <td>${u.nama_lengkap || '-'}</td>
-      <td>${u.email || '-'}</td>
-      <td>${u.whatsapp || '-'}</td>
-      <td><span class="badge bg-primary">${u.role}</span></td>
-      <td>
-        <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap || ''}', '${u.email || ''}', '${u.whatsapp || ''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    </tr>`).join('');
-}
-
-function editUser(id, username, nama, email, wa, role) {
-  document.getElementById('usrDbId').value = id;
-  document.getElementById('usrName').value = username;
-  document.getElementById('usrFullName').value = nama;
-  document.getElementById('usrEmail').value = email;
-  document.getElementById('usrWA').value = wa;
-  document.getElementById('usrRole').value = role;
-}
-
-// --- GENERAL DELETE HELPER WITH WARNING DIALOG ---
-async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
-  const konfirmasi = confirm(`⚠️ PERINGATAN PENTING ⚠️\n\nApakah Anda benar-benar yakin ingin menghapus "${itemDesc}"?\n\nData yang telah dihapus tidak dapat dikembalikan lagi.`);
-
-  if (konfirmasi) {
-    const { error } = await _supabase.from(tableName).delete().eq('id', id);
-    if (!error) {
-      await logActivity('INPUT_DATA', `Menghapus record: ${itemDesc}`);
-      alert('Data berhasil dihapus!');
-      reloadFn();
-    } else {
-      alert('Gagal menghapus: ' + error.message);
-    }
-  }
-}
-
-// --- FORMATTED EXCEL EXPORT (EXCELJS) ---
-async function exportFormattedExcel(tableId, filename) {
-  const table = document.getElementById(tableId);
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Sheet1');
-
-  const headers = [];
-  table.querySelectorAll('thead th').forEach(th => {
-    if(th.innerText !== 'AKSI') headers.push(th.innerText);
-  });
-  worksheet.addRow(headers);
-
-  const headerRow = worksheet.getRow(1);
-  headerRow.eachCell((cell) => {
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0F172A' } };
-    cell.font = { name: 'Arial', color: { argb: 'FFFFFF' }, bold: true, size: 10 };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
-  });
-
-  table.querySelectorAll('tbody tr').forEach(tr => {
-    const rowData = [];
-    tr.querySelectorAll('td').forEach((td, idx) => {
-      if (idx < headers.length) {
-        rowData.push(td.innerText.trim());
-      }
-    });
-    worksheet.addRow(rowData);
-  });
-
-  worksheet.eachRow((row, rowNumber) => {
-    if (rowNumber > 1) {
-      row.eachCell((cell) => {
-        cell.font = { name: 'Arial', size: 9 };
-        cell.border = {
-          top: { style: 'thin', color: { argb: 'CBD5E1' } },
-          left: { style: 'thin', color: { argb: 'CBD5E1' } },
-          bottom: { style: 'thin', color: { argb: 'CBD5E1' } },
-          right: { style: 'thin', color: { argb: 'CBD5E1' } }
-        };
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
+          () => resolve("Akses Lokasi Ditolak/Tidak Aktif"),
+          { timeout: 5000 }
+        );
       });
     }
-  });
 
-  worksheet.columns.forEach(column => {
-    let maxLen = 0;
-    column.eachCell({ includeEmpty: true }, cell => {
-      const len = cell.value ? cell.value.toString().length : 10;
-      if (len > maxLen) maxLen = len;
+    // --- LOG ACTIVITY & AUTOMATIC CLEANUP (> 50 DATA) ---
+    async function logActivity(tipe, detail) {
+      if (!currentUser) return;
+      
+      const loc = await getUserLocation();
+      const device = navigator.userAgent;
+      const payload = {
+        waktu: new Date().toISOString(),
+        username: currentUser.username,
+        role: currentUser.role,
+        tipe: tipe,
+        detail: detail,
+        device: device,
+        koordinat: loc
+      };
+
+      try {
+        const { error } = await _supabase.from('activity_logs').insert([payload]);
+        if (error) throw error;
+        
+        // Pembersihan otomatis: Hapus data terlama jika melebihi kuota MAX_LOG_LIMIT (50)
+        await cleanupOldLogs();
+
+      } catch (err) {
+        let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+        logs.unshift(payload);
+        if (logs.length > MAX_LOG_LIMIT) {
+          logs = logs.slice(0, MAX_LOG_LIMIT);
+        }
+        localStorage.setItem('rinnet_local_logs', JSON.stringify(logs));
+      }
+    }
+
+    async function cleanupOldLogs() {
+      try {
+        const { data: allLogs } = await _supabase.from('activity_logs').select('id').order('waktu', { ascending: false });
+        if (allLogs && allLogs.length > MAX_LOG_LIMIT) {
+          const idsToDelete = allLogs.slice(MAX_LOG_LIMIT).map(l => l.id);
+          await _supabase.from('activity_logs').delete().in('id', idsToDelete);
+        }
+      } catch(e) { console.log('Cleanup error:', e); }
+    }
+
+    // --- AUTHENTICATION ---
+    async function handleAuthLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value.trim().toLowerCase();
+      const p = document.getElementById('loginPassword').value;
+
+      const { data: user, error } = await _supabase.from('users').select('*').eq('username', u).single();
+
+      if (error || !user) {
+        alert('Username atau Password tidak ditemukan!');
+        return;
+      }
+
+      if (user.password_hash === p) {
+        currentUser = user;
+        sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
+        
+        await logActivity('LOGIN', `User ${user.username} (${user.role}) berhasil masuk ke sistem.`);
+        initAppView(user);
+      } else {
+        alert('Password salah!');
+      }
+    }
+
+    function initAppView(user) {
+      currentUser = user;
+      document.getElementById('pageLogin').classList.add('d-none');
+      document.getElementById('pageApp').classList.remove('d-none');
+      
+      document.getElementById('navUserName').innerText = user.nama_lengkap || user.username;
+      document.getElementById('userRoleBadge').innerText = user.role;
+      if (user.avatar_url) document.getElementById('navUserAvatar').src = user.avatar_url;
+
+      // HAK AKSES PERAN (ROLE MANAGEMENT)
+      if (user.role === 'SUPERADMIN') {
+        document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.remove('d-none'));
+      } else if (user.role === 'MANAJER') {
+        // Role Manajer dapat memantau monitoring aktivitas
+        document.querySelectorAll('.manager-sa-only').forEach(el => el.classList.remove('d-none'));
+      }
+
+      // Notifikasi realtime muncul saat ADA PERANGKAT/USER LOGIN
+      showLoginNotification(user);
+
+      // Mulai listener realtime untuk menangkap login user lain
+      listenRealtimeLogins();
+
+      loadDashboardData();
+    }
+
+    // --- NOTIFIKASI REALTIME LOGIN (OTOMATIS HILANG DALAM 5 DETIK) ---
+    async function showLoginNotification(user, customLog = null) {
+      let recentLog = customLog;
+      if (!recentLog) {
+        try {
+          const { data } = await _supabase.from('activity_logs')
+            .select('*')
+            .eq('tipe', 'LOGIN')
+            .order('waktu', { ascending: false })
+            .limit(1);
+          if (data && data.length > 0) recentLog = data[0];
+        } catch (e) {
+          let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+          recentLog = logs.find(l => l.tipe === 'LOGIN');
+        }
+      }
+
+      const alertBox = document.getElementById('userLoginAlert');
+      const alertText = document.getElementById('userLoginAlertText');
+
+      const targetUser = recentLog?.username || user.username;
+      const targetRole = recentLog?.role || user.role;
+      const devInfo = recentLog?.device || navigator.userAgent;
+      const coordInfo = recentLog?.koordinat || 'N/A';
+
+      alertText.innerHTML = `Perangkat/Pengguna <strong>${targetUser}</strong> (${targetRole}) baru saja masuk ke aplikasi.<br>` +
+        `• <strong>Device:</strong> <span class="text-truncate d-inline-block align-bottom" style="max-width: 250px;">${devInfo}</span><br>` +
+        `• <strong>Koordinat:</strong> ${coordInfo}`;
+      
+      alertBox.classList.remove('d-none');
+
+      // Clear timer sebelumnya bila ada
+      if (alertTimer) clearTimeout(alertTimer);
+
+      // Hilang otomatis tepat dalam 5000 ms (5 detik)
+      alertTimer = setTimeout(() => {
+        closeLoginAlert();
+      }, 5000);
+    }
+
+    function listenRealtimeLogins() {
+      try {
+        _supabase
+          .channel('public:activity_logs')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
+            if (payload.new && payload.new.tipe === 'LOGIN') {
+              showLoginNotification(null, payload.new);
+            }
+          })
+          .subscribe();
+      } catch (e) { console.log('Realtime Error:', e); }
+    }
+
+    function closeLoginAlert() {
+      const alertBox = document.getElementById('userLoginAlert');
+      if (alertBox) {
+        alertBox.classList.add('d-none');
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('rinnet_session_user');
+      location.reload();
+    }
+
+    // --- NAVIGATION ---
+    function switchMenu(menuName) {
+      const sections = ['dashboard', 'karyawan', 'kasbon', 'server', 'reseller', 'profil', 'monitoring', 'userMgmt', 'sysPerf'];
+      sections.forEach(s => {
+        const el = document.getElementById(`menu-${s}`);
+        if(el) el.classList.add('d-none');
+      });
+      
+      const target = document.getElementById(`menu-${menuName}`);
+      if(target) target.classList.remove('d-none');
+
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(menuName)) link.classList.add('active');
+      });
+
+      if (window.innerWidth < 992) document.getElementById('mainSidebar').classList.remove('show');
+
+      if (menuName === 'dashboard') loadDashboardData();
+      if (menuName === 'karyawan') loadKaryawanData();
+      if (menuName === 'kasbon') loadKasbonData();
+      if (menuName === 'server') loadServerData();
+      if (menuName === 'reseller') loadStokData();
+      if (menuName === 'profil') loadProfilData();
+      if (menuName === 'monitoring') loadMonitoringData();
+      if (menuName === 'userMgmt') loadUserData();
+    }
+
+    // --- DASHBOARD & SKALABILITAS GRAFIK (80 - 100+ DATA) ---
+    async function loadDashboardData() {
+      const { data: servers } = await _supabase.from('servers').select('*');
+      const { data: emps } = await _supabase.from('employees').select('*');
+      const { data: kasbons } = await _supabase.from('kasbon').select('*');
+      const { data: stocks } = await _supabase.from('reseller_stock').select('*');
+
+      const totalServerCount = (servers || []).length;
+      document.getElementById('dashTotalServer').innerText = totalServerCount;
+      document.getElementById('dashTotalKaryawan').innerText = (emps || []).length;
+
+      let sumKasbon = 0;
+      (kasbons || []).forEach(k => sumKasbon += parseFloat(k.jumlah_kasbon || 0));
+      document.getElementById('dashTotalKasbon').innerText = `Rp ${sumKasbon.toLocaleString('id-ID')}`;
+
+      let sumStok = 0;
+      (stocks || []).forEach(s => {
+        sumStok += (s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k + s.b1hp + s.b2hp + s.b3hp + s.b4hp + s.b5hp);
+      });
+      document.getElementById('dashTotalStok').innerText = sumStok;
+
+      // Disesuaikan agar muat jika ada 80 - 100+ server tanpa berdesakan
+      const chartWrapper = document.getElementById('chartWrapper');
+      if (totalServerCount > 15) {
+        chartWrapper.style.width = `${totalServerCount * 45}px`;
+      } else {
+        chartWrapper.style.width = '100%';
+      }
+
+      const ctx = document.getElementById('serverChart').getContext('2d');
+      if (activeChart) activeChart.destroy();
+      
+      activeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: (servers || []).map(s => s.nama_server),
+          datasets: [{
+            label: 'Alokasi Voucher Terdistribusi',
+            data: (servers || []).map(srv => {
+              const filterStk = (stocks || []).filter(stk => stk.nama_server === srv.nama_server);
+              return filterStk.reduce((acc, curr) => acc + (curr.v2k + curr.v3k + curr.v4k + curr.v5k + curr.v6k + curr.v25k), 0);
+            }),
+            backgroundColor: '#2563eb',
+            borderRadius: 6
+          }]
+        },
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 45, minRotation: 0 }
+            }
+          }
+        }
+      });
+    }
+
+    // --- MANAJEMEN SERVER ---
+    async function simpanServer(e) {
+      e.preventDefault();
+      const id = document.getElementById('srvId').value;
+      const payload = {
+        nama_server: document.getElementById('srvNama').value,
+        pengelola: document.getElementById('srvPengelola').value,
+        whatsapp: document.getElementById('srvWA').value,
+        wilayah: document.getElementById('srvWilayah').value
+      };
+
+      let res;
+      if(id) {
+        res = await _supabase.from('servers').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update server: ${payload.nama_server}`);
+      } else {
+        res = await _supabase.from('servers').insert([payload]);
+        await logActivity('INPUT_DATA', `Tambah server baru: ${payload.nama_server}`);
+      }
+
+      if (!res.error) {
+        alert('Data Server Berhasil Disimpan!');
+        document.getElementById('srvId').value = '';
+        e.target.reset();
+        loadServerData();
+      } else {
+        alert('Gagal menyimpan server: ' + res.error.message);
+      }
+    }
+
+    async function loadServerData() {
+      const { data } = await _supabase.from('servers').select('*');
+      document.getElementById('bodyServer').innerHTML = (data || []).map(s => `
+        <tr>
+          <td><b>${s.nama_server}</b></td>
+          <td>${s.pengelola}</td>
+          <td>${s.whatsapp}</td>
+          <td>${s.wilayah}</td>
+          <td>
+            <button class="btn btn-sm btn-warning text-white me-1" onclick="editServer('${s.id}', '${s.nama_server}', '${s.pengelola}', '${s.whatsapp}', '${s.wilayah}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('servers', '${s.id}', loadServerData, 'Server ${s.nama_server}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function editServer(id, nama, pengelola, wa, wilayah) {
+      document.getElementById('srvId').value = id;
+      document.getElementById('srvNama').value = nama;
+      document.getElementById('srvPengelola').value = pengelola;
+      document.getElementById('srvWA').value = wa;
+      document.getElementById('srvWilayah').value = wilayah;
+    }
+
+    // --- RESELLER & STOCK VOUCHER ---
+    async function simpanStokReseller(e) {
+      e.preventDefault();
+      const id = document.getElementById('stkId').value;
+      const payload = {
+        tanggal: document.getElementById('stkTanggal').value,
+        nama_server: document.getElementById('stkServer').value,
+        nama_reseller: document.getElementById('stkReseller').value,
+        petugas_lapangan: document.getElementById('stkPetugas').value,
+        v2k: parseInt(document.getElementById('v2k').value || 0),
+        v3k: parseInt(document.getElementById('v3k').value || 0),
+        v4k: parseInt(document.getElementById('v4k').value || 0),
+        v5k: parseInt(document.getElementById('v5k').value || 0),
+        v6k: parseInt(document.getElementById('v6k').value || 0),
+        v25k: parseInt(document.getElementById('v25k').value || 0),
+        b1hp: parseInt(document.getElementById('b1hp').value || 0),
+        b2hp: parseInt(document.getElementById('b2hp').value || 0),
+        b3hp: parseInt(document.getElementById('b3hp').value || 0),
+        b4hp: parseInt(document.getElementById('b4hp').value || 0),
+        b5hp: parseInt(document.getElementById('b5hp').value || 0)
+      };
+
+      let res;
+      if(id) {
+        res = await _supabase.from('reseller_stock').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update stok voucher reseller: ${payload.nama_reseller}`);
+      } else {
+        res = await _supabase.from('reseller_stock').insert([payload]);
+        await logActivity('INPUT_DATA', `Penyerahan stok voucher ke: ${payload.nama_reseller}`);
+      }
+
+      if (!res.error) {
+        alert('Penyerahan Stok Berhasil Disimpan!');
+        document.getElementById('stkId').value = '';
+        e.target.reset();
+        loadStokData();
+      } else {
+        alert('Gagal menyimpan stok: ' + res.error.message);
+      }
+    }
+
+    async function loadStokData() {
+      let query = _supabase.from('reseller_stock').select('*');
+      const bulan = document.getElementById('filterBulanStok').value;
+      if (bulan) {
+        query = query.gte('tanggal', `${bulan}-01`).lte('tanggal', `${bulan}-31`);
+      }
+
+      const { data } = await query;
+      document.getElementById('bodyStok').innerHTML = (data || []).map(d => `
+        <tr>
+          <td>${d.tanggal || '-'}</td>
+          <td><b>${d.nama_server}</b></td>
+          <td>${d.nama_reseller}</td>
+          <td>${d.petugas_lapangan || '-'}</td>
+          <td>${d.v2k}</td><td>${d.v3k}</td><td>${d.v4k}</td><td>${d.v5k}</td><td>${d.v6k}</td><td>${d.v25k}</td>
+          <td>${d.b1hp}</td><td>${d.b2hp}</td><td>${d.b3hp}</td><td>${d.b4hp}</td><td>${d.b5hp}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('reseller_stock', '${d.id}', loadStokData, 'Stok Reseller ${d.nama_reseller}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`).join('');
+    }
+
+    // --- MANAJEMEN KARYAWAN ---
+    async function simpanKaryawan(e) {
+      e.preventDefault();
+      const id = document.getElementById('empDbId').value;
+      const payload = {
+        employee_id: document.getElementById('empID').value,
+        nama_karyawan: document.getElementById('empNama').value,
+        whatsapp: document.getElementById('empWA').value
+      };
+
+      let res;
+      if(id) {
+        res = await _supabase.from('employees').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update data karyawan: ${payload.nama_karyawan}`);
+      } else {
+        res = await _supabase.from('employees').insert([payload]);
+        await logActivity('INPUT_DATA', `Input data karyawan baru: ${payload.nama_karyawan}`);
+      }
+
+      if(!res.error) {
+        alert('Data Karyawan Berhasil Disimpan!');
+        document.getElementById('empDbId').value = '';
+        e.target.reset();
+        loadKaryawanData();
+      } else {
+        alert('Gagal menyimpan karyawan: ' + res.error.message);
+      }
+    }
+
+    async function loadKaryawanData() {
+      const { data } = await _supabase.from('employees').select('*');
+      document.getElementById('bodyKaryawan').innerHTML = (data || []).map(e => `
+        <tr>
+          <td><b>${e.employee_id}</b></td>
+          <td>${e.nama_karyawan}</td>
+          <td>${e.whatsapp}</td>
+          <td>
+            <button class="btn btn-sm btn-warning text-white me-1" onclick="editKaryawan('${e.id}', '${e.employee_id}', '${e.nama_karyawan}', '${e.whatsapp}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('employees', '${e.id}', loadKaryawanData, 'Karyawan ${e.nama_karyawan}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function editKaryawan(id, empId, nama, wa) {
+      document.getElementById('empDbId').value = id;
+      document.getElementById('empID').value = empId;
+      document.getElementById('empNama').value = nama;
+      document.getElementById('empWA').value = wa;
+    }
+
+    // --- KASBON & REKAPITULASI ---
+    async function simpanKasbon(e) {
+      e.preventDefault();
+      const id = document.getElementById('ksbId').value;
+      const payload = {
+        tanggal: document.getElementById('ksbTanggal').value,
+        nama_karyawan: document.getElementById('ksbKaryawan').value,
+        jumlah_kasbon: parseFloat(document.getElementById('ksbJumlah').value || 0),
+        sumber_dana: document.getElementById('ksbSumber').value,
+        keterangan: document.getElementById('ksbKet').value || '-'
+      };
+
+      let res;
+      if(id) {
+        res = await _supabase.from('kasbon').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update kasbon karyawan: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
+      } else {
+        res = await _supabase.from('kasbon').insert([payload]);
+        await logActivity('INPUT_DATA', `Input kasbon baru: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
+      }
+
+      if(!res.error) {
+        alert('Kasbon Berhasil Dicatat!');
+        document.getElementById('ksbId').value = '';
+        e.target.reset();
+        loadKasbonData();
+      } else {
+        alert('Gagal menyimpan kasbon: ' + res.error.message);
+      }
+    }
+
+    async function loadKasbonData() {
+      const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
+      const { data: srvs } = await _supabase.from('servers').select('nama_server');
+
+      document.getElementById('ksbKaryawan').innerHTML = '<option value="">-- Pilih Karyawan --</option>' + 
+        (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
+      document.getElementById('fltKasbonKaryawan').innerHTML = '<option value="">-- Semua Karyawan --</option>' + 
+        (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
+      document.getElementById('ksbSumber').innerHTML = '<option value="">-- Pilih Server --</option>' + 
+        (srvs || []).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
+
+      let query = _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
+      
+      const empFlt = document.getElementById('fltKasbonKaryawan').value;
+      const startFlt = document.getElementById('fltKasbonStart').value;
+      const endFlt = document.getElementById('fltKasbonEnd').value;
+
+      if(empFlt) query = query.eq('nama_karyawan', empFlt);
+      if(startFlt) query = query.gte('tanggal', startFlt);
+      if(endFlt) query = query.lte('tanggal', endFlt);
+
+      const { data } = await query;
+
+      const today = new Date();
+      const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000));
+      const oneMonthAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+
+      let totalFiltered = 0, total2W = 0, total1M = 0;
+
+      (data || []).forEach(k => {
+        const val = parseFloat(k.jumlah_kasbon || 0);
+        const dDate = new Date(k.tanggal);
+        
+        totalFiltered += val;
+        if(dDate >= twoWeeksAgo) total2W += val;
+        if(dDate >= oneMonthAgo) total1M += val;
+      });
+
+      document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${totalFiltered.toLocaleString('id-ID')}`;
+      document.getElementById('rekapTotalKasbon2W').innerText = `Rp ${total2W.toLocaleString('id-ID')}`;
+      document.getElementById('rekapTotalKasbon1M').innerText = `Rp ${total1M.toLocaleString('id-ID')}`;
+
+      document.getElementById('bodyKasbon').innerHTML = (data || []).map(k => `
+        <tr>
+          <td>${k.tanggal}</td>
+          <td><b>${k.nama_karyawan}</b></td>
+          <td>Rp ${parseFloat(k.jumlah_kasbon).toLocaleString('id-ID')}</td>
+          <td><span class="badge bg-secondary">${k.sumber_dana}</span></td>
+          <td>${k.keterangan}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Kasbon ${k.nama_karyawan}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`).join('');
+    }
+
+    // --- PROFIL SAYA ---
+    function loadProfilData() {
+      if (!currentUser) return;
+      document.getElementById('prfUsername').value = currentUser.username || '';
+      document.getElementById('prfNamaLengkap').value = currentUser.nama_lengkap || '';
+      document.getElementById('prfEmail').value = currentUser.email || '';
+      document.getElementById('prfWA').value = currentUser.whatsapp || '';
+      if (currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
+    }
+
+    function previewSelectedImage(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          base64AvatarImage = evt.target.result;
+          document.getElementById('prfAvatarPreview').src = base64AvatarImage;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function simpanProfil(e) {
+      e.preventDefault();
+      const updatePayload = {
+        nama_lengkap: document.getElementById('prfNamaLengkap').value,
+        email: document.getElementById('prfEmail').value,
+        whatsapp: document.getElementById('prfWA').value
+      };
+      if (base64AvatarImage) updatePayload.avatar_url = base64AvatarImage;
+
+      const { error } = await _supabase.from('users').update(updatePayload).eq('id', currentUser.id);
+      if(!error) {
+        Object.assign(currentUser, updatePayload);
+        sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
+        document.getElementById('navUserName').innerText = currentUser.nama_lengkap || currentUser.username;
+        await logActivity('INPUT_DATA', `Memperbarui profil diri`);
+        alert('Profil berhasil diperbarui!');
+      } else {
+        alert('Gagal memperbarui profil: ' + error.message);
+      }
+    }
+
+    // --- MONITORING PEKERJAAN & TITIK KOORDINAT GOOGLE MAPS ---
+    async function loadMonitoringData() {
+      let logs = [];
+      try {
+        const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
+        if (error) throw error;
+        logs = data || [];
+      } catch (err) {
+        logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+        logs = logs.slice(0, MAX_LOG_LIMIT);
+      }
+
+      const dateFlt = document.getElementById('fltLogDate').value;
+      const typeFlt = document.getElementById('fltLogType').value;
+
+      let filtered = logs;
+      if (dateFlt) {
+        filtered = filtered.filter(l => (l.waktu || '').startsWith(dateFlt));
+      }
+      if (typeFlt) {
+        filtered = filtered.filter(l => l.tipe === typeFlt);
+      }
+
+      document.getElementById('bodyMonitoring').innerHTML = filtered.map(l => {
+        const d = new Date(l.waktu);
+        const formatWaktu = isNaN(d) ? l.waktu : d.toLocaleString('id-ID');
+        const badgeColor = l.tipe === 'LOGIN' ? 'bg-info' : 'bg-success';
+        
+        // FORMAT LINK INTERAKTIF KE GOOGLE MAPS
+        let gmapsLink = '<span class="badge bg-secondary">Tidak diketahui</span>';
+        if (l.koordinat && l.koordinat.includes(',')) {
+          const coordsClean = l.koordinat.replace(/\s+/g, '');
+          gmapsLink = `<a href="https://maps.google.com/?q=${coordsClean}" target="_blank" class="badge bg-primary text-decoration-none px-2 py-1"><i class="fa-solid fa-location-dot me-1"></i>${l.koordinat}</a>`;
+        }
+
+        return `
+          <tr>
+            <td><small class="text-muted fw-bold">${formatWaktu}</small></td>
+            <td><b>${l.username}</b> <span class="badge bg-light text-dark border">${l.role}</span></td>
+            <td><span class="badge ${badgeColor}">${l.tipe}</span></td>
+            <td>${l.detail}</td>
+            <td><small class="text-truncate d-inline-block" style="max-width: 180px;" title="${l.device}">${l.device || '-'}</small></td>
+            <td>${gmapsLink}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- USER MANAGEMENT (SUPERADMIN & MANAJER) ---
+    async function simpanUserMgmt(e) {
+      e.preventDefault();
+      const id = document.getElementById('usrDbId').value;
+      const pass = document.getElementById('usrPass').value;
+
+      const payload = {
+        username: document.getElementById('usrName').value.trim().toLowerCase(),
+        nama_lengkap: document.getElementById('usrFullName').value,
+        email: document.getElementById('usrEmail').value,
+        whatsapp: document.getElementById('usrWA').value,
+        role: document.getElementById('usrRole').value
+      };
+
+      if (pass) payload.password_hash = pass;
+
+      let res;
+      if (id) {
+        res = await _supabase.from('users').update(payload).eq('id', id);
+        await logActivity('INPUT_DATA', `Update user admin/manajer: ${payload.username}`);
+      } else {
+        res = await _supabase.from('users').insert([payload]);
+        await logActivity('INPUT_DATA', `Tambah user baru: ${payload.username}`);
+      }
+
+      if (!res.error) {
+        alert('Akun User Berhasil Disimpan!');
+        document.getElementById('usrDbId').value = '';
+        e.target.reset();
+        loadUserData();
+      } else {
+        alert('Gagal menyimpan user: ' + res.error.message);
+      }
+    }
+
+    async function loadUserData() {
+      const { data } = await _supabase.from('users').select('*');
+      document.getElementById('bodyUsers').innerHTML = (data || []).map(u => `
+        <tr>
+          <td><b>${u.username}</b></td>
+          <td>${u.nama_lengkap || '-'}</td>
+          <td>${u.email || '-'}</td>
+          <td>${u.whatsapp || '-'}</td>
+          <td><span class="badge bg-primary">${u.role}</span></td>
+          <td>
+            <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap || ''}', '${u.email || ''}', '${u.whatsapp || ''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function editUser(id, username, nama, email, wa, role) {
+      document.getElementById('usrDbId').value = id;
+      document.getElementById('usrName').value = username;
+      document.getElementById('usrFullName').value = nama;
+      document.getElementById('usrEmail').value = email;
+      document.getElementById('usrWA').value = wa;
+      document.getElementById('usrRole').value = role;
+    }
+
+    // --- GENERAL DELETE HELPER WITH WARNING DIALOG ---
+    async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
+      const konfirmasi = confirm(`⚠️ PERINGATAN PENTING ⚠️\n\nApakah Anda benar-benar yakin ingin menghapus "${itemDesc}"?\n\nData yang telah dihapus tidak dapat dikembalikan lagi.`);
+      
+      if (konfirmasi) {
+        const { error } = await _supabase.from(tableName).delete().eq('id', id);
+        if (!error) {
+          await logActivity('INPUT_DATA', `Menghapus record: ${itemDesc}`);
+          alert('Data berhasil dihapus!');
+          reloadFn();
+        } else {
+          alert('Gagal menghapus: ' + error.message);
+        }
+      }
+    }
+
+    // --- FORMATTED EXCEL EXPORT (EXCELJS) ---
+    async function exportFormattedExcel(tableId, filename) {
+      const table = document.getElementById(tableId);
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Sheet1');
+
+      const headers = [];
+      table.querySelectorAll('thead th').forEach(th => {
+        if(th.innerText !== 'AKSI') headers.push(th.innerText);
+      });
+      worksheet.addRow(headers);
+
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell((cell) => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0F172A' } };
+        cell.font = { name: 'Arial', color: { argb: 'FFFFFF' }, bold: true, size: 10 };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      });
+
+      table.querySelectorAll('tbody tr').forEach(tr => {
+        const rowData = [];
+        tr.querySelectorAll('td').forEach((td, idx) => {
+          if (idx < headers.length) {
+            rowData.push(td.innerText.trim());
+          }
+        });
+        worksheet.addRow(rowData);
+      });
+
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber > 1) {
+          row.eachCell((cell) => {
+            cell.font = { name: 'Arial', size: 9 };
+            cell.border = {
+              top: { style: 'thin', color: { argb: 'CBD5E1' } },
+              left: { style: 'thin', color: { argb: 'CBD5E1' } },
+              bottom: { style: 'thin', color: { argb: 'CBD5E1' } },
+              right: { style: 'thin', color: { argb: 'CBD5E1' } }
+            };
+          });
+        }
+      });
+
+      worksheet.columns.forEach(column => {
+        let maxLen = 0;
+        column.eachCell({ includeEmpty: true }, cell => {
+          const len = cell.value ? cell.value.toString().length : 10;
+          if (len > maxLen) maxLen = len;
+        });
+        column.width = Math.max(maxLen + 4, 12);
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      saveAs(new Blob([buffer]), `${filename}.xlsx`);
+    }
+
+    // --- INITIAL SESSION CHECK ---
+    document.addEventListener('DOMContentLoaded', () => {
+      const activeSession = sessionStorage.getItem('rinnet_session_user');
+      if (activeSession) {
+        initAppView(JSON.parse(activeSession));
+      }
     });
-    column.width = Math.max(maxLen + 4, 12);
-  });
-
-  const buffer = await workbook.xlsx.writeBuffer();
-  saveAs(new Blob([buffer]), `${filename}.xlsx`);
-}
-
-// --- INITIAL SESSION CHECK ---
-document.addEventListener('DOMContentLoaded', () => {
-  const activeSession = sessionStorage.getItem('rinnet_session_user');
-  if (activeSession) {
-    initAppView(JSON.parse(activeSession));
-  }
-});
-</script>
+  </script>
 </body>
 </html>
