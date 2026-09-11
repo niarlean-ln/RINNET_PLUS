@@ -34,7 +34,21 @@
       color: var(--text-main);
     }
 
-    /* --- LOGO & BRANDING --- */
+    /* --- BRANDING & TYPOGRAPHY LOGO --- */
+    .brand-title {
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title-sidebar {
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+
     .brand-logo-wrap {
       display: inline-flex;
       align-items: center;
@@ -192,7 +206,7 @@
       <div class="brand-logo-wrap">
         <img src="logo.png" alt="RINNET PLUS" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-bolt-lightning fs-2 text-white\'></i>';">
       </div>
-      <h3 class="fw-800 mb-0" style="color: var(--primary); letter-spacing: -0.5px;">RINNET PLUS</h3>
+      <h3 class="brand-title mb-0">RINNET PLUS</h3>
       <p class="text-muted small mb-4 fw-600">Internal Enterprise Management System</p>
       
       <form onsubmit="handleAuthLogin(event)">
@@ -219,7 +233,7 @@
     <!-- Header Mobile Toggle -->
     <div class="mobile-header d-lg-none">
       <div class="fw-bold fs-5 d-flex align-items-center gap-2">
-        <i class="fa-solid fa-bolt-lightning text-primary"></i> RINNET+
+        <i class="fa-solid fa-bolt-lightning text-primary"></i> RINNET PLUS
       </div>
       <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
     </div>
@@ -231,7 +245,7 @@
           <div class="bg-primary rounded-3 p-2 text-white d-inline-flex" style="width: 36px; height: 36px; align-items: center; justify-content: center;">
             <img src="logo.png" alt="Logo" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-bolt-lightning\'></i>';">
           </div>
-          <span class="fw-800 fs-5 text-white tracking-wide">RINNET+</span>
+          <span class="brand-title-sidebar fs-5">RINNET PLUS</span>
         </div>
         <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
         <h6 class="fw-800 text-white mb-0" id="navUserName">User</h6>
@@ -549,7 +563,7 @@
 
             <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
             <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" placeholder="Nama Lengkap Terdaftar" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Email Resmi</label><input type="email" id="prfEmail" class="form-control" placeholder="email@perusahaan.com" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" placeholder="nama@email.com" required></div>
             <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
             <button type="submit" class="btn btn-primary fw-bold w-100">Simpan Profil Saya</button>
           </form>
@@ -725,13 +739,11 @@
     let activeChart = null;
     let currentUser = null;
     let base64AvatarImage = "";
-    let userLocation = "Tidak diizinkan/Tidak tersedia";
 
     function toggleSidebar() {
       document.getElementById('mainSidebar').classList.toggle('show');
     }
 
-    // Capture User Geolocation (Async Promise Wrapper)
     function getUserLocation() {
       return new Promise((resolve) => {
         if (!navigator.geolocation) {
@@ -746,7 +758,6 @@
       });
     }
 
-    // Logging Pekerjaan / Aktivitas
     async function logActivity(tipe, detail) {
       if (!currentUser) return;
       
@@ -808,7 +819,7 @@
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
         checkSuperadminNotif();
-        setInterval(checkSuperadminNotif, 15000); // Polling otomatis notifikasi
+        setInterval(checkSuperadminNotif, 15000);
       }
 
       loadDashboardData();
@@ -1307,9 +1318,11 @@
       document.getElementById('usrRole').value = role;
     }
 
-    // --- GENERAL DELETE HELPER ---
+    // --- GENERAL DELETE HELPER WITH WARNING DIALOG ---
     async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
-      if (confirm('Apakah Anda yakin ingin menghapus data me-record ini?')) {
+      const konfirmasi = confirm(`⚠️ PERINGATAN PENTING ⚠️\n\nApakah Anda benar-benar yakin ingin menghapus "${itemDesc}"?\n\nData yang telah dihapus tidak dapat dikembalikan lagi.`);
+      
+      if (konfirmasi) {
         const { error } = await _supabase.from(tableName).delete().eq('id', id);
         if (!error) {
           await logActivity('INPUT_DATA', `Menghapus record: ${itemDesc}`);
