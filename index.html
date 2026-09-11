@@ -34,7 +34,7 @@
       color: var(--text-main);
     }
 
-    /* --- LOGO STICKER / VECTOR MODERN STYLE --- */
+    /* --- PERBAIKAN LOGO & ICON --- */
     .brand-logo-badge {
       display: inline-flex;
       align-items: center;
@@ -45,18 +45,25 @@
       border-radius: 20px;
       box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
       color: #ffffff;
-      margin-bottom: 1rem;
+      margin: 0 auto 1rem auto;
       position: relative;
       transition: all 0.3s ease;
+    }
+
+    .brand-logo-badge i {
+      font-size: 2rem;
+      color: #ffffff !important;
+      z-index: 2;
     }
 
     .brand-logo-badge::after {
       content: '';
       position: absolute;
       top: 4px; left: 4px; right: 4px; bottom: 4px;
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
       border-radius: 16px;
       pointer-events: none;
+      z-index: 1;
     }
 
     .brand-logo-sidebar {
@@ -68,6 +75,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      color: #ffffff;
     }
 
     .brand-title {
@@ -217,9 +225,9 @@
   <!-- ================= PAGE 1: LOGIN ================= -->
   <div id="pageLogin" class="login-container">
     <div class="login-card text-center">
-      <!-- Logo Vector Badge Dynamic -->
+      <!-- Logo Vector Badge dengan Icon Terbaca -->
       <div class="brand-logo-badge">
-        <i class="fa-solid fa-network-wired fs-2 text-white"></i>
+        <i class="fa-solid fa-diagram-project"></i>
       </div>
       <h3 class="brand-title mb-0">RINNET PLUS</h3>
       <p class="text-muted small mb-4 fw-600">Internal Enterprise Management System</p>
@@ -249,7 +257,7 @@
     <div class="mobile-header d-lg-none">
       <div class="fw-bold fs-5 d-flex align-items-center gap-2">
         <div class="brand-logo-sidebar">
-          <i class="fa-solid fa-network-wired text-white fs-6"></i>
+          <i class="fa-solid fa-diagram-project text-white fs-6"></i>
         </div>
         <span>RINNET PLUS</span>
       </div>
@@ -261,7 +269,7 @@
       <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
         <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
           <div class="brand-logo-sidebar">
-            <i class="fa-solid fa-network-wired text-white fs-6"></i>
+            <i class="fa-solid fa-diagram-project text-white fs-6"></i>
           </div>
           <span class="brand-title-sidebar fs-5">RINNET PLUS</span>
         </div>
@@ -291,11 +299,11 @@
     <!-- Main Content Area -->
     <main class="content-area">
 
-      <!-- ALERT NOTIFIKASI LOGIN SUPERADMIN -->
+      <!-- ALERT NOTIFIKASI LOGIN OTOMATIS HILANG 3 DETIK -->
       <div id="superadminLoginAlert" class="alert alert-warning alert-dismissible fade show d-none mb-4 shadow-sm" role="alert">
         <h6 class="alert-heading fw-bold mb-1"><i class="fa-solid fa-shield-halved me-2"></i>Notifikasi Akses / Login Masuk</h6>
         <div id="superadminLoginAlertText" class="small"></div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type="button" class="btn-close" onclick="closeLoginAlert()" aria-label="Close"></button>
       </div>
 
       <!-- MENU 1: DASHBOARD -->
@@ -625,7 +633,7 @@
                   <th>Kategori</th>
                   <th>Detail Aktivitas / Modul</th>
                   <th>Perangkat (Device)</th>
-                  <th>Titik Koordinat GPS</th>
+                  <th>Titik Koordinat GPS (GMaps)</th>
                 </tr>
               </thead>
               <tbody id="bodyMonitoring"></tbody>
@@ -757,6 +765,8 @@
     let activeChart = null;
     let currentUser = null;
     let base64AvatarImage = "";
+    let alertTimer = null;
+    const MAX_LOG_LIMIT = 10; // Batas simpan riwayat aktivitas (bisa disesuaikan)
 
     function toggleSidebar() {
       document.getElementById('mainSidebar').classList.toggle('show');
@@ -776,6 +786,7 @@
       });
     }
 
+    // --- LOG ACTIVITY DENGAN AUTO CLEANUP MAX 10 LOG ---
     async function logActivity(tipe, detail) {
       if (!currentUser) return;
       
@@ -794,11 +805,28 @@
       try {
         const { error } = await _supabase.from('activity_logs').insert([payload]);
         if (error) throw error;
+        
+        // PEMBERSIHAN OTOMATIS: Hapus log lama melebihi kuota 10 teratas
+        cleanupOldLogs();
+
       } catch (err) {
         let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
         logs.unshift(payload);
+        if (logs.length > MAX_LOG_LIMIT) {
+          logs = logs.slice(0, MAX_LOG_LIMIT); // Batasi hanya 10 log
+        }
         localStorage.setItem('rinnet_local_logs', JSON.stringify(logs));
       }
+    }
+
+    async function cleanupOldLogs() {
+      try {
+        const { data: allLogs } = await _supabase.from('activity_logs').select('id').order('waktu', { ascending: false });
+        if (allLogs && allLogs.length > MAX_LOG_LIMIT) {
+          const idsToDelete = allLogs.slice(MAX_LOG_LIMIT).map(l => l.id);
+          await _supabase.from('activity_logs').delete().in('id', idsToDelete);
+        }
+      } catch(e) { console.log('Cleanup error:', e); }
     }
 
     // --- AUTHENTICATION ---
@@ -836,14 +864,16 @@
 
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
-        checkSuperadminNotif();
-        setInterval(checkSuperadminNotif, 15000);
       }
+
+      // Tampilkan notifikasi login untuk SEMUA user yang masuk
+      showLoginNotification(user);
 
       loadDashboardData();
     }
 
-    async function checkSuperadminNotif() {
+    // --- NOTIFIKASI OTOMATIS HILANG DALAM 3 DETIK ---
+    async function showLoginNotification(user) {
       let recentLog = null;
       try {
         const { data } = await _supabase.from('activity_logs')
@@ -857,13 +887,31 @@
         recentLog = logs.find(l => l.tipe === 'LOGIN');
       }
 
-      if (recentLog) {
-        const alertBox = document.getElementById('superadminLoginAlert');
-        const alertText = document.getElementById('superadminLoginAlertText');
-        alertText.innerHTML = `<strong>${recentLog.username}</strong> (${recentLog.role}) baru saja mengakses sistem.<br>` +
-          `• <strong>Device:</strong> ${recentLog.device || recentLog.perangkat || 'Mobile/Browser'}<br>` +
-          `• <strong>Koordinat:</strong> ${recentLog.koordinat || 'N/A'}`;
-        alertBox.classList.remove('d-none');
+      const alertBox = document.getElementById('superadminLoginAlert');
+      const alertText = document.getElementById('superadminLoginAlertText');
+
+      const devInfo = recentLog?.device || navigator.userAgent;
+      const coordInfo = recentLog?.koordinat || 'N/A';
+
+      alertText.innerHTML = `<strong>${user.username}</strong> (${user.role}) baru saja mengakses sistem.<br>` +
+        `• <strong>Device:</strong> ${devInfo}<br>` +
+        `• <strong>Koordinat:</strong> ${coordInfo}`;
+      
+      alertBox.classList.remove('d-none');
+
+      // Clear timer sebelumnya bila ada
+      if (alertTimer) clearTimeout(alertTimer);
+
+      // Hilang otomatis dalam 3000 ms (3 detik)
+      alertTimer = setTimeout(() => {
+        closeLoginAlert();
+      }, 3000);
+    }
+
+    function closeLoginAlert() {
+      const alertBox = document.getElementById('superadminLoginAlert');
+      if (alertBox) {
+        alertBox.classList.add('d-none');
       }
     }
 
@@ -1236,15 +1284,16 @@
       }
     }
 
-    // --- MONITORING PEKERJAAN & HARIAN ---
+    // --- MONITORING PEKERJAAN DENGAN KOORDINAT GOOGLE MAPS ---
     async function loadMonitoringData() {
       let logs = [];
       try {
-        const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false });
+        const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
         if (error) throw error;
         logs = data || [];
       } catch (err) {
         logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+        logs = logs.slice(0, MAX_LOG_LIMIT);
       }
 
       const dateFlt = document.getElementById('fltLogDate').value;
@@ -1262,6 +1311,13 @@
         const d = new Date(l.waktu);
         const formatWaktu = isNaN(d) ? l.waktu : d.toLocaleString('id-ID');
         const badgeColor = l.tipe === 'LOGIN' ? 'bg-info' : 'bg-success';
+        
+        // FORMAT LINK GMAPS KOORDINAT
+        let gmapsLink = '<span class="badge bg-secondary">Tidak diketahui</span>';
+        if (l.koordinat && l.koordinat.includes(',')) {
+          const coordsClean = l.koordinat.replace(/\s+/g, '');
+          gmapsLink = `<a href="https://maps.google.com/?q=${coordsClean}" target="_blank" class="badge bg-primary text-decoration-none px-2 py-1"><i class="fa-solid fa-location-dot me-1"></i>${l.koordinat}</a>`;
+        }
 
         return `
           <tr>
@@ -1270,7 +1326,7 @@
             <td><span class="badge ${badgeColor}">${l.tipe}</span></td>
             <td>${l.detail}</td>
             <td><small class="text-truncate d-inline-block" style="max-width: 180px;" title="${l.device}">${l.device || '-'}</small></td>
-            <td><span class="badge bg-secondary">${l.koordinat || 'Tidak diketahui'}</span></td>
+            <td>${gmapsLink}</td>
           </tr>
         `;
       }).join('');
