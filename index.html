@@ -7,14 +7,14 @@
   
   <!-- Fonts & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.net/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
   <style>
     :root {
@@ -218,7 +218,6 @@
   <!-- ================= PAGE 1: LOGIN ================= -->
   <div id="pageLogin" class="login-container">
     <div class="login-card text-center">
-      <!-- Logo Text RINNET(+) Tanpa Icon/Bingkai -->
       <div class="mb-2">
         <span class="brand-text-logo">
           RINNET
@@ -275,10 +274,10 @@
 
       <div class="sidebar-menu">
         <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
-        <a class="nav-link admin-only" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
-        <a class="nav-link admin-only" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Pendaftaran & Stok Voucher</a>
-        <a class="nav-link admin-only" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
-        <a class="nav-link admin-only" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form & Rekap Kasbon</a>
+        <a class="nav-link" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
+        <a class="nav-link" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Pendaftaran & Stok Voucher</a>
+        <a class="nav-link" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
+        <a class="nav-link" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form & Rekap Kasbon</a>
         <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
         <a class="nav-link manager-sa-only d-none" href="#" onclick="switchMenu('monitoring')"><i class="fa-solid fa-clock-rotate-left text-info"></i>Monitoring Aktivitas</a>
         <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear"></i>Manajemen User</a>
@@ -775,7 +774,7 @@
     let base64AvatarImage = "";
     let alertTimer = null;
     
-    // BATAS MAKSIMAL SIMPAN LOG RIWAYAT (DIATUR 50 LOG SESUAI KEBUTUHAN SISTEM)
+    // BATAS MAKSIMAL SIMPAN LOG RIWAYAT
     const MAX_LOG_LIMIT = 50; 
 
     function toggleSidebar() {
@@ -816,7 +815,6 @@
         const { error } = await _supabase.from('activity_logs').insert([payload]);
         if (error) throw error;
         
-        // Pembersihan otomatis: Hapus data terlama jika melebihi kuota MAX_LOG_LIMIT (50)
         await cleanupOldLogs();
 
       } catch (err) {
@@ -873,26 +871,23 @@
       if (user.avatar_url) document.getElementById('navUserAvatar').src = user.avatar_url;
 
       // HAK AKSES PERAN (ROLE MANAGEMENT)
+      document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.add('d-none'));
+
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.remove('d-none'));
       } else if (user.role === 'MANAJER') {
-        // Role Manajer dapat memantau monitoring aktivitas
         document.querySelectorAll('.manager-sa-only').forEach(el => el.classList.remove('d-none'));
       }
 
-      // Notifikasi realtime muncul saat ADA PERANGKAT/USER LOGIN
       showLoginNotification(user);
-
-      // Mulai listener realtime untuk menangkap login user lain
       listenRealtimeLogins();
-
       loadDashboardData();
     }
 
     // --- NOTIFIKASI REALTIME LOGIN (OTOMATIS HILANG DALAM 5 DETIK) ---
     async function showLoginNotification(user, customLog = null) {
       let recentLog = customLog;
-      if (!recentLog) {
+      if (!recentLog && user) {
         try {
           const { data } = await _supabase.from('activity_logs')
             .select('*')
@@ -909,8 +904,8 @@
       const alertBox = document.getElementById('userLoginAlert');
       const alertText = document.getElementById('userLoginAlertText');
 
-      const targetUser = recentLog?.username || user.username;
-      const targetRole = recentLog?.role || user.role;
+      const targetUser = recentLog?.username || user?.username || 'System User';
+      const targetRole = recentLog?.role || user?.role || 'User';
       const devInfo = recentLog?.device || navigator.userAgent;
       const coordInfo = recentLog?.koordinat || 'N/A';
 
@@ -920,10 +915,8 @@
       
       alertBox.classList.remove('d-none');
 
-      // Clear timer sebelumnya bila ada
       if (alertTimer) clearTimeout(alertTimer);
 
-      // Hilang otomatis tepat dalam 5000 ms (5 detik)
       alertTimer = setTimeout(() => {
         closeLoginAlert();
       }, 5000);
@@ -982,7 +975,7 @@
       if (menuName === 'userMgmt') loadUserData();
     }
 
-    // --- DASHBOARD & SKALABILITAS GRAFIK (80 - 100+ DATA) ---
+    // --- DASHBOARD & SKALABILITAS GRAFIK ---
     async function loadDashboardData() {
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: emps } = await _supabase.from('employees').select('*');
@@ -999,11 +992,10 @@
 
       let sumStok = 0;
       (stocks || []).forEach(s => {
-        sumStok += (s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k + s.b1hp + s.b2hp + s.b3hp + s.b4hp + s.b5hp);
+        sumStok += ((s.v2k||0) + (s.v3k||0) + (s.v4k||0) + (s.v5k||0) + (s.v6k||0) + (s.v25k||0) + (s.b1hp||0) + (s.b2hp||0) + (s.b3hp||0) + (s.b4hp||0) + (s.b5hp||0));
       });
       document.getElementById('dashTotalStok').innerText = sumStok;
 
-      // Disesuaikan agar muat jika ada 80 - 100+ server tanpa berdesakan
       const chartWrapper = document.getElementById('chartWrapper');
       if (totalServerCount > 15) {
         chartWrapper.style.width = `${totalServerCount * 45}px`;
@@ -1022,7 +1014,7 @@
             label: 'Alokasi Voucher Terdistribusi',
             data: (servers || []).map(srv => {
               const filterStk = (stocks || []).filter(stk => stk.nama_server === srv.nama_server);
-              return filterStk.reduce((acc, curr) => acc + (curr.v2k + curr.v3k + curr.v4k + curr.v5k + curr.v6k + curr.v25k), 0);
+              return filterStk.reduce((acc, curr) => acc + ((curr.v2k||0) + (curr.v3k||0) + (curr.v4k||0) + (curr.v5k||0) + (curr.v6k||0) + (curr.v25k||0)), 0);
             }),
             backgroundColor: '#2563eb',
             borderRadius: 6
@@ -1136,7 +1128,7 @@
     }
 
     async function loadStokData() {
-      let query = _supabase.from('reseller_stock').select('*');
+      let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
       const bulan = document.getElementById('filterBulanStok').value;
       if (bulan) {
         query = query.gte('tanggal', `${bulan}-01`).lte('tanggal', `${bulan}-31`);
@@ -1149,8 +1141,8 @@
           <td><b>${d.nama_server}</b></td>
           <td>${d.nama_reseller}</td>
           <td>${d.petugas_lapangan || '-'}</td>
-          <td>${d.v2k}</td><td>${d.v3k}</td><td>${d.v4k}</td><td>${d.v5k}</td><td>${d.v6k}</td><td>${d.v25k}</td>
-          <td>${d.b1hp}</td><td>${d.b2hp}</td><td>${d.b3hp}</td><td>${d.b4hp}</td><td>${d.b5hp}</td>
+          <td>${d.v2k || 0}</td><td>${d.v3k || 0}</td><td>${d.v4k || 0}</td><td>${d.v5k || 0}</td><td>${d.v6k || 0}</td><td>${d.v25k || 0}</td>
+          <td>${d.b1hp || 0}</td><td>${d.b2hp || 0}</td><td>${d.b3hp || 0}</td><td>${d.b4hp || 0}</td><td>${d.b5hp || 0}</td>
           <td>
             <button class="btn btn-sm btn-danger" onclick="hapusRecord('reseller_stock', '${d.id}', loadStokData, 'Stok Reseller ${d.nama_reseller}')"><i class="fa-solid fa-trash"></i></button>
           </td>
@@ -1244,8 +1236,11 @@
 
       document.getElementById('ksbKaryawan').innerHTML = '<option value="">-- Pilih Karyawan --</option>' + 
         (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
+      
+      const currentFltUser = document.getElementById('fltKasbonKaryawan').value;
       document.getElementById('fltKasbonKaryawan').innerHTML = '<option value="">-- Semua Karyawan --</option>' + 
-        (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
+        (emps || []).map(e => `<option value="${e.nama_karyawan}" ${e.nama_karyawan === currentFltUser ? 'selected':''}>${e.nama_karyawan}</option>`).join('');
+      
       document.getElementById('ksbSumber').innerHTML = '<option value="">-- Pilih Server --</option>' + 
         (srvs || []).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
 
@@ -1284,9 +1279,9 @@
         <tr>
           <td>${k.tanggal}</td>
           <td><b>${k.nama_karyawan}</b></td>
-          <td>Rp ${parseFloat(k.jumlah_kasbon).toLocaleString('id-ID')}</td>
+          <td>Rp ${parseFloat(k.jumlah_kasbon || 0).toLocaleString('id-ID')}</td>
           <td><span class="badge bg-secondary">${k.sumber_dana}</span></td>
-          <td>${k.keterangan}</td>
+          <td>${k.keterangan || '-'}</td>
           <td>
             <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Kasbon ${k.nama_karyawan}')"><i class="fa-solid fa-trash"></i></button>
           </td>
@@ -1364,7 +1359,6 @@
         const formatWaktu = isNaN(d) ? l.waktu : d.toLocaleString('id-ID');
         const badgeColor = l.tipe === 'LOGIN' ? 'bg-info' : 'bg-success';
         
-        // FORMAT LINK INTERAKTIF KE GOOGLE MAPS
         let gmapsLink = '<span class="badge bg-secondary">Tidak diketahui</span>';
         if (l.koordinat && l.koordinat.includes(',')) {
           const coordsClean = l.koordinat.replace(/\s+/g, '');
@@ -1496,7 +1490,7 @@
             cell.border = {
               top: { style: 'thin', color: { argb: 'CBD5E1' } },
               left: { style: 'thin', color: { argb: 'CBD5E1' } },
-              bottom: { style: 'thin', color: { argb: 'CBD5E1' },
+              bottom: { style: 'thin', color: { argb: 'CBD5E1' } },
               right: { style: 'thin', color: { argb: 'CBD5E1' } }
             };
           });
