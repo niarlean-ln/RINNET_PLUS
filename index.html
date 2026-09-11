@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>RINNET PLUS - Cloud Management System</title>
   
-  <!-- Framework UI & Icon -->
+  <!-- UI Framework & Google Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
     :root {
       --primary: #0f172a;
       --accent: #2563eb;
+      --accent-hover: #1d4ed8;
       --bg-body: #f8fafc;
       --card-bg: #ffffff;
       --text-main: #1e293b;
@@ -46,6 +47,7 @@
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.98);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
     }
 
     /* --- SIDEBAR & NAV--- */
@@ -77,6 +79,14 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
+    .profile-avatar-nav {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent);
+    }
+
     /* --- CONTENT AREA & PAGE ANIMATION --- */
     .content-area {
       margin-left: 260px;
@@ -100,6 +110,7 @@
       border-radius: 16px;
       background: var(--card-bg);
       box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .stat-card {
       position: relative;
@@ -112,6 +123,9 @@
       opacity: 0.15;
     }
 
+    .table-responsive {
+      border-radius: 12px;
+    }
     .table {
       vertical-align: middle;
       font-size: 0.9rem;
@@ -122,17 +136,35 @@
       font-weight: 700;
       text-transform: uppercase;
       font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      border: none;
     }
 
+    /* --- RESPONSIVE MOBILE UX --- */
     @media (max-width: 991px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.show { transform: translateX(0); }
-      .content-area { margin-left: 0; padding: 1.25rem; padding-top: 5rem; }
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .content-area {
+        margin-left: 0;
+        padding: 1.25rem;
+        padding-top: 5rem;
+      }
       .mobile-header {
-        position: fixed; top: 0; left: 0; right: 0; height: 60px;
-        background: var(--primary); color: #fff; z-index: 999;
-        display: flex; align-items: center; justify-content: space-between;
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 60px;
+        background: var(--primary);
+        color: #fff;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         padding: 0 1.25rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       }
     }
   </style>
@@ -165,6 +197,7 @@
   <!-- ================= MAIN APP SYSTEM ================= -->
   <div id="pageApp" class="d-none">
     
+    <!-- Header Mobile Toggle -->
     <div class="mobile-header d-lg-none">
       <div class="fw-bold fs-5"><i class="fa-solid fa-wifi me-2 text-primary"></i>RINNET+</div>
       <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
@@ -173,8 +206,9 @@
     <!-- Sidebar Navigation -->
     <nav class="sidebar" id="mainSidebar">
       <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
-        <h4 class="fw-800 text-white mb-0 mt-2"><i class="fa-solid fa-wifi text-primary me-2"></i>RINNET+</h4>
-        <span class="badge bg-primary bg-opacity-25 text-primary mt-2 px-3 py-1 rounded-pill" id="userRoleBadge">Role: -</span>
+        <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
+        <h5 class="fw-800 text-white mb-0" id="navUserName">User</h5>
+        <span class="badge bg-primary bg-opacity-25 text-primary mt-1 px-3 py-1 rounded-pill" id="userRoleBadge">Role: -</span>
       </div>
       <div class="nav flex-column my-3">
         <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
@@ -195,15 +229,23 @@
     <!-- Main Content Area -->
     <main class="content-area">
       
-      <!-- MENU 1: DASHBOARD -->
+      <!-- PERINGATAN KAPASITAS DATABASE (SUPERADMIN ONLY) -->
+      <div id="dbCapacityAlert" class="alert alert-warning alert-dismissible fade show d-none" role="alert">
+        <i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i>
+        <strong>Peringatan Kapasitas Storage:</strong> Jumlah total records database hampir mendekati ambang batas. Disarankan untuk mengekspor data lama ke Excel dan mengosongkannya.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
+      <!-- MENU 1: DASHBOARD LENGKAP -->
       <section id="menu-dashboard" class="page-section">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
             <h3 class="fw-800 mb-1">Dashboard Analisis Realtime</h3>
-            <p class="text-muted small mb-0">Ringkasan performa server, stok, dan aktivitas transaksi.</p>
+            <p class="text-muted small mb-0">Ringkasan performa server, stok, dan aktivitas transaksi reseller.</p>
           </div>
         </div>
 
+        <!-- Metric Cards -->
         <div class="row g-3 mb-4">
           <div class="col-12 col-sm-6 col-xl-4">
             <div class="card card-custom stat-card p-3 bg-primary text-white">
@@ -228,20 +270,40 @@
           </div>
         </div>
 
+        <!-- Chart Section -->
         <div class="card card-custom p-4 mb-4">
           <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Laporan Performa Per Server</h5>
           <canvas id="serverChart" style="max-height: 280px;"></canvas>
         </div>
 
+        <!-- TABEL REKAP 1: DATA INPUTAN RESELLER OLEH ADMIN -->
         <div class="card card-custom p-3 p-md-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Rekap Input Data Reseller</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblDashReseller', 'Rekap_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Rekap Inputan Data Reseller (Admin)</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblDashReseller', 'Rekap_Input_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
           </div>
           <div class="table-responsive">
             <table class="table table-hover" id="tblDashReseller">
-              <thead><tr><th>Server</th><th>Nama Reseller</th><th>WhatsApp</th><th>Status</th></tr></thead>
+              <thead>
+                <tr><th>Server</th><th>Nama Reseller</th><th>WhatsApp</th><th>Status Stok</th></tr>
+              </thead>
               <tbody id="bodyDashReseller"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TABEL REKAP 2: LAPORAN INPUTAN TRANSAKSI PENJUALAN RESELLER -->
+        <div class="card card-custom p-3 p-md-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-receipt me-2 text-primary"></i>Laporan Penjualan Reseller (Realtime)</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblDashSales', 'Laporan_Penjualan_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped" id="tblDashSales">
+              <thead>
+                <tr><th>Server</th><th>Reseller</th><th>Qty Terjual</th><th>Total Omset</th></tr>
+              </thead>
+              <tbody id="bodyDashSales"></tbody>
             </table>
           </div>
         </div>
@@ -275,7 +337,10 @@
             <div class="card card-custom p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Daftar Karyawan</h5>
-                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-success rounded-pill px-3 me-2" onclick="exportToExcel('tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill px-3 superadmin-only d-none" onclick="exportAndPurgeTable('employees', 'tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-download me-1"></i>Export & Hapus Data</button>
+                </div>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="tblKaryawan">
@@ -290,7 +355,7 @@
 
       <!-- MENU BARU: FORM KASBON -->
       <section id="menu-kasbon" class="page-section d-none">
-        <h3 class="fw-800 mb-4">Form & Records Kasbon Karyawan</h3>
+        <h3 class="fw-800 mb-4">Form & Catatan Kasbon Karyawan</h3>
         <div class="row g-4">
           <div class="col-12 col-lg-4">
             <div class="card card-custom p-4">
@@ -328,7 +393,10 @@
             <div class="card card-custom p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Riwayat Kasbon</h5>
-                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblKasbon', 'Data_Kasbon')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-success rounded-pill px-3 me-2" onclick="exportToExcel('tblKasbon', 'Data_Kasbon')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill px-3 superadmin-only d-none" onclick="exportAndPurgeTable('kasbon', 'tblKasbon', 'Data_Kasbon')"><i class="fa-solid fa-download me-1"></i>Export & Hapus Data</button>
+                </div>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="tblKasbon">
@@ -341,7 +409,7 @@
         </div>
       </section>
 
-      <!-- MENU: INPUT SERVER -->
+      <!-- MENU 2: INPUT SERVER -->
       <section id="menu-server" class="page-section d-none">
         <h3 class="fw-800 mb-4">Input & Kelola Server</h3>
         <div class="row g-4">
@@ -361,7 +429,10 @@
             <div class="card card-custom p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Daftar Server Cloud</h5>
-                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblServer', 'Data_Server')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-success rounded-pill px-3 me-2" onclick="exportToExcel('tblServer', 'Data_Server')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill px-3 superadmin-only d-none" onclick="exportAndPurgeTable('servers', 'tblServer', 'Data_Server')"><i class="fa-solid fa-download me-1"></i>Export & Hapus Data</button>
+                </div>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="tblServer">
@@ -374,7 +445,7 @@
         </div>
       </section>
 
-      <!-- MENU: STOK RESELLER -->
+      <!-- MENU 3: STOK RESELLER -->
       <section id="menu-reseller" class="page-section d-none">
         <h3 class="fw-800 mb-4">Input Data Reseller & Stok Voucher</h3>
         <div class="card card-custom p-4 mb-4">
@@ -401,7 +472,7 @@
             <div class="col-6 col-md-2"><label class="small">6K</label><input type="number" id="v6k" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">25K (Mggu)</label><input type="number" id="v25k" class="form-control" value="0"></div>
 
-            <h6 class="fw-bold mb-1 text-primary mt-3">Voucher Bulanan:</h6>
+            <h6 class="fw-bold mb-1 text-primary mt-3">Voucher Bulanan (50k - 200k):</h6>
             <div class="col-6 col-md-2"><label class="small">Bulanan 1HP</label><input type="number" id="b1hp" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">Bulanan 2HP</label><input type="number" id="b2hp" class="form-control" value="0"></div>
             <div class="col-6 col-md-2"><label class="small">Bulanan 3HP</label><input type="number" id="b3hp" class="form-control" value="0"></div>
@@ -415,7 +486,10 @@
         <div class="card card-custom p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0">Tabel Rekap Stok Reseller</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblStok', 'Stok_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-outline-success rounded-pill px-3 me-2" onclick="exportToExcel('tblStok', 'Stok_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+              <button class="btn btn-sm btn-outline-danger rounded-pill px-3 superadmin-only d-none" onclick="exportAndPurgeTable('reseller_stock', 'tblStok', 'Stok_Reseller')"><i class="fa-solid fa-download me-1"></i>Export & Hapus Data</button>
+            </div>
           </div>
           <div class="table-responsive">
             <table class="table table-bordered table-sm text-center" id="tblStok">
@@ -432,13 +506,13 @@
         </div>
       </section>
 
-      <!-- MENU: PENJUALAN VOUCHER -->
+      <!-- MENU 4: PENJUALAN VOUCHER -->
       <section id="menu-penjualan" class="page-section d-none">
         <h3 class="fw-800 mb-4">Laporan Penjualan Voucher Reseller</h3>
         <div class="card card-custom p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0">Rincian Penjualan Reseller</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblSales', 'Laporan_Penjualan')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+            <h5 class="fw-bold mb-0">Rincian Penjualan Reseller Per Server</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblSales', 'Laporan_Penjualan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
           </div>
           <div class="table-responsive">
             <table class="table table-striped" id="tblSales">
@@ -451,20 +525,28 @@
         </div>
       </section>
 
-      <!-- MENU: PROFIL PENGGUNA -->
+      <!-- MENU 5: PROFIL PENGGUNA -->
       <section id="menu-profil" class="page-section d-none">
         <h3 class="fw-800 mb-4">Profil Saya</h3>
         <div class="card card-custom p-4" style="max-width: 600px;">
           <form onsubmit="simpanProfil(event)">
+            <div class="text-center mb-4">
+              <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-primary mb-3" style="width: 110px; height: 110px; object-fit: cover;">
+              <div>
+                <label class="form-label small fw-bold">URL Foto Profil / Avatar</label>
+                <input type="url" id="prfAvatarURL" class="form-control form-control-sm text-center" placeholder="https://link-gambar.com/foto.jpg" oninput="updateAvatarPreview(this.value)">
+                <span class="text-muted small">Masukkan link gambar/foto Anda dari internet</span>
+              </div>
+            </div>
+
             <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNama" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Email</label><input type="email" id="prfEmail" class="form-control" required></div>
             <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-            <button type="submit" class="btn btn-primary fw-bold">Update Profil</button>
+            <button type="submit" class="btn btn-primary fw-bold w-100">Update Profil & Foto</button>
           </form>
         </div>
       </section>
 
-      <!-- MENU: MANAJEMEN USER -->
+      <!-- MENU 6: MANAJEMEN USER -->
       <section id="menu-userMgmt" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen User & Hak Akses</h3>
         <div class="row g-4">
@@ -488,7 +570,13 @@
           </div>
           <div class="col-12 col-lg-8">
             <div class="card card-custom p-4">
-              <h5 class="fw-bold mb-3">Daftar Pengguna</h5>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Daftar Pengguna</h5>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-success rounded-pill px-3 me-2" onclick="exportToExcel('tblUsers', 'Data_Users')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+                  <button class="btn btn-sm btn-outline-danger rounded-pill px-3 superadmin-only d-none" onclick="exportAndPurgeTable('users', 'tblUsers', 'Data_Users')"><i class="fa-solid fa-download me-1"></i>Export & Purge Users</button>
+                </div>
+              </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="tblUsers">
                   <thead><tr><th>Username</th><th>WhatsApp</th><th>Role</th></tr></thead>
@@ -503,15 +591,17 @@
     </main>
   </div>
 
+  <!-- APP JS LOGIC -->
   <script src="supabase-client.js"></script>
   <script>
     let activeChart = null;
+    let currentUser = null;
 
     function toggleSidebar() {
       document.getElementById('mainSidebar').classList.toggle('show');
     }
 
-    // --- AUTHENTICATION (SESSION STORAGE FOR HIGH SECURITY) ---
+    // --- AUTHENTICATION (SESSION STORAGE LOGOUT PRIVACY) ---
     async function handleAuthLogin(e) {
       e.preventDefault();
       const u = document.getElementById('loginUsername').value.trim().toLowerCase();
@@ -525,7 +615,6 @@
       }
 
       if (user.password_hash === p) {
-        // Menggunakan sessionStorage agar otomatis logout saat tab/browser ditutup
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
         initAppView(user);
       } else {
@@ -534,11 +623,20 @@
     }
 
     function initAppView(user) {
+      currentUser = user;
       document.getElementById('pageLogin').classList.add('d-none');
       document.getElementById('pageApp').classList.remove('d-none');
-      document.getElementById('userRoleBadge').innerText = `${user.username} (${user.role})`;
+      
+      document.getElementById('navUserName').innerText = user.username;
+      document.getElementById('userRoleBadge').innerText = user.role;
+      if (user.avatar_url) {
+        document.getElementById('navUserAvatar').src = user.avatar_url;
+      }
 
-      if (user.role !== 'SUPERADMIN') {
+      if (user.role === 'SUPERADMIN') {
+        document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
+        checkDatabaseStorageUsage();
+      } else {
         document.getElementById('menuUserMgmt').classList.add('d-none');
       }
       
@@ -570,7 +668,22 @@
       if (menuName === 'server') loadServerData();
       if (menuName === 'reseller') loadStokData();
       if (menuName === 'penjualan') loadPenjualanData();
+      if (menuName === 'profil') loadProfilData();
       if (menuName === 'userMgmt') loadUserData();
+    }
+
+    // --- CAPACITY MONITORING & WARNING (SUPERADMIN) ---
+    async function checkDatabaseStorageUsage() {
+      const { count: srvCount } = await _supabase.from('servers').select('*', { count: 'exact', head: true });
+      const { count: stkCount } = await _supabase.from('reseller_stock').select('*', { count: 'exact', head: true });
+      const { count: ksbCount } = await _supabase.from('kasbon').select('*', { count: 'exact', head: true });
+
+      const totalRecords = (srvCount || 0) + (stkCount || 0) + (ksbCount || 0);
+
+      // Ambang batas simulasi peringatan kapasitas (Misal > 500 records)
+      if (totalRecords > 500) {
+        document.getElementById('dbCapacityAlert').classList.remove('d-none');
+      }
     }
 
     // --- KARYAWAN LOGIC ---
@@ -614,19 +727,15 @@
     }
 
     async function loadKasbonData() {
-      // 1. Populate Dropdown Options
       const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
       const { data: srvs } = await _supabase.from('servers').select('nama_server');
 
-      const ksbKaryawan = document.getElementById('ksbKaryawan');
-      ksbKaryawan.innerHTML = '<option value="">-- Pilih Karyawan --</option>' + 
+      document.getElementById('ksbKaryawan').innerHTML = '<option value="">-- Pilih Karyawan --</option>' + 
         (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
 
-      const ksbSumber = document.getElementById('ksbSumber');
-      ksbSumber.innerHTML = '<option value="">-- Pilih Server --</option>' + 
+      document.getElementById('ksbSumber').innerHTML = '<option value="">-- Pilih Server --</option>' + 
         (srvs || []).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
 
-      // 2. Load Table Kasbon
       const { data } = await _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
       document.getElementById('bodyKasbon').innerHTML = (data || []).map(k => `
         <tr>
@@ -639,7 +748,7 @@
       `).join('');
     }
 
-    // --- DASHBOARD & OTHER LOGICS ---
+    // --- DASHBOARD LOGIC ---
     async function loadDashboardData() {
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: stocks } = await _supabase.from('reseller_stock').select('*');
@@ -665,6 +774,12 @@
         </tr>
       `).join('');
 
+      document.getElementById('bodyDashSales').innerHTML = (stocks || []).filter(s => s.status === 'Terjual').map(d => {
+        const totalQty = d.v2k + d.v3k + d.v4k + d.v5k + d.v6k + d.v25k + d.b1hp + d.b2hp + d.b3hp + d.b4hp + d.b5hp;
+        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v4k*4000) + (d.v5k*5000) + (d.v6k*6000) + (d.v25k*25000) + (d.b1hp*50000);
+        return `<tr><td><b>${d.nama_server}</b></td><td>${d.nama_reseller}</td><td>${totalQty} pcs</td><td>Rp ${estOmset.toLocaleString('id-ID')}</td></tr>`;
+      }).join('');
+
       const ctx = document.getElementById('serverChart').getContext('2d');
       if (activeChart) activeChart.destroy();
       
@@ -683,6 +798,7 @@
       });
     }
 
+    // --- OTHER CRUD LOGICS ---
     async function simpanServer(e) {
       e.preventDefault();
       await _supabase.from('servers').insert([{
@@ -743,6 +859,37 @@
       }).join('');
     }
 
+    function loadProfilData() {
+      if (!currentUser) return;
+      document.getElementById('prfNama').value = currentUser.username || '';
+      document.getElementById('prfWA').value = currentUser.whatsapp || '';
+      document.getElementById('prfAvatarURL').value = currentUser.avatar_url || '';
+      if(currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
+    }
+
+    function updateAvatarPreview(url) {
+      if(url) document.getElementById('prfAvatarPreview').src = url;
+    }
+
+    async function simpanProfil(e) {
+      e.preventDefault();
+      const newAvatar = document.getElementById('prfAvatarURL').value;
+      const newWA = document.getElementById('prfWA').value;
+
+      const { error } = await _supabase.from('users').update({
+        avatar_url: newAvatar,
+        whatsapp: newWA
+      }).eq('id', currentUser.id);
+
+      if(!error) {
+        currentUser.avatar_url = newAvatar;
+        currentUser.whatsapp = newWA;
+        sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
+        document.getElementById('navUserAvatar').src = newAvatar;
+        alert('Profil & Foto berhasil diperbarui!');
+      }
+    }
+
     async function simpanUserMgmt(e) {
       e.preventDefault();
       await _supabase.from('users').insert([{
@@ -762,22 +909,30 @@
       `).join('');
     }
 
-    function simpanProfil(e) {
-      e.preventDefault();
-      alert('Profil diperbarui!');
-    }
-
+    // --- EXPORT & PURGE LOGIC (SUPERADMIN FITUR HAPUS TERPISAH) ---
     function exportToExcel(tableID, filename) {
       const table = document.getElementById(tableID);
       const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
       XLSX.writeFile(wb, `${filename}.xlsx`);
     }
 
-    // --- CEK SESSION LOGIN (OTOMATIS LOGOUT SAAT TAB DITUTUP) ---
-    document.addEventListener('DOMContentLoaded', () => {
-      // Hapus localStorage lama agar tidak otomatis ter-login
-      localStorage.removeItem('rinnet_user');
+    async function exportAndPurgeTable(tableName, tableID, filename) {
+      if (confirm(`APAKAH ANDA YAKIN?\nData akan di-export ke Excel lalu SELURUH data pada tabel ${tableName} akan DIHAPUS PERMANEN dari database untuk mengosongkan memori.`)) {
+        exportToExcel(tableID, filename);
 
+        const { error } = await _supabase.from(tableName).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (!error) {
+          alert(`Data berhasil di-export & tabel ${tableName} telah dikosongkan!`);
+          location.reload();
+        } else {
+          alert('Gagal menghapus data: ' + error.message);
+        }
+      }
+    }
+
+    // --- CEK SESSION LOGIN (NON-AUTO LOGIN SAAT TAB DITUTUP) ---
+    document.addEventListener('DOMContentLoaded', () => {
+      localStorage.removeItem('rinnet_user');
       const activeSession = sessionStorage.getItem('rinnet_session_user');
       if (activeSession) {
         initAppView(JSON.parse(activeSession));
