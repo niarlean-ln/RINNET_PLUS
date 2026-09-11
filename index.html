@@ -214,37 +214,35 @@ body {
 </head>
 <body>
 
-<!-- ================= PAGE 1: LOGIN ================= -
+<!-- ================= PAGE 1: LOGIN ================= -->
 <div id="pageLogin" class="login-container">
-<div class="login-card text-center">
-<!-- Logo Text RINNET(+) Tanpa Icon/Bingkai -
-<div class="mb-2">
-<span class="brand-text-logo">
-RINNET
-<span class="plus-sign">+</span>
-</span>
-</div>
-<p class="text-muted small mb-4 fw-600">Internal Enterprise Management System</p>
-
- 
-  <form onsubmit="handleAuthLogin(event)">
-    <div class="text-start mb-3">
-      <label class="form-label small fw-bold text-secondary">USERNAME</label>
-      <input type="text" id="loginUsername" class="form-control form-control-lg fs-6" placeholder="Masukkan username" required>
+  <div class="login-card text-center">
+    <!-- Logo Text RINNET(+) Tanpa Icon/Bingkai -->
+    <div class="mb-2">
+      <span class="brand-text-logo">
+        RINNET
+        <span class="plus-sign">+</span>
+      </span>
     </div>
-    <div class="text-start mb-4">
-      <label class="form-label small fw-bold text-secondary">PASSWORD</label>
-      <input type="password" id="loginPassword" class="form-control form-control-lg fs-6" placeholder="••••••••" required>
-    </div>
-    <button type="submit" id="btnLogin" class="btn btn-primary btn-lg w-100 fw-bold fs-6 shadow-sm">MASUK SISTEM</button>
-  </form>
+    <p class="text-muted small mb-4 fw-semibold">Internal Enterprise Management System</p>
 
-  <div class="mt-4 pt-3 border-top text-muted small">
-    Sistem Dikembangkan Oleh <br><strong class="text-dark">Lean Naddhito</strong>
+    <form onsubmit="handleAuthLogin(event)">
+      <div class="text-start mb-3">
+        <label class="form-label small fw-bold text-secondary">USERNAME</label>
+        <input type="text" id="loginUsername" class="form-control form-control-lg fs-6" placeholder="Masukkan username" required>
+      </div>
+      <div class="text-start mb-4">
+        <label class="form-label small fw-bold text-secondary">PASSWORD</label>
+        <input type="password" id="loginPassword" class="form-control form-control-lg fs-6" placeholder="••••••••" required>
+      </div>
+      <button type="submit" id="btnLogin" class="btn btn-primary btn-lg w-100 fw-bold fs-6 shadow-sm">MASUK SISTEM</button>
+    </form>
+
+    <div class="mt-4 pt-3 border-top text-muted small">
+      Sistem Dikembangkan Oleh <br><strong class="text-dark">Lean Naddhito</strong>
+    </div>
   </div>
 </div>
-</div>
-
 <!-- ================= MAIN APP SYSTEM ================= -->
 <div id="pageApp" class="d-none">
 
