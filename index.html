@@ -2,12 +2,14 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>RINNET PLUS - Cloud Management System</title>
   
-  <!-- UI Framework, Icons & Libraries -->
+  <!-- UI Framework & Google Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -16,65 +18,145 @@
     :root {
       --primary: #0f172a;
       --accent: #2563eb;
-      --bg: #f8fafc;
+      --accent-hover: #1d4ed8;
+      --bg-body: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
     }
-    body { background-color: var(--bg); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    
-    /* Login Screen */
+
+    body { 
+      background-color: var(--bg-body); 
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* --- LOGIN SCREEN --- */
     .login-container {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      background: radial-gradient(circle at top left, #1e293b, #0f172a);
+      padding: 1.5rem;
     }
     .login-card {
       width: 100%;
-      max-width: 420px;
-      padding: 2.5rem;
-      border-radius: 16px;
-      background: #ffffff;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-    }
-    .brand-logo {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--accent);
-      letter-spacing: 1px;
+      max-width: 400px;
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
     }
 
-    /* Main Dashboard Layout */
+    /* --- SIDEBAR & NAV--- */
     .sidebar {
       width: 260px;
       height: 100vh;
       position: fixed;
+      top: 0; left: 0;
       background: var(--primary);
       color: #fff;
-      transition: all 0.3s;
+      z-index: 1000;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .sidebar .nav-link {
       color: #94a3b8;
-      padding: 0.8rem 1.5rem;
-      font-weight: 500;
-      border-radius: 8px;
+      padding: 0.9rem 1.2rem;
+      font-weight: 600;
+      border-radius: 12px;
       margin: 0.2rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s ease;
     }
     .sidebar .nav-link:hover, .sidebar .nav-link.active {
       color: #fff;
       background: var(--accent);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
+
+    /* --- CONTENT AREA & PAGE ANIMATION --- */
     .content-area {
       margin-left: 260px;
       padding: 2rem;
+      min-height: 100vh;
+      transition: all 0.3s ease;
     }
-    @media (max-width: 768px) {
-      .sidebar { width: 100%; height: auto; position: relative; }
-      .content-area { margin-left: 0; }
+
+    .page-section {
+      animation: fadeInUp 0.35s cubic-bezier(0, 0, 0.2, 1) forwards;
     }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- UI CARDS & TABLES --- */
     .card-custom {
       border: none;
+      border-radius: 16px;
+      background: var(--card-bg);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card .stat-icon {
+      position: absolute;
+      right: 15px; bottom: 10px;
+      font-size: 3.5rem;
+      opacity: 0.15;
+    }
+
+    .table-responsive {
       border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+    .table {
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+    .table thead th {
+      background-color: #f1f5f9;
+      color: #475569;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      border: none;
+    }
+
+    /* --- RESPONSIVE MOBILE UX --- */
+    @media (max-width: 991px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .content-area {
+        margin-left: 0;
+        padding: 1.25rem;
+        padding-top: 5rem;
+      }
+      .mobile-header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 60px;
+        background: var(--primary);
+        color: #fff;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.25rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
     }
   </style>
 </head>
@@ -83,19 +165,22 @@
   <!-- ================= PAGE 1: LOGIN ================= -->
   <div id="pageLogin" class="login-container">
     <div class="login-card text-center">
-      <div class="brand-logo mb-1"><i class="fa-solid fa-wifi me-2"></i>RINNET PLUS</div>
-      <p class="text-muted mb-4 small">Sistem Manajemen Server & Reseller Voucher Cloud</p>
+      <div class="mb-3">
+        <i class="fa-solid fa-wifi text-primary display-5"></i>
+      </div>
+      <h3 class="fw-800 mb-1" style="color: var(--primary);">RINNET PLUS</h3>
+      <p class="text-muted small mb-4">Cloud Server & Voucher Management System</p>
       
       <form onsubmit="handleAuthLogin(event)">
         <div class="text-start mb-3">
-          <label class="form-label small fw-bold">USERNAME</label>
-          <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan username" autocapitalize="none" autocorrect="off" required>
+          <label class="form-label small fw-bold text-secondary">USERNAME</label>
+          <input type="text" id="loginUsername" class="form-control form-control-lg fs-6" placeholder="Masukkan username" autocapitalize="none" autocorrect="off" required>
         </div>
         <div class="text-start mb-4">
-          <label class="form-label small fw-bold">PASSWORD</label>
-          <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+          <label class="form-label small fw-bold text-secondary">PASSWORD</label>
+          <input type="password" id="loginPassword" class="form-control form-control-lg fs-6" placeholder="••••••••" required>
         </div>
-        <button type="submit" id="btnLogin" class="btn btn-primary w-100 py-2 fw-bold">MASUK SISTEM</button>
+        <button type="submit" id="btnLogin" class="btn btn-primary btn-lg w-100 fw-bold fs-6 shadow-sm">MASUK SISTEM</button>
       </form>
     </div>
   </div>
@@ -103,77 +188,126 @@
   <!-- ================= MAIN APP SYSTEM ================= -->
   <div id="pageApp" class="d-none">
     
+    <!-- Header Mobile Toggle -->
+    <div class="mobile-header d-lg-none">
+      <div class="fw-bold fs-5"><i class="fa-solid fa-wifi me-2 text-primary"></i>RINNET+</div>
+      <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
+    </div>
+
     <!-- Sidebar Navigation -->
-    <nav class="sidebar">
-      <div class="p-3 text-center border-bottom border-secondary">
-        <h4 class="brand-logo mb-0"><i class="fa-solid fa-wifi me-2"></i>RINNET+</h4>
-        <small class="text-light-50 d-block mt-1" id="userRoleBadge">Role: -</small>
+    <nav class="sidebar" id="mainSidebar">
+      <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
+        <h4 class="fw-800 text-white mb-0 mt-2"><i class="fa-solid fa-wifi text-primary me-2"></i>RINNET+</h4>
+        <span class="badge bg-primary bg-opacity-25 text-primary mt-2 px-3 py-1 rounded-pill" id="userRoleBadge">Role: -</span>
       </div>
       <div class="nav flex-column mt-3">
-        <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-line me-2"></i>Dashboard</a>
-        <a class="nav-link" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server me-2"></i>Input Server</a>
-        <a class="nav-link" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive me-2"></i>Stok Reseller</a>
-        <a class="nav-link" href="#" onclick="switchMenu('penjualan')"><i class="fa-solid fa-cart-shopping me-2"></i>Penjualan Voucher</a>
-        <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user me-2"></i>Profil Saya</a>
-        <a class="nav-link" href="#" id="menuUserMgmt" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear me-2"></i>Manajemen User</a>
-        <a class="nav-link text-danger mt-4" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket me-2"></i>Keluar</a>
+        <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
+        <a class="nav-link" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
+        <a class="nav-link" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Stok Reseller</a>
+        <a class="nav-link" href="#" onclick="switchMenu('penjualan')"><i class="fa-solid fa-cart-shopping"></i>Penjualan Voucher</a>
+        <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
+        <a class="nav-link" href="#" id="menuUserMgmt" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear"></i>Manajemen User</a>
+        <a class="nav-link text-danger mt-4" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</a>
       </div>
     </nav>
 
-    <!-- Main Content View Area -->
+    <!-- Main Content Area -->
     <main class="content-area">
       
-      <!-- MENU 1: DASHBOARD -->
-      <section id="menu-dashboard">
-        <h3 class="fw-bold mb-4">Dashboard & Analisis Realtime</h3>
+      <!-- MENU 1: DASHBOARD LENGKAP -->
+      <section id="menu-dashboard" class="page-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-800 mb-1">Dashboard Analisis Realtime</h3>
+            <p class="text-muted small mb-0">Ringkasan performa server, stok, dan aktivitas transaksi reseller.</p>
+          </div>
+        </div>
+
+        <!-- Metric Cards -->
         <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="card card-custom p-3 bg-primary text-white">
-              <h6>Total Server Aktif</h6>
-              <h2 id="dashTotalServer" class="fw-bold">0</h2>
+          <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card card-custom stat-card p-3 bg-primary text-white">
+              <span class="text-white-50 small fw-bold">TOTAL SERVER AKTIF</span>
+              <h2 id="dashTotalServer" class="fw-800 my-1">0</h2>
+              <i class="fa-solid fa-server stat-icon"></i>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card card-custom p-3 bg-success text-white">
-              <h6>Voucher Terjual (Total)</h6>
-              <h2 id="dashTotalTerjual" class="fw-bold">0</h2>
+          <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card card-custom stat-card p-3 bg-success text-white">
+              <span class="text-white-50 small fw-bold">VOUCHER TERJUAL</span>
+              <h2 id="dashTotalTerjual" class="fw-800 my-1">0</h2>
+              <i class="fa-solid fa-cart-check stat-icon"></i>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="card card-custom p-3 bg-dark text-white">
-              <h6>Stok Voucher Tersedia</h6>
-              <h2 id="dashTotalStok" class="fw-bold">0</h2>
+          <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card card-custom stat-card p-3 bg-dark text-white">
+              <span class="text-white-50 small fw-bold">STOK TERSEDIA</span>
+              <h2 id="dashTotalStok" class="fw-800 my-1">0</h2>
+              <i class="fa-solid fa-boxes-stacked stat-icon"></i>
             </div>
           </div>
         </div>
 
+        <!-- Chart Section -->
         <div class="card card-custom p-4 mb-4">
-          <h5 class="fw-bold mb-3">Laporan Grafis Performa Per Server</h5>
-          <canvas id="serverChart" style="max-height: 300px;"></canvas>
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Laporan Performa Per Server</h5>
+          <canvas id="serverChart" style="max-height: 280px;"></canvas>
+        </div>
+
+        <!-- TABEL REKAP 1: DATA INPUTAN RESELLER OLEH ADMIN -->
+        <div class="card card-custom p-3 p-md-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Rekap Inputan Data Reseller (Admin)</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblDashReseller', 'Rekap_Input_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover" id="tblDashReseller">
+              <thead>
+                <tr><th>Server</th><th>Nama Reseller</th><th>WhatsApp</th><th>Status Stok</th></tr>
+              </thead>
+              <tbody id="bodyDashReseller"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TABEL REKAP 2: LAPORAN INPUTAN TRANSAKSI PENJUALAN RESELLER -->
+        <div class="card card-custom p-3 p-md-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-receipt me-2 text-primary"></i>Laporan Penjualan Reseller (Realtime)</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblDashSales', 'Laporan_Penjualan_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped" id="tblDashSales">
+              <thead>
+                <tr><th>Server</th><th>Reseller</th><th>Qty Terjual</th><th>Total Omset</th></tr>
+              </thead>
+              <tbody id="bodyDashSales"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
       <!-- MENU 2: INPUT SERVER -->
-      <section id="menu-server" class="d-none">
-        <h3 class="fw-bold mb-4">Input & Rekap Data Server</h3>
+      <section id="menu-server" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Input & Kelola Server</h3>
         <div class="row g-4">
-          <div class="col-md-4">
-            <div class="card card-custom p-3">
-              <h5 class="fw-bold mb-3">Tambah Server</h5>
+          <div class="col-12 col-lg-4">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Tambah Server Baru</h5>
               <form onsubmit="simpanServer(event)">
-                <input type="text" id="srvNama" class="form-control mb-2" placeholder="Nama Server" required>
-                <input type="text" id="srvPengelola" class="form-control mb-2" placeholder="Nama Pengelola" required>
-                <input type="text" id="srvWA" class="form-control mb-2" placeholder="Nomor WhatsApp" required>
-                <input type="text" id="srvWilayah" class="form-control mb-3" placeholder="Wilayah / Cluster" required>
-                <button type="submit" class="btn btn-primary w-100">Simpan Server</button>
+                <div class="mb-2"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="srvNama" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Pengelola</label><input type="text" id="srvPengelola" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="srvWA" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Wilayah / Cluster</label><input type="text" id="srvWilayah" class="form-control" required></div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Server</button>
               </form>
             </div>
           </div>
-          <div class="col-md-8">
-            <div class="card card-custom p-3">
-              <div class="d-flex justify-content-between mb-3">
-                <h5 class="fw-bold">Daftar Server</h5>
-                <button class="btn btn-sm btn-outline-success" onclick="exportToExcel('tblServer', 'Data_Server')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+          <div class="col-12 col-lg-8">
+            <div class="card card-custom p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Daftar Server Cloud</h5>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblServer', 'Data_Server')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="tblServer">
@@ -187,14 +321,16 @@
       </section>
 
       <!-- MENU 3: STOK RESELLER -->
-      <section id="menu-reseller" class="d-none">
-        <h3 class="fw-bold mb-4">Input & Laporan Stok Reseller</h3>
+      <section id="menu-reseller" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Input Data Reseller & Stok Voucher</h3>
         <div class="card card-custom p-4 mb-4">
-          <form onsubmit="simpanStokReseller(event)" class="row g-2">
-            <div class="col-md-3"><input type="text" id="stkServer" class="form-control" placeholder="Nama Server" required></div>
-            <div class="col-md-3"><input type="text" id="stkReseller" class="form-control" placeholder="Nama Reseller" required></div>
-            <div class="col-md-3"><input type="text" id="stkWA" class="form-control" placeholder="No WhatsApp" required></div>
-            <div class="col-md-3">
+          <h5 class="fw-bold mb-3">Form Input Stok Reseller</h5>
+          <form onsubmit="simpanStokReseller(event)" class="row g-3">
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="stkServer" class="form-control" required></div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Reseller</label><input type="text" id="stkReseller" class="form-control" required></div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="stkWA" class="form-control" required></div>
+            <div class="col-12 col-md-3">
+              <label class="form-label small fw-bold">Status Voucher</label>
               <select id="stkStatus" class="form-select">
                 <option value="Masuk">Masuk</option>
                 <option value="Terjual">Terjual</option>
@@ -202,32 +338,33 @@
               </select>
             </div>
             
-            <h6 class="fw-bold mt-3 mb-1">Nominal Voucher Harian & Mingguan:</h6>
-            <div class="col"><input type="number" id="v2k" class="form-control" placeholder="2K"></div>
-            <div class="col"><input type="number" id="v3k" class="form-control" placeholder="3K"></div>
-            <div class="col"><input type="number" id="v4k" class="form-control" placeholder="4K"></div>
-            <div class="col"><input type="number" id="v5k" class="form-control" placeholder="5K"></div>
-            <div class="col"><input type="number" id="v6k" class="form-control" placeholder="6K"></div>
-            <div class="col"><input type="number" id="v25k" class="form-control" placeholder="25K (Mggu)"></div>
+            <div class="col-12"><hr class="my-1"></div>
+            <h6 class="fw-bold mb-1 text-primary">Voucher Harian & Mingguan:</h6>
+            <div class="col-6 col-md-2"><label class="small">2K</label><input type="number" id="v2k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">3K</label><input type="number" id="v3k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">4K</label><input type="number" id="v4k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">5K</label><input type="number" id="v5k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">6K</label><input type="number" id="v6k" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">25K (Mggu)</label><input type="number" id="v25k" class="form-control" value="0"></div>
 
-            <h6 class="fw-bold mt-3 mb-1">Nominal Bulanan (Range 50k - 200k):</h6>
-            <div class="col"><input type="number" id="b1hp" class="form-control" placeholder="1 HP"></div>
-            <div class="col"><input type="number" id="b2hp" class="form-control" placeholder="2 HP"></div>
-            <div class="col"><input type="number" id="b3hp" class="form-control" placeholder="3 HP"></div>
-            <div class="col"><input type="number" id="b4hp" class="form-control" placeholder="4 HP"></div>
-            <div class="col"><input type="number" id="b5hp" class="form-control" placeholder="5 HP"></div>
+            <h6 class="fw-bold mb-1 text-primary mt-3">Voucher Bulanan (50k - 200k):</h6>
+            <div class="col-6 col-md-2"><label class="small">Bulanan 1HP</label><input type="number" id="b1hp" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">Bulanan 2HP</label><input type="number" id="b2hp" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">Bulanan 3HP</label><input type="number" id="b3hp" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">Bulanan 4HP</label><input type="number" id="b4hp" class="form-control" value="0"></div>
+            <div class="col-6 col-md-2"><label class="small">Bulanan 5HP</label><input type="number" id="b5hp" class="form-control" value="0"></div>
 
-            <div class="col-12 mt-3"><button type="submit" class="btn btn-primary">Simpan Record Stok</button></div>
+            <div class="col-12 mt-4"><button type="submit" class="btn btn-primary px-4 fw-bold">Simpan Record Stok</button></div>
           </form>
         </div>
 
-        <div class="card card-custom p-3">
-          <div class="d-flex justify-content-between mb-3">
-            <h5 class="fw-bold">Rekapitulasi Stok Reseller</h5>
-            <button class="btn btn-sm btn-outline-success" onclick="exportToExcel('tblStok', 'Stok_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+        <div class="card card-custom p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Tabel Rekap Stok Reseller</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblStok', 'Stok_Reseller')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
           </div>
           <div class="table-responsive">
-            <table class="table table-sm table-bordered" id="tblStok">
+            <table class="table table-bordered table-sm text-center" id="tblStok">
               <thead>
                 <tr>
                   <th>Server</th><th>Reseller</th><th>Status</th>
@@ -242,19 +379,17 @@
       </section>
 
       <!-- MENU 4: PENJUALAN VOUCHER -->
-      <section id="menu-penjualan" class="d-none">
-        <h3 class="fw-bold mb-4">Laporan Penjualan Voucher</h3>
-        <div class="card card-custom p-3 mb-4">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="fw-bold mb-0">Tabel Penjualan Reseller Per Server</h5>
-            <button class="btn btn-sm btn-outline-success" onclick="exportToExcel('tblSales', 'Laporan_Penjualan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+      <section id="menu-penjualan" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Laporan Penjualan Voucher Reseller</h3>
+        <div class="card card-custom p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Rincian Penjualan Reseller Per Server</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportToExcel('tblSales', 'Laporan_Penjualan')"><i class="fa-solid fa-file-excel me-1"></i>Excel</button>
           </div>
-        </div>
-        <div class="card card-custom p-3">
           <div class="table-responsive">
             <table class="table table-striped" id="tblSales">
               <thead>
-                <tr><th>Server</th><th>Reseller</th><th>Voucher Terjual</th><th>Estimasi Omset</th></tr>
+                <tr><th>Server</th><th>Reseller</th><th>Voucher Terjual (Qty)</th><th>Estimasi Omset</th></tr>
               </thead>
               <tbody id="bodySales"></tbody>
             </table>
@@ -263,48 +398,50 @@
       </section>
 
       <!-- MENU 5: PROFIL PENGGUNA -->
-      <section id="menu-profil" class="d-none">
-        <h3 class="fw-bold mb-4">Profil Pengguna</h3>
-        <div class="card card-custom p-4 style-width: 600px;">
+      <section id="menu-profil" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Profil Saya</h3>
+        <div class="card card-custom p-4" style="max-width: 600px;">
           <form onsubmit="simpanProfil(event)">
-            <div class="mb-3"><label class="form-label">Nama Lengkap</label><input type="text" id="prfNama" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label">Email</label><input type="email" id="prfEmail" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label">Tempat, Tanggal Lahir</label><input type="text" id="prfTTL" class="form-control" placeholder="Bandung, 01-01-1995" required></div>
-            <div class="mb-3"><label class="form-label">Agama</label><input type="text" id="prfAgama" class="form-control" required></div>
-            <button type="submit" class="btn btn-primary">Update Profil</button>
+            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNama" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Email</label><input type="email" id="prfEmail" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Tempat, Tanggal Lahir</label><input type="text" id="prfTTL" class="form-control" placeholder="Kota, DD-MM-YYYY" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Agama</label><input type="text" id="prfAgama" class="form-control" required></div>
+            <button type="submit" class="btn btn-primary fw-bold">Update Profil</button>
           </form>
         </div>
       </section>
 
-      <!-- MENU 6: MANAJEMEN USER (SUPERADMIN) -->
-      <section id="menu-userMgmt" class="d-none">
-        <h3 class="fw-bold mb-4">Manajemen User & Hak Akses Fitur</h3>
+      <!-- MENU 6: MANAJEMEN USER -->
+      <section id="menu-userMgmt" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Manajemen User & Hak Akses</h3>
         <div class="row g-4">
-          <div class="col-md-4">
-            <div class="card card-custom p-3">
-              <h5 class="fw-bold mb-3">Buat Akun Baru</h5>
+          <div class="col-12 col-lg-4">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Tambah Akun Baru</h5>
               <form onsubmit="simpanUserMgmt(event)">
-                <input type="text" id="usrName" class="form-control mb-2" placeholder="Username" autocapitalize="none" autocorrect="off" required>
-                <input type="password" id="usrPass" class="form-control mb-2" placeholder="Password" required>
-                <input type="text" id="usrWA" class="form-control mb-2" placeholder="No WhatsApp">
-                <select id="usrRole" class="form-select mb-3">
-                  <option value="SUPERADMIN">SUPERADMIN</option>
-                  <option value="ADMIN">ADMIN</option>
-                  <option value="RESELLER">RESELLER</option>
-                </select>
+                <div class="mb-2"><label class="form-label small fw-bold">Username</label><input type="text" id="usrName" class="form-control" autocapitalize="none" autocorrect="off" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Password</label><input type="password" id="usrPass" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="usrWA" class="form-control"></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Role</label>
+                  <select id="usrRole" class="form-select">
+                    <option value="SUPERADMIN">SUPERADMIN</option>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="RESELLER">RESELLER</option>
+                  </select>
+                </div>
                 <div class="mb-3">
                   <div class="form-check"><input type="checkbox" id="permInput" class="form-check-input" checked><label class="form-check-label small">Izin Input Data</label></div>
                   <div class="form-check"><input type="checkbox" id="permExport" class="form-check-input"><label class="form-check-label small">Izin Export Excel</label></div>
                   <div class="form-check"><input type="checkbox" id="permDelete" class="form-check-input"><label class="form-check-label small">Izin Hapus Data</label></div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Simpan Akun</button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Buat Akun</button>
               </form>
             </div>
           </div>
-          <div class="col-md-8">
-            <div class="card card-custom p-3">
-              <h5 class="fw-bold mb-3">Daftar Pengguna Cloud</h5>
+          <div class="col-12 col-lg-8">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Daftar Pengguna</h5>
               <div class="table-responsive">
                 <table class="table table-hover" id="tblUsers">
                   <thead><tr><th>Username</th><th>WhatsApp</th><th>Role</th><th>Izin Akses</th></tr></thead>
@@ -319,10 +456,14 @@
     </main>
   </div>
 
-  <!-- SCRIPT LOGIC APPLICATION -->
+  <!-- APP JS LOGIC -->
   <script src="supabase-client.js"></script>
   <script>
     let activeChart = null;
+
+    function toggleSidebar() {
+      document.getElementById('mainSidebar').classList.toggle('show');
+    }
 
     // --- AUTHENTICATION ---
     async function handleAuthLogin(e) {
@@ -333,7 +474,7 @@
       const { data: user, error } = await _supabase.from('users').select('*').eq('username', u).single();
 
       if (error || !user) {
-        alert('Username atau Password salah!');
+        alert('Username atau Password tidak ditemukan!');
         return;
       }
 
@@ -348,7 +489,7 @@
     function initAppView(user) {
       document.getElementById('pageLogin').classList.add('d-none');
       document.getElementById('pageApp').classList.remove('d-none');
-      document.getElementById('userRoleBadge').innerText = `User: ${user.username} (${user.role})`;
+      document.getElementById('userRoleBadge').innerText = `${user.username} (${user.role})`;
 
       if (user.role !== 'SUPERADMIN') {
         document.getElementById('menuUserMgmt').classList.add('d-none');
@@ -366,7 +507,17 @@
     function switchMenu(menuName) {
       const sections = ['dashboard', 'server', 'reseller', 'penjualan', 'profil', 'userMgmt'];
       sections.forEach(s => document.getElementById(`menu-${s}`).classList.add('d-none'));
+      
       document.getElementById(`menu-${menuName}`).classList.remove('d-none');
+
+      // Update Nav Active State
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('onclick').includes(menuName)) link.classList.add('active');
+      });
+
+      // Close sidebar on mobile
+      if (window.innerWidth < 992) document.getElementById('mainSidebar').classList.remove('show');
 
       if (menuName === 'dashboard') loadDashboardData();
       if (menuName === 'server') loadServerData();
@@ -375,7 +526,74 @@
       if (menuName === 'userMgmt') loadUserData();
     }
 
-    // --- DATA MANAGEMENT ---
+    // --- DATA LOADING FOR DASHBOARD ---
+    async function loadDashboardData() {
+      const { data: servers } = await _supabase.from('servers').select('*');
+      const { data: stocks } = await _supabase.from('reseller_stock').select('*');
+
+      document.getElementById('dashTotalServer').innerText = (servers || []).length;
+      
+      let totalJual = 0;
+      let totalStok = 0;
+      
+      (stocks || []).forEach(s => {
+        const sum = s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k + s.b1hp + s.b2hp + s.b3hp + s.b4hp + s.b5hp;
+        if(s.status === 'Terjual') totalJual += sum;
+        else totalStok += sum;
+      });
+
+      document.getElementById('dashTotalTerjual').innerText = totalJual;
+      document.getElementById('dashTotalStok').innerText = totalStok;
+
+      // 1. Render Tabel Rekap Input Reseller oleh Admin
+      const bodyDashReseller = document.getElementById('bodyDashReseller');
+      bodyDashReseller.innerHTML = (stocks || []).map(r => `
+        <tr>
+          <td><b>${r.nama_server}</b></td>
+          <td>${r.nama_reseller}</td>
+          <td>${r.whatsapp || '-'}</td>
+          <td><span class="badge ${r.status === 'Terjual' ? 'bg-success' : 'bg-primary'}">${r.status}</span></td>
+        </tr>
+      `).join('');
+
+      // 2. Render Tabel Laporan Penjualan Reseller
+      const bodyDashSales = document.getElementById('bodyDashSales');
+      bodyDashSales.innerHTML = (stocks || []).filter(s => s.status === 'Terjual').map(d => {
+        const totalQty = d.v2k + d.v3k + d.v4k + d.v5k + d.v6k + d.v25k + d.b1hp + d.b2hp + d.b3hp + d.b4hp + d.b5hp;
+        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v4k*4000) + (d.v5k*5000) + (d.v6k*6000) + (d.v25k*25000) + (d.b1hp*50000);
+        return `
+          <tr>
+            <td><b>${d.nama_server}</b></td>
+            <td>${d.nama_reseller}</td>
+            <td>${totalQty} pcs</td>
+            <td>Rp ${estOmset.toLocaleString('id-ID')}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // 3. Render Chart
+      const ctx = document.getElementById('serverChart').getContext('2d');
+      if (activeChart) activeChart.destroy();
+      
+      activeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: (servers || []).map(s => s.nama_server),
+          datasets: [{
+            label: 'Total Reseller Per Server',
+            data: (servers || []).map(srv => (stocks || []).filter(stk => stk.nama_server === srv.nama_server).length),
+            backgroundColor: '#2563eb',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // --- OTHER CRUD LOGICS ---
     async function simpanServer(e) {
       e.preventDefault();
       await _supabase.from('servers').insert([{
@@ -390,8 +608,7 @@
 
     async function loadServerData() {
       const { data } = await _supabase.from('servers').select('*');
-      const tbody = document.getElementById('bodyServer');
-      tbody.innerHTML = (data || []).map(s => `<tr><td>${s.nama_server}</td><td>${s.pengelola}</td><td>${s.whatsapp}</td><td>${s.wilayah}</td></tr>`).join('');
+      document.getElementById('bodyServer').innerHTML = (data || []).map(s => `<tr><td>${s.nama_server}</td><td>${s.pengelola}</td><td>${s.whatsapp}</td><td>${s.wilayah}</td></tr>`).join('');
     }
 
     async function simpanStokReseller(e) {
@@ -419,10 +636,9 @@
 
     async function loadStokData() {
       const { data } = await _supabase.from('reseller_stock').select('*');
-      const tbody = document.getElementById('bodyStok');
-      tbody.innerHTML = (data || []).map(d => `
+      document.getElementById('bodyStok').innerHTML = (data || []).map(d => `
         <tr>
-          <td>${d.nama_server}</td><td>${d.nama_reseller}</td><td><span class="badge bg-info">${d.status}</span></td>
+          <td>${d.nama_server}</td><td>${d.nama_reseller}</td><td><span class="badge bg-primary">${d.status}</span></td>
           <td>${d.v2k}</td><td>${d.v3k}</td><td>${d.v4k}</td><td>${d.v5k}</td><td>${d.v6k}</td><td>${d.v25k}</td>
           <td>${d.b1hp}</td><td>${d.b2hp}</td><td>${d.b3hp}</td><td>${d.b4hp}</td><td>${d.b5hp}</td>
         </tr>
@@ -431,10 +647,9 @@
 
     async function loadPenjualanData() {
       const { data } = await _supabase.from('reseller_stock').select('*').eq('status', 'Terjual');
-      const tbody = document.getElementById('bodySales');
-      tbody.innerHTML = (data || []).map(d => {
+      document.getElementById('bodySales').innerHTML = (data || []).map(d => {
         const totalQty = d.v2k + d.v3k + d.v4k + d.v5k + d.v6k + d.v25k + d.b1hp + d.b2hp + d.b3hp + d.b4hp + d.b5hp;
-        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v5k*5000) + (d.v25k*25000) + (d.b1hp*50000);
+        const estOmset = (d.v2k*2000) + (d.v3k*3000) + (d.v4k*4000) + (d.v5k*5000) + (d.v6k*6000) + (d.v25k*25000) + (d.b1hp*50000);
         return `<tr><td>${d.nama_server}</td><td>${d.nama_reseller}</td><td>${totalQty} pcs</td><td>Rp ${estOmset.toLocaleString('id-ID')}</td></tr>`;
       }).join('');
     }
@@ -456,8 +671,7 @@
 
     async function loadUserData() {
       const { data } = await _supabase.from('users').select('*');
-      const tbody = document.getElementById('bodyUsers');
-      tbody.innerHTML = (data || []).map(u => `
+      document.getElementById('bodyUsers').innerHTML = (data || []).map(u => `
         <tr>
           <td><b>${u.username}</b></td><td>${u.whatsapp || '-'}</td><td><span class="badge bg-secondary">${u.role}</span></td>
           <td>${u.can_input ? '[Input] ' : ''}${u.can_export ? '[Export] ' : ''}</td>
@@ -470,41 +684,6 @@
       alert('Profil berhasil diperbarui!');
     }
 
-    // --- DASHBOARD CHART ---
-    async function loadDashboardData() {
-      const { data: servers } = await _supabase.from('servers').select('*');
-      const { data: stocks } = await _supabase.from('reseller_stock').select('*');
-
-      document.getElementById('dashTotalServer').innerText = (servers || []).length;
-      
-      let totalJual = 0;
-      let totalStok = 0;
-      (stocks || []).forEach(s => {
-        const sum = s.v2k + s.v3k + s.v4k + s.v5k + s.v6k + s.v25k + s.b1hp + s.b2hp + s.b3hp + s.b4hp + s.b5hp;
-        if(s.status === 'Terjual') totalJual += sum;
-        else totalStok += sum;
-      });
-
-      document.getElementById('dashTotalTerjual').innerText = totalJual;
-      document.getElementById('dashTotalStok').innerText = totalStok;
-
-      // Render Chart
-      const ctx = document.getElementById('serverChart').getContext('2d');
-      if (activeChart) activeChart.destroy();
-      
-      activeChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: (servers || []).map(s => s.nama_server),
-          datasets: [{
-            label: 'Aktivitas Server',
-            data: (servers || []).map(() => Math.floor(Math.random() * 50) + 10),
-            backgroundColor: '#2563eb'
-          }]
-        }
-      });
-    }
-
     // --- EXPORT TO EXCEL ---
     function exportToExcel(tableID, filename) {
       const table = document.getElementById(tableID);
@@ -512,10 +691,10 @@
       XLSX.writeFile(wb, `${filename}.xlsx`);
     }
 
-    // --- AUTO AUTO-LOGIN CHECK ---
+    // --- AUTO-LOGIN CHECK ---
     document.addEventListener('DOMContentLoaded', () => {
       const savedUser = localStorage.getItem('rinnet_user');
-      if (savedUser) initAppView(JSON.stringify(savedUser));
+      if (savedUser) initAppView(JSON.parse(savedUser));
     });
   </script>
 </body>
