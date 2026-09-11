@@ -27,6 +27,7 @@
 --text-main: #0f172a;
 --text-muted: #64748b;
 }
+
 body { 
   background-color: var(--bg-body); 
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -243,8 +244,6 @@ body {
     </div>
   </div>
 </div>
-<!-- ================= MAIN APP SYSTEM ================= -->
-<div id="pageApp" class="d-none">
 
 <!-- Header Mobile Toggle -->
 <div class="mobile-header d-lg-none">
@@ -773,7 +772,7 @@ let currentUser = null;
 let base64AvatarImage = "";
 let alertTimer = null;
 
- // BATAS MAKSIMAL SIMPAN LOG RIWAYAT (DIATUR 50 LOG SESUAI KEBUTUHAN SISTEM)
+// BATAS MAKSIMAL SIMPAN LOG RIWAYAT (DIATUR 50 LOG SESUAI KEBUTUHAN SISTEM)
 const MAX_LOG_LIMIT = 50;
 
 function toggleSidebar() {
