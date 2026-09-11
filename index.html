@@ -13,7 +13,6 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- ExcelJS for clean formatted exports -->
   <script src="https://cdnjs.cloudflare.net/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
@@ -47,12 +46,13 @@
       box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
       color: #ffffff;
       margin-bottom: 1rem;
+      overflow: hidden;
     }
 
     .brand-logo-wrap img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* --- LOGIN SCREEN --- */
@@ -133,7 +133,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* --- UI CARDS & TABLES --- */
     .card-custom {
       border: none;
       border-radius: 16px;
@@ -157,7 +156,6 @@
       border-bottom: 2px solid #e2e8f0;
     }
 
-    /* Status Badges */
     .status-badge {
       padding: 0.35em 0.75em;
       border-radius: 50rem;
@@ -165,7 +163,6 @@
       font-size: 0.75rem;
     }
 
-    /* Footer Credit */
     .app-credit {
       font-size: 0.75rem;
       color: #64748b;
@@ -193,7 +190,7 @@
     <div class="login-card text-center">
       <!-- Logo RINNET PLUS Fixed -->
       <div class="brand-logo-wrap">
-        <i class="fa-solid fa-bolt-lightning fs-2 text-white"></i>
+        <img src="logo.png" alt="RINNET PLUS" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-bolt-lightning fs-2 text-white\'></i>';">
       </div>
       <h3 class="fw-800 mb-0" style="color: var(--primary); letter-spacing: -0.5px;">RINNET PLUS</h3>
       <p class="text-muted small mb-4 fw-600">Internal Enterprise Management System</p>
@@ -231,7 +228,9 @@
     <nav class="sidebar" id="mainSidebar">
       <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
         <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-          <div class="bg-primary rounded-3 p-2 text-white d-inline-flex"><i class="fa-solid fa-bolt-lightning"></i></div>
+          <div class="bg-primary rounded-3 p-2 text-white d-inline-flex" style="width: 36px; height: 36px; align-items: center; justify-content: center;">
+            <img src="logo.png" alt="Logo" style="width: 24px; height: 24px; object-fit: contain;" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-bolt-lightning\'></i>';">
+          </div>
           <span class="fw-800 fs-5 text-white tracking-wide">RINNET+</span>
         </div>
         <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
@@ -444,7 +443,6 @@
       <section id="menu-kasbon" class="page-section d-none">
         <h3 class="fw-800 mb-4">Form & Rekapitulasi Kasbon Karyawan</h3>
         
-        <!-- Summary Cards Kasbon -->
         <div class="row g-3 mb-4">
           <div class="col-12 col-md-4">
             <div class="card card-custom p-3 border-start border-4 border-primary">
@@ -508,7 +506,6 @@
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKasbon', 'Rekapan_Kasbon_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Format Excel</button>
               </div>
 
-              <!-- Filter Panel Kasbon -->
               <div class="row g-2 mb-3 bg-light p-3 rounded-3">
                 <div class="col-12 col-sm-4">
                   <label class="small fw-bold">Filter Karyawan</label>
@@ -559,7 +556,7 @@
         </div>
       </section>
 
-      <!-- MENU 7: MONITORING AKTIVITAS HARI INI (SUPERADMIN / ADMIN) -->
+      <!-- MENU 7: MONITORING AKTIVITAS HARI INI -->
       <section id="menu-monitoring" class="page-section d-none">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
@@ -605,7 +602,7 @@
         </div>
       </section>
 
-      <!-- MENU 8: MANAJEMEN USER (SUPERADMIN ONLY) -->
+      <!-- MENU 8: MANAJEMEN USER -->
       <section id="menu-userMgmt" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen User & Hak Akses Intern</h3>
         <div class="row g-4">
@@ -646,7 +643,7 @@
         </div>
       </section>
 
-      <!-- MENU 9: MONITORING SYSTEM (SUPERADMIN ONLY) -->
+      <!-- MENU 9: MONITORING SYSTEM -->
       <section id="menu-sysPerf" class="page-section d-none">
         <h3 class="fw-800 mb-1">System Health & Hardware Performance</h3>
         <p class="text-muted small mb-4">Monitoring integrasi platform Supabase, GitHub Deployment API, Server & Engine Metrics secara realtime.</p>
@@ -734,21 +731,26 @@
       document.getElementById('mainSidebar').classList.toggle('show');
     }
 
-    // Capture User Geolocation
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          userLocation = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-        },
-        () => {
-          userLocation = "Akses Lokasi Ditolak";
+    // Capture User Geolocation (Async Promise Wrapper)
+    function getUserLocation() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve("Geolocation Tidak Didukung");
+          return;
         }
-      );
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
+          () => resolve("Akses Lokasi Ditolak/Tidak Aktif"),
+          { timeout: 5000 }
+        );
+      });
     }
 
-    // Helper untuk Logging Pekerjaan / Aktivitas
+    // Logging Pekerjaan / Aktivitas
     async function logActivity(tipe, detail) {
       if (!currentUser) return;
+      
+      const loc = await getUserLocation();
       const device = navigator.userAgent;
       const payload = {
         waktu: new Date().toISOString(),
@@ -757,13 +759,13 @@
         tipe: tipe,
         detail: detail,
         device: device,
-        koordinat: userLocation
+        koordinat: loc
       };
 
       try {
-        await _supabase.from('activity_logs').insert([payload]);
+        const { error } = await _supabase.from('activity_logs').insert([payload]);
+        if (error) throw error;
       } catch (err) {
-        // Fallback local memory log jika tabel belum ada
         let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
         logs.unshift(payload);
         localStorage.setItem('rinnet_local_logs', JSON.stringify(logs));
@@ -787,9 +789,7 @@
         currentUser = user;
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
         
-        // Log Aktivitas Login
         await logActivity('LOGIN', `User ${user.username} (${user.role}) berhasil masuk ke sistem.`);
-        
         initAppView(user);
       } else {
         alert('Password salah!');
@@ -808,13 +808,13 @@
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
         checkSuperadminNotif();
+        setInterval(checkSuperadminNotif, 15000); // Polling otomatis notifikasi
       }
 
       loadDashboardData();
     }
 
     async function checkSuperadminNotif() {
-      // Menampilkan notifikasi login user/device terbaru
       let recentLog = null;
       try {
         const { data } = await _supabase.from('activity_logs')
@@ -832,7 +832,7 @@
         const alertBox = document.getElementById('superadminLoginAlert');
         const alertText = document.getElementById('superadminLoginAlertText');
         alertText.innerHTML = `<strong>${recentLog.username}</strong> (${recentLog.role}) baru saja mengakses sistem.<br>` +
-          `• <strong>Device:</strong> ${recentLog.device || recentLog.perangkat}<br>` +
+          `• <strong>Device:</strong> ${recentLog.device || recentLog.perangkat || 'Mobile/Browser'}<br>` +
           `• <strong>Koordinat:</strong> ${recentLog.koordinat || 'N/A'}`;
         alertBox.classList.remove('d-none');
       }
@@ -923,18 +923,23 @@
         wilayah: document.getElementById('srvWilayah').value
       };
 
+      let res;
       if(id) {
-        await _supabase.from('servers').update(payload).eq('id', id);
+        res = await _supabase.from('servers').update(payload).eq('id', id);
         await logActivity('INPUT_DATA', `Update server: ${payload.nama_server}`);
       } else {
-        await _supabase.from('servers').insert([payload]);
+        res = await _supabase.from('servers').insert([payload]);
         await logActivity('INPUT_DATA', `Tambah server baru: ${payload.nama_server}`);
       }
 
-      alert('Data Server Berhasil Disimpan!');
-      document.getElementById('srvId').value = '';
-      e.target.reset();
-      loadServerData();
+      if (!res.error) {
+        alert('Data Server Berhasil Disimpan!');
+        document.getElementById('srvId').value = '';
+        e.target.reset();
+        loadServerData();
+      } else {
+        alert('Gagal menyimpan server: ' + res.error.message);
+      }
     }
 
     async function loadServerData() {
@@ -982,18 +987,23 @@
         b5hp: parseInt(document.getElementById('b5hp').value || 0)
       };
 
+      let res;
       if(id) {
-        await _supabase.from('reseller_stock').update(payload).eq('id', id);
+        res = await _supabase.from('reseller_stock').update(payload).eq('id', id);
         await logActivity('INPUT_DATA', `Update stok voucher reseller: ${payload.nama_reseller}`);
       } else {
-        await _supabase.from('reseller_stock').insert([payload]);
+        res = await _supabase.from('reseller_stock').insert([payload]);
         await logActivity('INPUT_DATA', `Penyerahan stok voucher ke: ${payload.nama_reseller}`);
       }
 
-      alert('Penyerahan Stok Berhasil Disimpan!');
-      document.getElementById('stkId').value = '';
-      e.target.reset();
-      loadStokData();
+      if (!res.error) {
+        alert('Penyerahan Stok Berhasil Disimpan!');
+        document.getElementById('stkId').value = '';
+        e.target.reset();
+        loadStokData();
+      } else {
+        alert('Gagal menyimpan stok: ' + res.error.message);
+      }
     }
 
     async function loadStokData() {
@@ -1028,18 +1038,23 @@
         whatsapp: document.getElementById('empWA').value
       };
 
+      let res;
       if(id) {
-        await _supabase.from('employees').update(payload).eq('id', id);
+        res = await _supabase.from('employees').update(payload).eq('id', id);
         await logActivity('INPUT_DATA', `Update data karyawan: ${payload.nama_karyawan}`);
       } else {
-        await _supabase.from('employees').insert([payload]);
+        res = await _supabase.from('employees').insert([payload]);
         await logActivity('INPUT_DATA', `Input data karyawan baru: ${payload.nama_karyawan}`);
       }
 
-      alert('Data Karyawan Berhasil Disimpan!');
-      document.getElementById('empDbId').value = '';
-      e.target.reset();
-      loadKaryawanData();
+      if(!res.error) {
+        alert('Data Karyawan Berhasil Disimpan!');
+        document.getElementById('empDbId').value = '';
+        e.target.reset();
+        loadKaryawanData();
+      } else {
+        alert('Gagal menyimpan karyawan: ' + res.error.message);
+      }
     }
 
     async function loadKaryawanData() {
@@ -1075,25 +1090,29 @@
         keterangan: document.getElementById('ksbKet').value || '-'
       };
 
+      let res;
       if(id) {
-        await _supabase.from('kasbon').update(payload).eq('id', id);
+        res = await _supabase.from('kasbon').update(payload).eq('id', id);
         await logActivity('INPUT_DATA', `Update kasbon karyawan: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
       } else {
-        await _supabase.from('kasbon').insert([payload]);
+        res = await _supabase.from('kasbon').insert([payload]);
         await logActivity('INPUT_DATA', `Input kasbon baru: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`);
       }
 
-      alert('Kasbon Berhasil Dicatat!');
-      document.getElementById('ksbId').value = '';
-      e.target.reset();
-      loadKasbonData();
+      if(!res.error) {
+        alert('Kasbon Berhasil Dicatat!');
+        document.getElementById('ksbId').value = '';
+        e.target.reset();
+        loadKasbonData();
+      } else {
+        alert('Gagal menyimpan kasbon: ' + res.error.message);
+      }
     }
 
     async function loadKasbonData() {
       const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
       const { data: srvs } = await _supabase.from('servers').select('nama_server');
 
-      // Populate selects
       document.getElementById('ksbKaryawan').innerHTML = '<option value="">-- Pilih Karyawan --</option>' + 
         (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
       document.getElementById('fltKasbonKaryawan').innerHTML = '<option value="">-- Semua Karyawan --</option>' + 
@@ -1113,7 +1132,6 @@
 
       const { data } = await query;
 
-      // Hitung Rekapan 2 Minggu & 1 Bulan
       const today = new Date();
       const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000));
       const oneMonthAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
@@ -1181,8 +1199,11 @@
       if(!error) {
         Object.assign(currentUser, updatePayload);
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
+        document.getElementById('navUserName').innerText = currentUser.nama_lengkap || currentUser.username;
         await logActivity('INPUT_DATA', `Memperbarui profil diri`);
         alert('Profil berhasil diperbarui!');
+      } else {
+        alert('Gagal memperbarui profil: ' + error.message);
       }
     }
 
@@ -1190,7 +1211,8 @@
     async function loadMonitoringData() {
       let logs = [];
       try {
-        const { data } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false });
+        const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false });
+        if (error) throw error;
         logs = data || [];
       } catch (err) {
         logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
@@ -1241,18 +1263,23 @@
 
       if (pass) payload.password_hash = pass;
 
+      let res;
       if (id) {
-        await _supabase.from('users').update(payload).eq('id', id);
+        res = await _supabase.from('users').update(payload).eq('id', id);
         await logActivity('INPUT_DATA', `Update user admin: ${payload.username}`);
       } else {
-        await _supabase.from('users').insert([payload]);
+        res = await _supabase.from('users').insert([payload]);
         await logActivity('INPUT_DATA', `Tambah user admin baru: ${payload.username}`);
       }
 
-      alert('Akun User Berhasil Disimpan!');
-      document.getElementById('usrDbId').value = '';
-      e.target.reset();
-      loadUserData();
+      if (!res.error) {
+        alert('Akun User Berhasil Disimpan!');
+        document.getElementById('usrDbId').value = '';
+        e.target.reset();
+        loadUserData();
+      } else {
+        alert('Gagal menyimpan user: ' + res.error.message);
+      }
     }
 
     async function loadUserData() {
@@ -1282,7 +1309,7 @@
 
     // --- GENERAL DELETE HELPER ---
     async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
-      if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+      if (confirm('Apakah Anda yakin ingin menghapus data me-record ini?')) {
         const { error } = await _supabase.from(tableName).delete().eq('id', id);
         if (!error) {
           await logActivity('INPUT_DATA', `Menghapus record: ${itemDesc}`);
@@ -1300,14 +1327,12 @@
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
-      // Ambil Header
       const headers = [];
       table.querySelectorAll('thead th').forEach(th => {
         if(th.innerText !== 'AKSI') headers.push(th.innerText);
       });
       worksheet.addRow(headers);
 
-      // Format Header Row
       const headerRow = worksheet.getRow(1);
       headerRow.eachCell((cell) => {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0F172A' } };
@@ -1315,11 +1340,9 @@
         cell.alignment = { vertical: 'middle', horizontal: 'center' };
       });
 
-      // Ambil Body Data
       table.querySelectorAll('tbody tr').forEach(tr => {
         const rowData = [];
         tr.querySelectorAll('td').forEach((td, idx) => {
-          // Abaikan kolom aksi terakhir
           if (idx < headers.length) {
             rowData.push(td.innerText.trim());
           }
@@ -1327,7 +1350,6 @@
         worksheet.addRow(rowData);
       });
 
-      // Style All Cells (Borders & Font Cleanliness)
       worksheet.eachRow((row, rowNumber) => {
         if (rowNumber > 1) {
           row.eachCell((cell) => {
@@ -1342,7 +1364,6 @@
         }
       });
 
-      // Auto Width Column
       worksheet.columns.forEach(column => {
         let maxLen = 0;
         column.eachCell({ includeEmpty: true }, cell => {
