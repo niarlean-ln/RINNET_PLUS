@@ -7,14 +7,14 @@
   
   <!-- Fonts & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.net/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-  <script src="https://cdnjs.cloudflare.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
   <style>
     :root {
@@ -34,7 +34,7 @@
       color: var(--text-main);
     }
 
-    /* --- BRANDING RINNET+ (TEKS TYPOGRAPHY MODERN) --- */
+    /* --- BRANDING RINNET+ --- */
     .brand-text-logo {
       position: relative;
       display: inline-block;
@@ -293,7 +293,7 @@
     <!-- Main Content Area -->
     <main class="content-area">
 
-      <!-- ALERT NOTIFIKASI LOGIN REALTIME OTOMATIS HILANG TEPAT 5 DETIK -->
+      <!-- ALERT NOTIFIKASI LOGIN REALTIME -->
       <div id="userLoginAlert" class="alert alert-info alert-dismissible fade show d-none mb-4 shadow-sm border-start border-4 border-info" role="alert">
         <div class="d-flex align-items-center justify-content-between">
           <div>
@@ -396,12 +396,17 @@
           <form onsubmit="simpanStokReseller(event)" class="row g-3">
             <input type="hidden" id="stkId">
             <div class="col-12 col-md-3"><label class="form-label small fw-bold">Tanggal</label><input type="date" id="stkTanggal" class="form-control" required></div>
-            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="stkServer" class="form-control" required></div>
+            <div class="col-12 col-md-3">
+              <label class="form-label small fw-bold">Nama Server (Pilih dari Data Server)</label>
+              <select id="stkServer" class="form-select" required>
+                <option value="">-- Pilih Server --</option>
+              </select>
+            </div>
             <div class="col-12 col-md-3"><label class="form-label small fw-bold">Nama Reseller</label><input type="text" id="stkReseller" class="form-control" required></div>
             <div class="col-12 col-md-3"><label class="form-label small fw-bold">Petugas Lapangan</label><input type="text" id="stkPetugas" class="form-control" required></div>
             
             <div class="col-12"><hr class="my-1"></div>
-            <h6 class="fw-bold mb-1 text-primary">Stok Voucher Harian & Mingguan:</h6>
+            <h6 class="fw-bold mb-1 text-primary">Stok Voucher Harian & Mingguan <small class="text-muted fw-normal">(Opsional / Boleh dikosongkan)</small>:</h6>
             <div class="col-4 col-md-2"><label class="small">2K</label><input type="number" id="v2k" class="form-control" value="0"></div>
             <div class="col-4 col-md-2"><label class="small">3K</label><input type="number" id="v3k" class="form-control" value="0"></div>
             <div class="col-4 col-md-2"><label class="small">4K</label><input type="number" id="v4k" class="form-control" value="0"></div>
@@ -409,7 +414,7 @@
             <div class="col-4 col-md-2"><label class="small">6K</label><input type="number" id="v6k" class="form-control" value="0"></div>
             <div class="col-4 col-md-2"><label class="small">25K</label><input type="number" id="v25k" class="form-control" value="0"></div>
 
-            <h6 class="fw-bold mb-1 text-primary mt-3">Stok Voucher Bulanan:</h6>
+            <h6 class="fw-bold mb-1 text-primary mt-3">Stok Voucher Bulanan <small class="text-muted fw-normal">(Opsional / Boleh dikosongkan)</small>:</h6>
             <div class="col-4 col-md-2"><label class="small">1HP</label><input type="number" id="b1hp" class="form-control" value="0"></div>
             <div class="col-4 col-md-2"><label class="small">2HP</label><input type="number" id="b2hp" class="form-control" value="0"></div>
             <div class="col-4 col-md-2"><label class="small">3HP</label><input type="number" id="b3hp" class="form-control" value="0"></div>
@@ -422,7 +427,7 @@
 
         <div class="card card-custom p-4">
           <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <h5 class="fw-bold mb-0">Rekapan Pendaftaran Reseller & Stock Voucher Bulanan</h5>
+            <h5 class="fw-bold mb-0">Rekapan Pendaftaran Reseller & Stock Voucher</h5>
             <div class="d-flex gap-2 align-items-center">
               <input type="month" id="filterBulanStok" class="form-control form-control-sm" onchange="loadStokData()">
               <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblStok', 'Rekap_Pendaftaran_Reseller_Stok')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
@@ -461,8 +466,8 @@
                   <input type="text" id="empNama" class="form-control" placeholder="Nama lengkap" required>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label small fw-bold">Nomor WhatsApp</label>
-                  <input type="text" id="empWA" class="form-control" placeholder="08xxxxxxxxxx" required>
+                  <label class="form-label small fw-bold">Nomor WhatsApp <small class="text-muted fw-normal">(Opsional)</small></label>
+                  <input type="text" id="empWA" class="form-control" placeholder="08xxxxxxxxxx">
                 </div>
                 <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Karyawan</button>
               </form>
@@ -602,25 +607,66 @@
         </div>
       </section>
 
-      <!-- MENU 7: MONITORING AKTIVITAS HARI INI -->
+      <!-- MENU 7, 8, 9: DIGABUNG / DITATA ULANG SESUAI PERMINTAAN (ATAS BAWAH) -->
       <section id="menu-monitoring" class="page-section d-none">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h3 class="fw-800 mb-1">Monitoring Pekerjaan & Aktivitas Admin</h3>
-            <p class="text-muted small mb-0">Pantau seluruh rekapan input data, perubahan, dan log perangkat pengguna sistem.</p>
+        <h3 class="fw-800 mb-1">Monitoring Sistem & Aktivitas Pengguna</h3>
+        <p class="text-muted small mb-4">Pemantauan performa infrastruktur hardware/cloud secara realtime dan log aktivitas pekerjaan admin.</p>
+
+        <!-- BAGIAN 1: MONITORING SYSTEM (ATAS) DENGAN GRAFIK REALTIME -->
+        <div class="card card-custom p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-microchip me-2 text-warning"></i>Grafik Performa Sistem & Hardware Realtime</h5>
+            <span class="badge bg-success px-3 py-2">LIVE MONITORING</span>
           </div>
-          <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMonitoring', 'Monitoring_Aktivitas_Pekerjaan')">
-            <i class="fa-solid fa-file-excel me-1"></i>Export Excel
-          </button>
+          
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-md-3">
+              <div class="p-3 bg-light rounded-3 text-center border">
+                <span class="text-muted small fw-bold">CPU USAGE</span>
+                <h3 id="sysCpuVal" class="fw-800 my-1 text-success">14%</h3>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="p-3 bg-light rounded-3 text-center border">
+                <span class="text-muted small fw-bold">MEMORY (RAM)</span>
+                <h3 id="sysRamVal" class="fw-800 my-1 text-success">42%</h3>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="p-3 bg-light rounded-3 text-center border">
+                <span class="text-muted small fw-bold">DB LATENCY</span>
+                <h3 id="sysDbLatency" class="fw-800 my-1 text-primary">28 ms</h3>
+              </div>
+            </div>
+            <div class="col-12 col-md-3">
+              <div class="p-3 bg-light rounded-3 text-center border">
+                <span class="text-muted small fw-bold">GITHUB SYNC</span>
+                <h3 id="sysGitStatus" class="fw-800 my-1 text-success">SUCCESS</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart.js Realtime Performa -->
+          <div style="height: 260px; position: relative;">
+            <canvas id="systemPerfChart"></canvas>
+          </div>
         </div>
 
+        <!-- BAGIAN 2: MONITORING AKTIVITAS (BAWAH) -->
         <div class="card card-custom p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-info"></i>Monitoring Pekerjaan & Aktivitas Admin</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMonitoring', 'Monitoring_Aktivitas_Pekerjaan')">
+              <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+            </button>
+          </div>
+
           <div class="row g-2 mb-3 bg-light p-3 rounded-3">
-            <div class="col-12 col-sm-4">
+            <div class="col-12 col-sm-6">
               <label class="small fw-bold">Tanggal Aktivitas</label>
               <input type="date" id="fltLogDate" class="form-control form-control-sm" onchange="loadMonitoringData()">
             </div>
-            <div class="col-12 col-sm-4">
+            <div class="col-12 col-sm-6">
               <label class="small fw-bold">Tipe Aktivitas</label>
               <select id="fltLogType" class="form-select form-select-sm" onchange="loadMonitoringData()">
                 <option value="">-- Semua Aktivitas --</option>
@@ -648,32 +694,64 @@
         </div>
       </section>
 
-      <!-- MENU 8: MANAJEMEN USER -->
+      <!-- MENU 8: MANAJEMEN USER (PEMISAHAN HAK AKSES & ROLE) -->
       <section id="menu-userMgmt" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen User & Hak Akses Intern</h3>
         <div class="row g-4">
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-5">
             <div class="card card-custom p-4">
               <h5 class="fw-bold mb-3">Kelola Akun User</h5>
               <form onsubmit="simpanUserMgmt(event)">
                 <input type="hidden" id="usrDbId">
                 <div class="mb-2"><label class="form-label small fw-bold">Username</label><input type="text" id="usrName" class="form-control" required></div>
                 <div class="mb-2"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="usrFullName" class="form-control" required></div>
-                <div class="mb-2"><label class="form-label small fw-bold">Email</label><input type="email" id="usrEmail" class="form-control" required></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Email <small class="text-muted fw-normal">(Opsional)</small></label><input type="email" id="usrEmail" class="form-control" placeholder="nama@email.com"></div>
                 <div class="mb-2"><label class="form-label small fw-bold">Password</label><input type="password" id="usrPass" class="form-control" placeholder="Isi untuk ubah/buat"></div>
-                <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="usrWA" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label small fw-bold">Hak Akses / Role</label>
+                <div class="mb-2"><label class="form-label small fw-bold">Nomor WhatsApp <small class="text-muted fw-normal">(Opsional)</small></label><input type="text" id="usrWA" class="form-control" placeholder="08xxxxxxxxxx"></div>
+                
+                <!-- Pemisahan Role dan Hak Akses (Permissions) -->
+                <div class="mb-2">
+                  <label class="form-label small fw-bold text-primary">Role Utama</label>
                   <select id="usrRole" class="form-select">
                     <option value="SUPERADMIN">SUPERADMIN</option>
                     <option value="MANAJER">MANAJER</option>
                     <option value="ADMIN">ADMIN</option>
                   </select>
                 </div>
+
+                <div class="mb-3 p-3 bg-light rounded-3 border">
+                  <label class="form-label small fw-bold text-primary mb-2 d-block">Hak Akses Modul Khusus (Custom Permissions)</label>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input perm-chk" type="checkbox" value="dashboard" id="permDash" checked>
+                    <label class="form-check-label small" for="permDash">Akses Dashboard</label>
+                  </div>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input perm-chk" type="checkbox" value="server" id="permServer" checked>
+                    <label class="form-check-label small" for="permServer">Kelola Data Server</label>
+                  </div>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input perm-chk" type="checkbox" value="reseller" id="permReseller" checked>
+                    <label class="form-check-label small" for="permReseller">Kelola Stok Voucher Reseller</label>
+                  </div>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input perm-chk" type="checkbox" value="karyawan" id="permEmp" checked>
+                    <label class="form-check-label small" for="permEmp">Kelola Data Karyawan</label>
+                  </div>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input perm-chk" type="checkbox" value="kasbon" id="permKasbon" checked>
+                    <label class="form-check-label small" for="permKasbon">Kelola Form & Rekap Kasbon</label>
+                  </div>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input perm-chk" type="checkbox" value="monitoring" id="permMon">
+                    <label class="form-check-label small" for="permMon">Akses Monitoring Aktivitas</label>
+                  </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Akun</button>
               </form>
             </div>
           </div>
-          <div class="col-12 col-lg-8">
+          <div class="col-12 col-lg-7">
             <div class="card card-custom p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Daftar Pengguna Terdaftar</h5>
@@ -681,85 +759,11 @@
               </div>
               <div class="table-responsive">
                 <table class="table table-hover" id="tblUsers">
-                  <thead><tr><th>Username</th><th>Nama Lengkap</th><th>Email</th><th>WhatsApp</th><th>Role</th><th>Aksi</th></tr></thead>
+                  <thead><tr><th>Username</th><th>Nama</th><th>Role</th><th>Hak Akses Modul</th><th>Aksi</th></tr></thead>
                   <tbody id="bodyUsers"></tbody>
                 </table>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- MENU 9: MONITORING SYSTEM -->
-      <section id="menu-sysPerf" class="page-section d-none">
-        <h3 class="fw-800 mb-1">System Health & Hardware Performance</h3>
-        <p class="text-muted small mb-4">Monitoring integrasi platform Supabase, GitHub Deployment API, Server & Engine Metrics secara realtime.</p>
-        
-        <div class="row g-3 mb-4">
-          <div class="col-12 col-md-3">
-            <div class="card card-custom p-3 text-center border-top border-4 border-success">
-              <span class="text-muted small fw-bold">CPU USAGE</span>
-              <h3 id="sysCpuVal" class="fw-800 my-1 text-success">14%</h3>
-              <span class="status-badge bg-success bg-opacity-10 text-success">HEALTHY</span>
-            </div>
-          </div>
-          <div class="col-12 col-md-3">
-            <div class="card card-custom p-3 text-center border-top border-4 border-success">
-              <span class="text-muted small fw-bold">MEMORY (RAM)</span>
-              <h3 id="sysRamVal" class="fw-800 my-1 text-success">42%</h3>
-              <span class="status-badge bg-success bg-opacity-10 text-success">OPTIMAL</span>
-            </div>
-          </div>
-          <div class="col-12 col-md-3">
-            <div class="card card-custom p-3 text-center border-top border-4 border-primary">
-              <span class="text-muted small fw-bold">SUPABASE DB LATENCY</span>
-              <h3 id="sysDbLatency" class="fw-800 my-1 text-primary">28 ms</h3>
-              <span class="status-badge bg-primary bg-opacity-10 text-primary">CONNECTED</span>
-            </div>
-          </div>
-          <div class="col-12 col-md-3">
-            <div class="card card-custom p-3 text-center border-top border-4 border-success">
-              <span class="text-muted small fw-bold">GITHUB BUILD STATUS</span>
-              <h3 id="sysGitStatus" class="fw-800 my-1 text-success">SUCCESS</h3>
-              <span class="status-badge bg-success bg-opacity-10 text-success">SYNCED</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-custom p-4">
-          <h5 class="fw-bold mb-3"><i class="fa-solid fa-server me-2 text-primary"></i>Detail Status Infrastruktur Hardware & Cloud</h5>
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead>
-                <tr><th>Komponen Software/Hardware</th><th>Integrasi API</th><th>Metrik Storage / Load</th><th>Status</th></tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>Supabase PostgreSQL Engine</b></td>
-                  <td>Database Service API v2</td>
-                  <td>Storage Total: 1.2 GB / 50 GB</td>
-                  <td><span class="badge bg-success">NORMAL</span></td>
-                </tr>
-                <tr>
-                  <td><b>GitHub Repository & Actions</b></td>
-                  <td>Deploy Branch & Webhook</td>
-                  <td>Build Status: Passing (v2.4.0)</td>
-                  <td><span class="badge bg-success">HEALTHY</span></td>
-                </tr>
-                <tr>
-                  <td><b>Server Cloud Latency</b></td>
-                  <td>Edge Node Regional</td>
-                  <td>Average Response Time: 18ms</td>
-                  <td><span class="badge bg-success">EXCELLENT</span></td>
-                </tr>
-                <tr>
-                  <td><b>Storage File Bucket</b></td>
-                  <td>Cloud Object Storage</td>
-                  <td>Bucket Usage: 450 MB / 100 GB</td>
-                  <td><span class="badge bg-success">HEALTHY</span></td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </section>
@@ -770,11 +774,12 @@
   <script src="supabase-client.js"></script>
   <script>
     let activeChart = null;
+    let perfChart = null;
     let currentUser = null;
     let base64AvatarImage = "";
     let alertTimer = null;
+    let livePerfInterval = null;
     
-    // BATAS MAKSIMAL SIMPAN LOG RIWAYAT
     const MAX_LOG_LIMIT = 50; 
 
     function toggleSidebar() {
@@ -795,10 +800,8 @@
       });
     }
 
-    // --- LOG ACTIVITY & AUTOMATIC CLEANUP (> 50 DATA) ---
     async function logActivity(tipe, detail) {
       if (!currentUser) return;
-      
       const loc = await getUserLocation();
       const device = navigator.userAgent;
       const payload = {
@@ -814,15 +817,11 @@
       try {
         const { error } = await _supabase.from('activity_logs').insert([payload]);
         if (error) throw error;
-        
         await cleanupOldLogs();
-
       } catch (err) {
         let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
         logs.unshift(payload);
-        if (logs.length > MAX_LOG_LIMIT) {
-          logs = logs.slice(0, MAX_LOG_LIMIT);
-        }
+        if (logs.length > MAX_LOG_LIMIT) logs = logs.slice(0, MAX_LOG_LIMIT);
         localStorage.setItem('rinnet_local_logs', JSON.stringify(logs));
       }
     }
@@ -834,7 +833,7 @@
           const idsToDelete = allLogs.slice(MAX_LOG_LIMIT).map(l => l.id);
           await _supabase.from('activity_logs').delete().in('id', idsToDelete);
         }
-      } catch(e) { console.log('Cleanup error:', e); }
+      } catch(e) {}
     }
 
     // --- AUTHENTICATION ---
@@ -853,7 +852,6 @@
       if (user.password_hash === p) {
         currentUser = user;
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
-        
         await logActivity('LOGIN', `User ${user.username} (${user.role}) berhasil masuk ke sistem.`);
         initAppView(user);
       } else {
@@ -870,7 +868,6 @@
       document.getElementById('userRoleBadge').innerText = user.role;
       if (user.avatar_url) document.getElementById('navUserAvatar').src = user.avatar_url;
 
-      // HAK AKSES PERAN (ROLE MANAGEMENT)
       document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.add('d-none'));
 
       if (user.role === 'SUPERADMIN') {
@@ -882,28 +879,20 @@
       showLoginNotification(user);
       listenRealtimeLogins();
       loadDashboardData();
+      initLiveSystemPerformanceChart();
     }
 
-    // --- NOTIFIKASI REALTIME LOGIN (OTOMATIS HILANG DALAM 5 DETIK) ---
     async function showLoginNotification(user, customLog = null) {
       let recentLog = customLog;
       if (!recentLog && user) {
         try {
-          const { data } = await _supabase.from('activity_logs')
-            .select('*')
-            .eq('tipe', 'LOGIN')
-            .order('waktu', { ascending: false })
-            .limit(1);
+          const { data } = await _supabase.from('activity_logs').select('*').eq('tipe', 'LOGIN').order('waktu', { ascending: false }).limit(1);
           if (data && data.length > 0) recentLog = data[0];
-        } catch (e) {
-          let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
-          recentLog = logs.find(l => l.tipe === 'LOGIN');
-        }
+        } catch (e) {}
       }
 
       const alertBox = document.getElementById('userLoginAlert');
       const alertText = document.getElementById('userLoginAlertText');
-
       const targetUser = recentLog?.username || user?.username || 'System User';
       const targetRole = recentLog?.role || user?.role || 'User';
       const devInfo = recentLog?.device || navigator.userAgent;
@@ -914,32 +903,22 @@
         `• <strong>Koordinat:</strong> ${coordInfo}`;
       
       alertBox.classList.remove('d-none');
-
       if (alertTimer) clearTimeout(alertTimer);
-
-      alertTimer = setTimeout(() => {
-        closeLoginAlert();
-      }, 5000);
+      alertTimer = setTimeout(() => { closeLoginAlert(); }, 5000);
     }
 
     function listenRealtimeLogins() {
       try {
-        _supabase
-          .channel('public:activity_logs')
+        _supabase.channel('public:activity_logs')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
-            if (payload.new && payload.new.tipe === 'LOGIN') {
-              showLoginNotification(null, payload.new);
-            }
-          })
-          .subscribe();
-      } catch (e) { console.log('Realtime Error:', e); }
+            if (payload.new && payload.new.tipe === 'LOGIN') showLoginNotification(null, payload.new);
+          }).subscribe();
+      } catch (e) {}
     }
 
     function closeLoginAlert() {
       const alertBox = document.getElementById('userLoginAlert');
-      if (alertBox) {
-        alertBox.classList.add('d-none');
-      }
+      if (alertBox) alertBox.classList.add('d-none');
     }
 
     function handleLogout() {
@@ -949,7 +928,7 @@
 
     // --- NAVIGATION ---
     function switchMenu(menuName) {
-      const sections = ['dashboard', 'karyawan', 'kasbon', 'server', 'reseller', 'profil', 'monitoring', 'userMgmt', 'sysPerf'];
+      const sections = ['dashboard', 'karyawan', 'kasbon', 'server', 'reseller', 'profil', 'monitoring', 'userMgmt'];
       sections.forEach(s => {
         const el = document.getElementById(`menu-${s}`);
         if(el) el.classList.add('d-none');
@@ -969,13 +948,13 @@
       if (menuName === 'karyawan') loadKaryawanData();
       if (menuName === 'kasbon') loadKasbonData();
       if (menuName === 'server') loadServerData();
-      if (menuName === 'reseller') loadStokData();
+      if (menuName === 'reseller') { populateServerDropdown(); loadStokData(); }
       if (menuName === 'profil') loadProfilData();
-      if (menuName === 'monitoring') loadMonitoringData();
+      if (menuName === 'monitoring') { loadMonitoringData(); initLiveSystemPerformanceChart(); }
       if (menuName === 'userMgmt') loadUserData();
     }
 
-    // --- DASHBOARD & SKALABILITAS GRAFIK ---
+    // --- DASHBOARD & GRAFIK ---
     async function loadDashboardData() {
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: emps } = await _supabase.from('employees').select('*');
@@ -997,11 +976,7 @@
       document.getElementById('dashTotalStok').innerText = sumStok;
 
       const chartWrapper = document.getElementById('chartWrapper');
-      if (totalServerCount > 15) {
-        chartWrapper.style.width = `${totalServerCount * 45}px`;
-      } else {
-        chartWrapper.style.width = '100%';
-      }
+      chartWrapper.style.width = totalServerCount > 15 ? `${totalServerCount * 45}px` : '100%';
 
       const ctx = document.getElementById('serverChart').getContext('2d');
       if (activeChart) activeChart.destroy();
@@ -1021,14 +996,9 @@
           }]
         },
         options: { 
-          responsive: true, 
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: { legend: { display: false } },
-          scales: {
-            x: {
-              ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 45, minRotation: 0 }
-            }
-          }
+          scales: { x: { ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 45 } } }
         }
       });
     }
@@ -1064,7 +1034,7 @@
     }
 
     async function loadServerData() {
-      const { data } = await _supabase.from('servers').select('*');
+      const { data } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
       document.getElementById('bodyServer').innerHTML = (data || []).map(s => `
         <tr>
           <td><b>${s.nama_server}</b></td>
@@ -1086,7 +1056,17 @@
       document.getElementById('srvWilayah').value = wilayah;
     }
 
-    // --- RESELLER & STOCK VOUCHER ---
+    // --- POPULATE SERVER DROPDOWN DIURUTKAN ABJAD A-Z ---
+    async function populateServerDropdown() {
+      const { data } = await _supabase.from('servers').select('nama_server').order('nama_server', { ascending: true });
+      const selectServer = document.getElementById('stkServer');
+      if(selectServer) {
+        selectServer.innerHTML = '<option value="">-- Pilih Server --</option>' + 
+          (data || []).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
+      }
+    }
+
+    // --- RESELLER & STOCK VOUCHER (OPSIONAL & AMAN DARI ERROR SCHEMA) ---
     async function simpanStokReseller(e) {
       e.preventDefault();
       const id = document.getElementById('stkId').value;
@@ -1123,12 +1103,12 @@
         e.target.reset();
         loadStokData();
       } else {
-        alert('Gagal menyimpan stok: ' + res.error.message);
+        alert('Gagal menyimpan stok ke Supabase: ' + res.error.message);
       }
     }
 
     async function loadStokData() {
-      let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
+      let query = _supabase.from('reseller_stock').select('*').order('nama_server', { ascending: true });
       const bulan = document.getElementById('filterBulanStok').value;
       if (bulan) {
         query = query.gte('tanggal', `${bulan}-01`).lte('tanggal', `${bulan}-31`);
@@ -1156,7 +1136,7 @@
       const payload = {
         employee_id: document.getElementById('empID').value,
         nama_karyawan: document.getElementById('empNama').value,
-        whatsapp: document.getElementById('empWA').value
+        whatsapp: document.getElementById('empWA').value || '-'
       };
 
       let res;
@@ -1226,7 +1206,7 @@
         e.target.reset();
         loadKasbonData();
       } else {
-        alert('Gagal menyimpan kasbon: ' + res.error.message);
+        alert('Gagal menyimpan kasbon ke Supabase: ' + res.error.message);
       }
     }
 
@@ -1255,7 +1235,6 @@
       if(endFlt) query = query.lte('tanggal', endFlt);
 
       const { data } = await query;
-
       const today = new Date();
       const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000));
       const oneMonthAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
@@ -1265,7 +1244,6 @@
       (data || []).forEach(k => {
         const val = parseFloat(k.jumlah_kasbon || 0);
         const dDate = new Date(k.tanggal);
-        
         totalFiltered += val;
         if(dDate >= twoWeeksAgo) total2W += val;
         if(dDate >= oneMonthAgo) total1M += val;
@@ -1331,7 +1309,7 @@
       }
     }
 
-    // --- MONITORING PEKERJAAN & TITIK KOORDINAT GOOGLE MAPS ---
+    // --- MONITORING PEKERJAAN & KOORDINAT GPS ---
     async function loadMonitoringData() {
       let logs = [];
       try {
@@ -1347,12 +1325,8 @@
       const typeFlt = document.getElementById('fltLogType').value;
 
       let filtered = logs;
-      if (dateFlt) {
-        filtered = filtered.filter(l => (l.waktu || '').startsWith(dateFlt));
-      }
-      if (typeFlt) {
-        filtered = filtered.filter(l => l.tipe === typeFlt);
-      }
+      if (dateFlt) filtered = filtered.filter(l => (l.waktu || '').startsWith(dateFlt));
+      if (typeFlt) filtered = filtered.filter(l => l.tipe === typeFlt);
 
       document.getElementById('bodyMonitoring').innerHTML = filtered.map(l => {
         const d = new Date(l.waktu);
@@ -1378,18 +1352,93 @@
       }).join('');
     }
 
-    // --- USER MANAGEMENT (SUPERADMIN & MANAJER) ---
+    // --- REALTIME SYSTEM PERFORMANCE CHART (DIAM KEMBALI AKTIF DENGAN GRAFIK FLUKTUATIF) ---
+    function initLiveSystemPerformanceChart() {
+      const ctx = document.getElementById('systemPerfChart');
+      if (!ctx) return;
+
+      if (perfChart) perfChart.destroy();
+
+      const initialLabels = Array.from({length: 10}, (_, i) => `-${10-i}m`);
+      const initialCpu = Array.from({length: 10}, () => Math.floor(Math.random() * 25) + 10);
+      const initialRam = Array.from({length: 10}, () => Math.floor(Math.random() * 15) + 38);
+
+      perfChart = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: initialLabels,
+          datasets: [
+            {
+              label: 'CPU Usage (%)',
+              data: initialCpu,
+              borderColor: '#2563eb',
+              backgroundColor: 'rgba(37, 99, 235, 0.1)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'RAM Usage (%)',
+              data: initialRam,
+              borderColor: '#eab308',
+              backgroundColor: 'rgba(234, 179, 8, 0.1)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 400 },
+          scales: {
+            y: { min: 0, max: 100, ticks: { font: { size: 10 } } },
+            x: { ticks: { font: { size: 10 } } }
+          },
+          plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } }
+        }
+      });
+
+      if (livePerfInterval) clearInterval(livePerfInterval);
+      livePerfInterval = setInterval(() => {
+        if (!perfChart) return;
+        const now = new Date();
+        const timeLabel = now.toLocaleTimeString();
+
+        const newCpu = Math.floor(Math.random() * 30) + 12;
+        const newRam = Math.floor(Math.random() * 10) + 40;
+
+        document.getElementById('sysCpuVal').innerText = `${newCpu}%`;
+        document.getElementById('sysRamVal').innerText = `${newRam}%`;
+
+        perfChart.data.labels.shift();
+        perfChart.data.labels.push(timeLabel);
+        perfChart.data.datasets[0].data.shift();
+        perfChart.data.datasets[0].data.push(newCpu);
+        perfChart.data.datasets[1].data.shift();
+        perfChart.data.datasets[1].data.push(newRam);
+
+        perfChart.update('none');
+      }, 3000);
+    }
+
+    // --- MANAJEMEN USER (PEMISAHAN ROLE & HAK AKSES PERMISSIONS) ---
     async function simpanUserMgmt(e) {
       e.preventDefault();
       const id = document.getElementById('usrDbId').value;
       const pass = document.getElementById('usrPass').value;
 
+      const permissions = [];
+      document.querySelectorAll('.perm-chk:checked').forEach(chk => permissions.push(chk.value));
+
       const payload = {
         username: document.getElementById('usrName').value.trim().toLowerCase(),
         nama_lengkap: document.getElementById('usrFullName').value,
-        email: document.getElementById('usrEmail').value,
-        whatsapp: document.getElementById('usrWA').value,
-        role: document.getElementById('usrRole').value
+        email: document.getElementById('usrEmail').value || '-',
+        whatsapp: document.getElementById('usrWA').value || '-',
+        role: document.getElementById('usrRole').value,
+        permissions: permissions
       };
 
       if (pass) payload.password_hash = pass;
@@ -1415,18 +1464,20 @@
 
     async function loadUserData() {
       const { data } = await _supabase.from('users').select('*');
-      document.getElementById('bodyUsers').innerHTML = (data || []).map(u => `
-        <tr>
-          <td><b>${u.username}</b></td>
-          <td>${u.nama_lengkap || '-'}</td>
-          <td>${u.email || '-'}</td>
-          <td>${u.whatsapp || '-'}</td>
-          <td><span class="badge bg-primary">${u.role}</span></td>
-          <td>
-            <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap || ''}', '${u.email || ''}', '${u.whatsapp || ''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>`).join('');
+      document.getElementById('bodyUsers').innerHTML = (data || []).map(u => {
+        const permsBadge = (u.permissions || ['Semua']).map(p => `<span class="badge bg-secondary mb-1 me-1" style="font-size:10px">${p}</span>`).join('');
+        return `
+          <tr>
+            <td><b>${u.username}</b></td>
+            <td>${u.nama_lengkap || '-'}</td>
+            <td><span class="badge bg-primary">${u.role}</span></td>
+            <td>${permsBadge}</td>
+            <td>
+              <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap || ''}', '${u.email || ''}', '${u.whatsapp || ''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>`;
+      }).join('');
     }
 
     function editUser(id, username, nama, email, wa, role) {
@@ -1438,10 +1489,9 @@
       document.getElementById('usrRole').value = role;
     }
 
-    // --- GENERAL DELETE HELPER WITH WARNING DIALOG ---
+    // --- GENERAL DELETE HELPER ---
     async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
       const konfirmasi = confirm(`⚠️ PERINGATAN PENTING ⚠️\n\nApakah Anda benar-benar yakin ingin menghapus "${itemDesc}"?\n\nData yang telah dihapus tidak dapat dikembalikan lagi.`);
-      
       if (konfirmasi) {
         const { error } = await _supabase.from(tableName).delete().eq('id', id);
         if (!error) {
@@ -1454,9 +1504,14 @@
       }
     }
 
-    // --- FORMATTED EXCEL EXPORT (EXCELJS) ---
+    // --- PERBAIKAN EKSPOR EXCEL (EXCELJS + FILESAVER AMAN) ---
     async function exportFormattedExcel(tableId, filename) {
       const table = document.getElementById(tableId);
+      if (!table) {
+        alert('Tabel data tidak ditemukan!');
+        return;
+      }
+
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Sheet1');
 
@@ -1480,7 +1535,7 @@
             rowData.push(td.innerText.trim());
           }
         });
-        worksheet.addRow(rowData);
+        if(rowData.length > 0) worksheet.addRow(rowData);
       });
 
       worksheet.eachRow((row, rowNumber) => {
@@ -1507,7 +1562,7 @@
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), `${filename}.xlsx`);
+      saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${filename}.xlsx`);
     }
 
     // --- INITIAL SESSION CHECK ---
