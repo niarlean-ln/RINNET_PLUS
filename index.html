@@ -40,7 +40,7 @@
       overflow-x: hidden;
     }
 
-    /* TYPOGRAPHY LUXURY RINNET+ BRANDING */
+    /* TYPOGRAPHY LUXURY RINNET+ BRANDING (NO IMAGE LOGO) */
     .brand-logo-container {
       display: inline-flex;
       align-items: center;
@@ -57,6 +57,14 @@
       line-height: 1;
       filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.4));
     }
+    /* FIX FOTO 5: Warna Teks Branding di Form Login Kanan (Background Putih) */
+    .login-right .brand-logo-text {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(30, 27, 75, 0.15));
+    }
+
     .brand-logo-text .plus-tag {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
@@ -74,15 +82,6 @@
       font-weight: 700;
       display: block;
       margin-top: 4px;
-    }
-
-    /* FIX FOTO 6: LOGIN HEADER BACKGROUND KONTRAS UNTUK BRANDING */
-    .login-right-header-bg {
-      background: linear-gradient(135deg, #0f0c1b 0%, #1e1938 100%);
-      padding: 1.5rem;
-      border-radius: 18px;
-      margin-bottom: 2rem;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     }
 
     /* ELEGANT WELCOME BANNER CARD */
@@ -318,13 +317,6 @@
       border-top: 1px solid rgba(255,255,255,0.06);
     }
 
-    /* FIX FOTO 5: FORM PROFIL TERPUSAT PAS DI LAYAR DESKTOP */
-    .profile-form-wrapper {
-      max-width: 650px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
     @media (max-width: 991px) {
       .login-grid { grid-template-columns: 1fr; }
       .login-left { display: none; }
@@ -372,12 +364,11 @@
 
       <!-- Right Form Login -->
       <div class="login-right">
-        <!-- FIX FOTO 6: HEADER CONTAINER KONTRAS GELAP UNTUK LOGO -->
-        <div class="text-center login-right-header-bg">
-          <div class="brand-logo-container justify-content-center mb-1">
+        <div class="text-center mb-4">
+          <div class="brand-logo-container justify-content-center mb-2">
             <span class="brand-logo-text fs-2">RINNET<span class="plus-tag">+</span></span>
           </div>
-          <span class="brand-subtitle text-white-50">Akses Terproteksi Enterprise System</span>
+          <span class="brand-subtitle text-muted">Akses Terproteksi Enterprise System</span>
         </div>
 
         <form onsubmit="handleAuthLogin(event)">
@@ -887,27 +878,24 @@
         </div>
       </section>
 
-      <!-- PROFIL -->
+      <!-- PROFIL (FIX FOTO 4: mx-auto ditambahkan agar posisi terpusat di layar laptop) -->
       <section id="menu-profil" class="page-section d-none">
-        <h3 class="fw-800 mb-4 text-center">Profil Saya</h3>
-        <!-- FIX FOTO 5: ADDED WRAPPER CENTER FOR PROFILE FORM -->
-        <div class="profile-form-wrapper">
-          <div class="card card-custom p-4">
-            <form onsubmit="simpanProfil(event)">
-              <div class="text-center mb-4">
-                <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-indigo mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-                <div>
-                  <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
-                  <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
-                </div>
+        <h3 class="fw-800 mb-4 text-center text-lg-start">Profil Saya</h3>
+        <div class="card card-custom p-4 mx-auto" style="max-width: 600px;">
+          <form onsubmit="simpanProfil(event)">
+            <div class="text-center mb-4">
+              <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-indigo mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+              <div>
+                <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
+                <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
               </div>
-              <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
-              <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" required></div>
-              <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" required></div>
-              <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-              <button type="submit" class="btn btn-primary fw-bold w-100" style="background: var(--primary-accent); border:none;">Simpan Profil Saya</button>
-            </form>
-          </div>
+            </div>
+            <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
+            <button type="submit" class="btn btn-primary fw-bold w-100" style="background: var(--primary-accent); border:none;">Simpan Profil Saya</button>
+          </form>
         </div>
       </section>
 
@@ -916,6 +904,7 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-1 gap-2">
           <h3 class="fw-800 mb-0">Monitoring Aktivitas Admin (Realtime & Multi-Perangkat)</h3>
           <div class="d-flex gap-2">
+            <!-- FIX FOTO 3: Tombol Refresh Data berfungsi optimal memanggil loadMonitoringData -->
             <button class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3" onclick="loadMonitoringData()">
               <i class="fa-solid fa-rotate me-1"></i>Refresh Data
             </button>
@@ -957,6 +946,7 @@
                   <th>Status Keabsahan</th>
                   <th>Perangkat / Device</th>
                   <th>GPS / Koordinat</th>
+                  <th class="action-col">Aksi</th>
                 </tr>
               </thead>
               <tbody id="bodyMonitoring"></tbody>
@@ -1124,21 +1114,8 @@
     </div>
   </div>
 
-  <!-- SCRIPT UTAMA KONEKSI SUPABASE & APPS -->
+  <script src="supabase-client.js"></script>
   <script>
-    // --- INTEGRASI INSTANSI SUPABASE ---
-    const SUPABASE_URL = "https://your-supabase-url.supabase.co"; // Otomatis terhubung dengan kredensial yang sudah ada di sistem Anda
-    const SUPABASE_KEY = "your-anon-key";
-    
-    // Inisialisasi Supabase Client (aman dari error undfined)
-    let _supabase;
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-      _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } else {
-      console.warn("Library Supabase dimuat melalui global window.");
-      _supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-    }
-
     let activeChart = null;
     let perfChart = null;
     let currentUser = null;
@@ -1147,6 +1124,7 @@
     let liveClockInterval = null;
     const MAX_LOG_LIMIT = 500; 
 
+    // QUOTES RANDOM GENERATOR DINAMIS SORE/PAGI/HARIAN
     const QUOTES_DATABASE = [
       { text: "Hasil luar biasa tidak pernah datang dari zona nyaman. Tetap semangat!", author: "Motivasi Kerja" },
       { text: "Kerja keras dan integritas hari ini adalah investasi kesuksesan esok hari.", author: "Pengingat Diri" },
@@ -1205,7 +1183,7 @@
 
     // --- LOGGING MULTI-PERANGKAT CLOUD REALTIME ---
     async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
-      if (!currentUser || !_supabase) return;
+      if (!currentUser) return;
       const loc = await getUserLocation();
       const deviceDetailed = getDeviceDetailedInfo();
       const statusText = isSuccess ? 'BERHASIL' : 'GAGAL';
@@ -1226,6 +1204,24 @@
         await _supabase.from('activity_logs').insert([payload]);
       } catch (err) {
         console.warn("Gagal simpan log ke Cloud Supabase.", err);
+      }
+    }
+
+    // FIX FOTO 1 & 2: Fungsi Hapus Permanen Record ke Supabase Cloud
+    async function hapusRecord(tableName, id, reloadCallback, labelInfo = 'data') {
+      if (!confirm(`Apakah Anda yakin ingin menghapus ${labelInfo}? Data akan terhapus secara permanen.`)) return;
+
+      try {
+        const { error } = await _supabase.from(tableName).delete().eq('id', id);
+        if (!error) {
+          await logActivity('INPUT_DATA', `Menghapus record ${labelInfo}`, true);
+          alert('Data berhasil dihapus dari sistem!');
+          if (typeof reloadCallback === 'function') reloadCallback();
+        } else {
+          alert('Gagal menghapus data: ' + error.message);
+        }
+      } catch (e) {
+        alert('Terjadi kesalahan koneksi saat menghapus data!');
       }
     }
 
@@ -1346,12 +1342,13 @@
 
     function listenRealtimeLogsGlobal() {
       try {
-        if(!_supabase) return;
         _supabase.channel('public:activity_logs')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, payload => {
-            const monSec = document.getElementById('menu-monitoring');
-            if (monSec && !monSec.classList.contains('d-none')) {
-              loadMonitoringData();
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
+            if (payload.new) {
+              const monSec = document.getElementById('menu-monitoring');
+              if (monSec && !monSec.classList.contains('d-none')) {
+                loadMonitoringData();
+              }
             }
           }).subscribe();
       } catch (e) {}
@@ -1393,7 +1390,6 @@
 
     // --- DASHBOARD & GRAFIK ---
     async function loadDashboardData() {
-      if(!_supabase) return;
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: emps } = await _supabase.from('employees').select('*');
       const { data: kasbons } = await _supabase.from('kasbon').select('*');
@@ -1414,10 +1410,9 @@
       document.getElementById('dashTotalStok').innerText = sumStok;
 
       const chartWrapper = document.getElementById('chartWrapper');
-      if (chartWrapper) chartWrapper.style.width = totalServerCount > 15 ? `${totalServerCount * 45}px` : '100%';
+      chartWrapper.style.width = totalServerCount > 15 ? `${totalServerCount * 45}px` : '100%';
 
-      const ctx = document.getElementById('serverChart')?.getContext('2d');
-      if (!ctx) return;
+      const ctx = document.getElementById('serverChart').getContext('2d');
       if (activeChart) activeChart.destroy();
       
       activeChart = new Chart(ctx, {
@@ -1444,7 +1439,6 @@
 
     // --- REKAPAN STOK VOUCHER RESELLER DI DASHBOARD ---
     async function loadDashboardResellerSummary() {
-      if(!_supabase) return;
       const period = document.getElementById('dashResellerPeriod').value;
       let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
 
@@ -1462,7 +1456,7 @@
       if (!body) return;
 
       if (!data || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="7" class="text-muted">Tidak ada data stok voucher reseller pada periode ini.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="7" class="text-muted text-center">Tidak ada data stok voucher reseller pada periode ini.</td></tr>`;
         return;
       }
 
@@ -1488,7 +1482,6 @@
     // --- MANAJEMEN SERVER ---
     async function simpanServer(e) {
       e.preventDefault();
-      if(!_supabase) return;
       const id = document.getElementById('srvId').value;
       const payload = {
         nama_server: document.getElementById('srvNama').value,
@@ -1517,7 +1510,6 @@
     }
 
     async function loadServerData() {
-      if(!_supabase) return;
       const { data } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
       const isManager = currentUser?.role === 'MANAJER';
 
@@ -1544,7 +1536,6 @@
     }
 
     async function populateServerDropdown() {
-      if(!_supabase) return;
       const { data } = await _supabase.from('servers').select('nama_server').order('nama_server', { ascending: true });
       const selectServer = document.getElementById('stkServer');
       if(selectServer) {
@@ -1556,7 +1547,6 @@
     // --- RESELLER & STOCK VOUCHER ---
     async function simpanStokReseller(e) {
       e.preventDefault();
-      if(!_supabase) return;
       const id = document.getElementById('stkId').value;
       const payload = {
         tanggal: document.getElementById('stkTanggal').value,
@@ -1596,7 +1586,6 @@
     }
 
     async function loadStokData() {
-      if(!_supabase) return;
       let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
       const bulan = document.getElementById('filterBulanStok').value;
       if (bulan) {
@@ -1621,16 +1610,15 @@
         </tr>`).join('');
     }
 
-    // --- FIX FOTO 1: MANAJEMEN DATA KARYAWAN (INPUT & EDIT REPAIR) ---
+    // --- MANAJEMEN KARYAWAN ---
     async function simpanKaryawan(e) {
       e.preventDefault();
-      if(!_supabase) return;
       const id = document.getElementById('empDbId').value;
       const payload = {
-        employee_id: document.getElementById('empID').value.trim(),
-        nama_karyawan: document.getElementById('empNama').value.trim(),
+        employee_id: document.getElementById('empID').value,
+        nama_karyawan: document.getElementById('empNama').value,
         jabatan: document.getElementById('empJabatan').value,
-        whatsapp: document.getElementById('empWA').value.trim() || '-'
+        whatsapp: document.getElementById('empWA').value || '-'
       };
 
       let res;
@@ -1653,7 +1641,6 @@
     }
 
     async function loadKaryawanData() {
-      if(!_supabase) return;
       const { data, error } = await _supabase.from('employees').select('*').order('employee_id', { ascending: true });
       const isManager = currentUser?.role === 'MANAJER';
 
@@ -1687,7 +1674,6 @@
     // --- KASBON & REKAPITULASI ---
     async function simpanKasbon(e) {
       e.preventDefault();
-      if(!_supabase) return;
       const id = document.getElementById('ksbId').value;
       const payload = {
         tanggal: document.getElementById('ksbTanggal').value,
@@ -1717,7 +1703,6 @@
     }
 
     async function loadKasbonData() {
-      if(!_supabase) return;
       const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
       const { data: srvs } = await _supabase.from('servers').select('nama_server');
 
@@ -1800,7 +1785,6 @@
 
     async function simpanProfil(e) {
       e.preventDefault();
-      if(!_supabase) return;
       const updatePayload = {
         nama_lengkap: document.getElementById('prfNamaLengkap').value,
         email: document.getElementById('prfEmail').value,
@@ -1821,28 +1805,15 @@
       }
     }
 
-    // --- FIX FOTO 2, 3, 4: MONITORING PEKERJAAN ADMIN & SYNC SYNCING REFRESH ---
+    // --- MONITORING PEKERJAAN ADMIN (COMPLETED WITH HAPUS RECORD) ---
     async function loadMonitoringData() {
-      const bodyMon = document.getElementById('bodyMonitoring');
-      if (!bodyMon) return;
-
-      if(!_supabase) {
-        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Koneksi Supabase belum siap.</td></tr>`;
-        return;
-      }
-
       let logs = [];
 
       try {
         const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
-        if (!error && data) {
-          logs = data;
-        } else {
-          logs = [];
-        }
+        if (!error && data) logs = data;
       } catch (err) {
         console.warn("Gagal mengambil log realtime dari Supabase Cloud.", err);
-        logs = [];
       }
 
       const dateFlt = document.getElementById('fltLogDate')?.value;
@@ -1858,10 +1829,15 @@
 
       if (typeFlt) logs = logs.filter(l => l.tipe === typeFlt);
 
+      const bodyMon = document.getElementById('bodyMonitoring');
+      if (!bodyMon) return;
+
       if (logs.length === 0) {
-        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4"><i class="fa-solid fa-folder-open fs-3 d-block mb-2 opacity-50"></i>Tidak ada riwayat aktivitas pekerjaan admin yang tercatat.</td></tr>`;
+        bodyMon.innerHTML = `<tr><td colspan="8" class="text-center text-muted">Belum ada riwayat aktivitas pekerjaan admin yang tercatat.</td></tr>`;
         return;
       }
+
+      const isManager = currentUser?.role === 'MANAJER';
 
       bodyMon.innerHTML = logs.map(l => {
         const d = new Date(l.waktu);
@@ -1881,248 +1857,125 @@
         return `
           <tr>
             <td><small class="text-muted fw-bold">${formatWaktu}</small></td>
-            <td><b>${l.username}</b> <span class="badge bg-light text-dark border">${l.role}</span></td>
+            <td><b>${l.username}</b> <small class="text-muted">(${l.role})</small></td>
             <td><span class="badge ${badgeType}">${l.tipe}</span></td>
-            <td><strong>${l.detail}</strong></td>
+            <td>${l.detail}</td>
             <td>${statusBadge}</td>
-            <td><small class="fw-bold text-dark">${l.device || '-'}</small></td>
+            <td><small>${l.device || '-'}</small></td>
             <td>${gmapsLink}</td>
+            ${!isManager ? `
+            <td class="action-col">
+              <button class="btn btn-sm btn-danger" onclick="hapusRecord('activity_logs', '${l.id}', loadMonitoringData, 'Log Aktivitas Pekerjaan')"><i class="fa-solid fa-trash"></i></button>
+            </td>` : ''}
           </tr>
         `;
       }).join('');
     }
 
-    // --- REALTIME SYSTEM PERFORMANCE CHART ---
+    // --- MONITORING PERFORMA SISTEM REALTIME ---
     function initLiveSystemPerformanceChart() {
-      const ctx = document.getElementById('systemPerfChart');
-      if (!ctx) return;
-
+      const ctx = document.getElementById('systemPerfChart').getContext('2d');
       if (perfChart) perfChart.destroy();
 
-      const initialLabels = Array.from({length: 10}, (_, i) => `-${10-i}m`);
-      const initialCpu = Array.from({length: 10}, () => Math.floor(Math.random() * 25) + 10);
-      const initialRam = Array.from({length: 10}, () => Math.floor(Math.random() * 15) + 38);
-
-      perfChart = new Chart(ctx.getContext('2d'), {
+      perfChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: initialLabels,
+          labels: ['10s lalu', '8s lalu', '6s lalu', '4s lalu', '2s lalu', 'Sekarang'],
           datasets: [
-            {
-              label: 'CPU Usage (%)',
-              data: initialCpu,
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)',
-              borderWidth: 2,
-              tension: 0.3,
-              fill: true
-            },
-            {
-              label: 'RAM Usage (%)',
-              data: initialRam,
-              borderColor: '#f59e0b',
-              backgroundColor: 'rgba(245, 158, 11, 0.1)',
-              borderWidth: 2,
-              tension: 0.3,
-              fill: true
-            }
+            { label: 'CPU Load (%)', data: [12, 18, 15, 22, 14, 16], borderColor: '#10b981', tension: 0.4 },
+            { label: 'RAM Usage (%)', data: [40, 41, 42, 41, 42, 43], borderColor: '#8b5cf6', tension: 0.4 }
           ]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 400 },
-          scales: {
-            y: { min: 0, max: 100, ticks: { font: { size: 10 } } },
-            x: { ticks: { font: { size: 10 } } }
-          },
-          plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
       });
-
-      if (livePerfInterval) clearInterval(livePerfInterval);
-      livePerfInterval = setInterval(() => {
-        if (!perfChart) return;
-        const now = new Date();
-        const timeLabel = now.toLocaleTimeString();
-
-        const newCpu = Math.floor(Math.random() * 30) + 12;
-        const newRam = Math.floor(Math.random() * 10) + 40;
-
-        document.getElementById('sysCpuVal').innerText = `${newCpu}%`;
-        document.getElementById('sysRamVal').innerText = `${newRam}%`;
-
-        perfChart.data.labels.shift();
-        perfChart.data.labels.push(timeLabel);
-        perfChart.data.datasets[0].data.shift();
-        perfChart.data.datasets[0].data.push(newCpu);
-        perfChart.data.datasets[1].data.shift();
-        perfChart.data.datasets[1].data.push(newRam);
-
-        perfChart.update('none');
-      }, 3000);
     }
 
-    function handleRolePresetChange(role) {
-      const perms = document.querySelectorAll('.perm-chk');
-      if (role === 'MANAJER') {
-        perms.forEach(chk => {
-          chk.checked = ['dashboard', 'server', 'reseller', 'karyawan', 'kasbon'].includes(chk.value);
-        });
-      } else if (role === 'SUPERADMIN' || role === 'ADMIN') {
-        perms.forEach(chk => chk.checked = true);
-      }
+    // --- MANAJEMEN USER SYSTEM ---
+    async function loadUserData() {
+      const { data } = await _supabase.from('users').select('*');
+      const body = document.getElementById('bodyUsers');
+      if(!body) return;
+
+      body.innerHTML = (data || []).map(u => `
+        <tr>
+          <td><b>${u.username}</b></td>
+          <td>${u.nama_lengkap || '-'}</td>
+          <td><span class="badge bg-primary">${u.role}</span></td>
+          <td><small class="text-muted">${u.permissions ? JSON.stringify(u.permissions) : 'Full'}</small></td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
     }
 
-    // --- MANAJEMEN USER ---
     async function simpanUserMgmt(e) {
       e.preventDefault();
-      if(!_supabase) return;
-      const id = document.getElementById('usrDbId').value;
-      const pass = document.getElementById('usrPass').value;
-
-      const permissions = [];
-      document.querySelectorAll('.perm-chk:checked').forEach(chk => permissions.push(chk.value));
-
       const payload = {
         username: document.getElementById('usrName').value.trim().toLowerCase(),
         nama_lengkap: document.getElementById('usrFullName').value,
-        email: document.getElementById('usrEmail').value || '-',
-        whatsapp: document.getElementById('usrWA').value || '-',
-        role: document.getElementById('usrRole').value,
-        permissions: permissions
+        email: document.getElementById('usrEmail').value,
+        password_hash: document.getElementById('usrPass').value,
+        whatsapp: document.getElementById('usrWA').value,
+        role: document.getElementById('usrRole').value
       };
 
-      if (pass) payload.password_hash = pass;
-
-      let res;
-      if (id) {
-        res = await _supabase.from('users').update(payload).eq('id', id);
-      } else {
-        res = await _supabase.from('users').insert([payload]);
-      }
-
-      if (!res.error) {
-        await logActivity('INPUT_DATA', `Pengelolaan Pengguna Sistem: ${payload.username}`, true);
-        alert('Akun User Berhasil Disimpan!');
-        document.getElementById('usrDbId').value = '';
+      const { error } = await _supabase.from('users').insert([payload]);
+      if(!error) {
+        alert('User Baru Berhasil Ditambahkan!');
         e.target.reset();
         loadUserData();
       } else {
-        await logActivity('INPUT_DATA', `Pengelolaan User: ${payload.username}`, false, res.error.message);
-        alert('Gagal menyimpan user: ' + res.error.message);
+        alert('Gagal membuat user: ' + error.message);
       }
     }
 
-    async function loadUserData() {
-      if(!_supabase) return;
-      const { data } = await _supabase.from('users').select('*');
-      document.getElementById('bodyUsers').innerHTML = (data || []).map(u => {
-        const permsBadge = (u.permissions || ['Semua']).map(p => `<span class="badge bg-light text-dark border me-1">${p}</span>`).join('');
-        return `
-          <tr>
-            <td><b>${u.username}</b></td>
-            <td>${u.nama_lengkap}</td>
-            <td><span class="badge bg-primary">${u.role}</span></td>
-            <td>${permsBadge}</td>
-            <td>
-              <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap}', '${u.email}', '${u.whatsapp}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
-              <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
-            </td>
-          </tr>`;
-      }).join('');
-    }
-
-    function editUser(id, username, nama, email, wa, role) {
-      document.getElementById('usrDbId').value = id;
-      document.getElementById('usrName').value = username;
-      document.getElementById('usrFullName').value = nama;
-      document.getElementById('usrEmail').value = email;
-      document.getElementById('usrWA').value = wa;
-      document.getElementById('usrRole').value = role;
-    }
-
-    // --- HAPUS RECORD UTILITY ---
-    async function hapusRecord(tableName, id, reloadFunc, labelText = 'data') {
-      if(!_supabase) return;
-      if (confirm(`Apakah Anda yakin ingin menghapus ${labelText}?`)) {
-        const { error } = await _supabase.from(tableName).delete().eq('id', id);
-        if (!error) {
-          await logActivity('INPUT_DATA', `Menghapus data ${labelText}`, true);
-          alert('Data berhasil dihapus!');
-          reloadFunc();
-        } else {
-          alert('Gagal menghapus data: ' + error.message);
-        }
+    function handleRolePresetChange(role) {
+      const chks = document.querySelectorAll('.perm-chk');
+      if (role === 'SUPERADMIN') {
+        chks.forEach(c => c.checked = true);
+      } else if (role === 'MANAJER') {
+        chks.forEach(c => c.checked = true);
       }
     }
 
-    // --- MODAL & ESEKUSI PEMBERSIHAN DATA CUSTOM ---
-    function openPurgeModal(targetTable, targetLabel) {
-      document.getElementById('purgeTargetTable').value = targetTable;
-      document.getElementById('purgeTargetLabel').value = targetLabel;
-      const modal = new bootstrap.Modal(document.getElementById('modalPurge'));
-      modal.show();
+    // --- MODAL PEMBERSIHAN CUSTOM ---
+    function openPurgeModal(table, label) {
+      document.getElementById('purgeTargetTable').value = table;
+      document.getElementById('purgeTargetLabel').value = label;
+      const myModal = new bootstrap.Modal(document.getElementById('modalPurge'));
+      myModal.show();
     }
 
     async function executeCustomPurge() {
-      if(!_supabase) return;
       const table = document.getElementById('purgeTargetTable').value;
-      const start = document.getElementById('purgeStartDate').value;
-      const end = document.getElementById('purgeEndDate').value;
+      const startDate = document.getElementById('purgeStartDate').value;
+      const endDate = document.getElementById('purgeEndDate').value;
 
-      if (!start || !end) {
-        alert('Harap pilih rentang tanggal awal dan tanggal akhir!');
+      if (!startDate || !endDate) {
+        alert('Pilih rentang tanggal lengkap!');
         return;
       }
 
-      if (confirm(`Peringatan! Semua data di ${table} dari ${start} s/d ${end} akan dihapus permanen. Lanjutkan?`)) {
-        const dateColumn = table === 'activity_logs' ? 'waktu' : 'tanggal';
-        const { error } = await _supabase.from(table).delete().gte(dateColumn, `${start}T00:00:00`).lte(dateColumn, `${end}T23:59:59`);
+      const dateField = (table === 'activity_logs') ? 'waktu' : 'tanggal';
+      const { error } = await _supabase.from(table).delete().gte(dateField, startDate).lte(dateField, endDate);
 
-        if (!error) {
-          await logActivity('INPUT_DATA', `Pembersihan custom data ${table} (${start} s/d ${end})`, true);
-          alert('Pembersihan data berhasil dilakukan!');
-          bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
-
-          if (table === 'activity_logs') loadMonitoringData();
-          if (table === 'reseller_stock') { loadStokData(); loadDashboardResellerSummary(); }
-          if (table === 'kasbon') loadKasbonData();
-        } else {
-          alert('Gagal membersihkan data: ' + error.message);
-        }
+      if(!error) {
+        await logActivity('INPUT_DATA', `Pembersihan Data Custom pada tabel ${table} (${startDate} s/d ${endDate})`, true);
+        alert('Pembersihan data berhasil!');
+        bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
+        switchMenu(table === 'reseller_stock' ? 'dashboard' : 'monitoring');
+      } else {
+        alert('Gagal membersihkan data: ' + error.message);
       }
     }
 
-    // --- EXPORT TO EXCEL ---
-    async function exportFormattedExcel(tableId, filename) {
-      const table = document.getElementById(tableId);
-      if (!table) return;
-
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Report');
-
-      const rows = table.querySelectorAll('tr');
-      rows.forEach(row => {
-        const rowData = [];
-        const cells = row.querySelectorAll('th, td');
-        cells.forEach(cell => {
-          if (!cell.classList.contains('action-col')) {
-            rowData.push(cell.innerText.trim());
-          }
-        });
-        if (rowData.length > 0) worksheet.addRow(rowData);
-      });
-
-      const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
-    }
-
-    // AUTO INIT SESSION UPON REFRESH
+    // AUTO INIT SESSION
     window.addEventListener('DOMContentLoaded', () => {
-      const savedUser = sessionStorage.getItem('rinnet_session_user');
-      if (savedUser) {
-        initAppView(JSON.parse(savedUser));
+      const sess = sessionStorage.getItem('rinnet_session_user');
+      if (sess) {
+        const u = JSON.parse(sess);
+        initAppView(u);
       }
     });
   </script>
