@@ -754,7 +754,7 @@
       });
     }
 
-    // --- ENHANCED LOGGING WITH VALIDATION STATUS ---
+    // --- ENHANCED LOGGING WITH FALLBACK REALTIME ---
     async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
       if (!currentUser) return;
       const loc = await getUserLocation();
@@ -773,15 +773,18 @@
         koordinat: loc
       };
 
+      // Simpan ke Local Storage sebagai cadangan lokal langsung
+      let localLogs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+      localLogs.unshift(payload);
+      if (localLogs.length > MAX_LOG_LIMIT) localLogs = localLogs.slice(0, MAX_LOG_LIMIT);
+      localStorage.setItem('rinnet_local_logs', JSON.stringify(localLogs));
+
+      // Simpan ke Supabase
       try {
         const { error } = await _supabase.from('activity_logs').insert([payload]);
-        if (error) throw error;
-        await cleanupOldLogs();
+        if (!error) await cleanupOldLogs();
       } catch (err) {
-        let logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
-        logs.unshift(payload);
-        if (logs.length > MAX_LOG_LIMIT) logs = logs.slice(0, MAX_LOG_LIMIT);
-        localStorage.setItem('rinnet_local_logs', JSON.stringify(logs));
+        console.warn("Gagal menyimpan log ke Supabase, menggunakan fallback penyimpanan lokal.");
       }
     }
 
@@ -1300,26 +1303,40 @@
       }
     }
 
-    // --- MONITORING PEKERJAAN DENGAN STATUS VALIDASI AKURAT ---
+    // --- MONITORING PEKERJAAN ---
     async function loadMonitoringData() {
       let logs = [];
+      
+      // Ambil log lokal terlebih dahulu agar selalu ada data meskipun offline/error DB
+      const localLogs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
+
       try {
         const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
-        if (error) throw error;
-        logs = data || [];
+        if (!error && data && data.length > 0) {
+          logs = data;
+        } else {
+          logs = localLogs;
+        }
       } catch (err) {
-        logs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
-        logs = logs.slice(0, MAX_LOG_LIMIT);
+        logs = localLogs;
       }
 
-      const dateFlt = document.getElementById('fltLogDate').value;
-      const typeFlt = document.getElementById('fltLogType').value;
+      const dateFlt = document.getElementById('fltLogDate')?.value;
+      const typeFlt = document.getElementById('fltLogType')?.value;
 
       let filtered = logs;
       if (dateFlt) filtered = filtered.filter(l => (l.waktu || '').startsWith(dateFlt));
       if (typeFlt) filtered = filtered.filter(l => l.tipe === typeFlt);
 
-      document.getElementById('bodyMonitoring').innerHTML = filtered.map(l => {
+      const bodyMon = document.getElementById('bodyMonitoring');
+      if (!bodyMon) return;
+
+      if (filtered.length === 0) {
+        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Belum ada riwayat aktivitas yang tercatat.</td></tr>`;
+        return;
+      }
+
+      bodyMon.innerHTML = filtered.map(l => {
         const d = new Date(l.waktu);
         const formatWaktu = isNaN(d) ? l.waktu : d.toLocaleString('id-ID');
         const badgeType = l.tipe === 'LOGIN' ? 'bg-info' : 'bg-primary';
