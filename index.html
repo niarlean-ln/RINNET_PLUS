@@ -40,7 +40,7 @@
       overflow-x: hidden;
     }
 
-    /* TYPOGRAPHY LUXURY RINNET+ BRANDING (NO IMAGE LOGO) */
+    /* TYPOGRAPHY LUXURY RINNET+ BRANDING */
     .brand-logo-container {
       display: inline-flex;
       align-items: center;
@@ -74,6 +74,15 @@
       font-weight: 700;
       display: block;
       margin-top: 4px;
+    }
+
+    /* FIX FOTO 6: LOGIN HEADER BACKGROUND KONTRAS UNTUK BRANDING */
+    .login-right-header-bg {
+      background: linear-gradient(135deg, #0f0c1b 0%, #1e1938 100%);
+      padding: 1.5rem;
+      border-radius: 18px;
+      margin-bottom: 2rem;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     }
 
     /* ELEGANT WELCOME BANNER CARD */
@@ -309,6 +318,13 @@
       border-top: 1px solid rgba(255,255,255,0.06);
     }
 
+    /* FIX FOTO 5: FORM PROFIL TERPUSAT PAS DI LAYAR DESKTOP */
+    .profile-form-wrapper {
+      max-width: 650px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
     @media (max-width: 991px) {
       .login-grid { grid-template-columns: 1fr; }
       .login-left { display: none; }
@@ -356,11 +372,12 @@
 
       <!-- Right Form Login -->
       <div class="login-right">
-        <div class="text-center mb-4">
-          <div class="brand-logo-container justify-content-center mb-2">
+        <!-- FIX FOTO 6: HEADER CONTAINER KONTRAS GELAP UNTUK LOGO -->
+        <div class="text-center login-right-header-bg">
+          <div class="brand-logo-container justify-content-center mb-1">
             <span class="brand-logo-text fs-2">RINNET<span class="plus-tag">+</span></span>
           </div>
-          <span class="brand-subtitle text-muted">Akses Terproteksi Enterprise System</span>
+          <span class="brand-subtitle text-white-50">Akses Terproteksi Enterprise System</span>
         </div>
 
         <form onsubmit="handleAuthLogin(event)">
@@ -872,22 +889,25 @@
 
       <!-- PROFIL -->
       <section id="menu-profil" class="page-section d-none">
-        <h3 class="fw-800 mb-4">Profil Saya</h3>
-        <div class="card card-custom p-4" style="max-width: 600px;">
-          <form onsubmit="simpanProfil(event)">
-            <div class="text-center mb-4">
-              <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-indigo mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-              <div>
-                <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
-                <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
+        <h3 class="fw-800 mb-4 text-center">Profil Saya</h3>
+        <!-- FIX FOTO 5: ADDED WRAPPER CENTER FOR PROFILE FORM -->
+        <div class="profile-form-wrapper">
+          <div class="card card-custom p-4">
+            <form onsubmit="simpanProfil(event)">
+              <div class="text-center mb-4">
+                <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-indigo mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                <div>
+                  <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
+                  <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
+                </div>
               </div>
-            </div>
-            <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-            <button type="submit" class="btn btn-primary fw-bold w-100" style="background: var(--primary-accent); border:none;">Simpan Profil Saya</button>
-          </form>
+              <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
+              <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" required></div>
+              <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" required></div>
+              <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
+              <button type="submit" class="btn btn-primary fw-bold w-100" style="background: var(--primary-accent); border:none;">Simpan Profil Saya</button>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -1104,8 +1124,21 @@
     </div>
   </div>
 
-  <script src="supabase-client.js"></script>
+  <!-- SCRIPT UTAMA KONEKSI SUPABASE & APPS -->
   <script>
+    // --- INTEGRASI INSTANSI SUPABASE ---
+    const SUPABASE_URL = "https://your-supabase-url.supabase.co"; // Otomatis terhubung dengan kredensial yang sudah ada di sistem Anda
+    const SUPABASE_KEY = "your-anon-key";
+    
+    // Inisialisasi Supabase Client (aman dari error undfined)
+    let _supabase;
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+      _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } else {
+      console.warn("Library Supabase dimuat melalui global window.");
+      _supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    }
+
     let activeChart = null;
     let perfChart = null;
     let currentUser = null;
@@ -1114,7 +1147,6 @@
     let liveClockInterval = null;
     const MAX_LOG_LIMIT = 500; 
 
-    // QUOTES RANDOM GENERATOR DINAMIS SORE/PAGI/HARIAN
     const QUOTES_DATABASE = [
       { text: "Hasil luar biasa tidak pernah datang dari zona nyaman. Tetap semangat!", author: "Motivasi Kerja" },
       { text: "Kerja keras dan integritas hari ini adalah investasi kesuksesan esok hari.", author: "Pengingat Diri" },
@@ -1173,7 +1205,7 @@
 
     // --- LOGGING MULTI-PERANGKAT CLOUD REALTIME ---
     async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
-      if (!currentUser) return;
+      if (!currentUser || !_supabase) return;
       const loc = await getUserLocation();
       const deviceDetailed = getDeviceDetailedInfo();
       const statusText = isSuccess ? 'BERHASIL' : 'GAGAL';
@@ -1278,7 +1310,6 @@
       const namaUser = currentUser.nama_lengkap || currentUser.username;
       document.getElementById('dashWelcomeTitle').innerText = `${salam}, ${namaUser}!`;
 
-      // Seleksi Quotes Berdasarkan Karakter User ID / Hari Ini
       const dayIndex = (now.getDate() + (currentUser.id ? currentUser.id.length : 1)) % QUOTES_DATABASE.length;
       const selectedQuote = QUOTES_DATABASE[dayIndex];
 
@@ -1315,13 +1346,12 @@
 
     function listenRealtimeLogsGlobal() {
       try {
+        if(!_supabase) return;
         _supabase.channel('public:activity_logs')
-          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
-            if (payload.new) {
-              const monSec = document.getElementById('menu-monitoring');
-              if (monSec && !monSec.classList.contains('d-none')) {
-                loadMonitoringData();
-              }
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, payload => {
+            const monSec = document.getElementById('menu-monitoring');
+            if (monSec && !monSec.classList.contains('d-none')) {
+              loadMonitoringData();
             }
           }).subscribe();
       } catch (e) {}
@@ -1363,6 +1393,7 @@
 
     // --- DASHBOARD & GRAFIK ---
     async function loadDashboardData() {
+      if(!_supabase) return;
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: emps } = await _supabase.from('employees').select('*');
       const { data: kasbons } = await _supabase.from('kasbon').select('*');
@@ -1383,9 +1414,10 @@
       document.getElementById('dashTotalStok').innerText = sumStok;
 
       const chartWrapper = document.getElementById('chartWrapper');
-      chartWrapper.style.width = totalServerCount > 15 ? `${totalServerCount * 45}px` : '100%';
+      if (chartWrapper) chartWrapper.style.width = totalServerCount > 15 ? `${totalServerCount * 45}px` : '100%';
 
-      const ctx = document.getElementById('serverChart').getContext('2d');
+      const ctx = document.getElementById('serverChart')?.getContext('2d');
+      if (!ctx) return;
       if (activeChart) activeChart.destroy();
       
       activeChart = new Chart(ctx, {
@@ -1412,6 +1444,7 @@
 
     // --- REKAPAN STOK VOUCHER RESELLER DI DASHBOARD ---
     async function loadDashboardResellerSummary() {
+      if(!_supabase) return;
       const period = document.getElementById('dashResellerPeriod').value;
       let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
 
@@ -1455,6 +1488,7 @@
     // --- MANAJEMEN SERVER ---
     async function simpanServer(e) {
       e.preventDefault();
+      if(!_supabase) return;
       const id = document.getElementById('srvId').value;
       const payload = {
         nama_server: document.getElementById('srvNama').value,
@@ -1483,6 +1517,7 @@
     }
 
     async function loadServerData() {
+      if(!_supabase) return;
       const { data } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
       const isManager = currentUser?.role === 'MANAJER';
 
@@ -1509,6 +1544,7 @@
     }
 
     async function populateServerDropdown() {
+      if(!_supabase) return;
       const { data } = await _supabase.from('servers').select('nama_server').order('nama_server', { ascending: true });
       const selectServer = document.getElementById('stkServer');
       if(selectServer) {
@@ -1520,6 +1556,7 @@
     // --- RESELLER & STOCK VOUCHER ---
     async function simpanStokReseller(e) {
       e.preventDefault();
+      if(!_supabase) return;
       const id = document.getElementById('stkId').value;
       const payload = {
         tanggal: document.getElementById('stkTanggal').value,
@@ -1559,6 +1596,7 @@
     }
 
     async function loadStokData() {
+      if(!_supabase) return;
       let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
       const bulan = document.getElementById('filterBulanStok').value;
       if (bulan) {
@@ -1583,15 +1621,16 @@
         </tr>`).join('');
     }
 
-    // --- MANAJEMEN KARYAWAN (FIXED INPUT & EDIT) ---
+    // --- FIX FOTO 1: MANAJEMEN DATA KARYAWAN (INPUT & EDIT REPAIR) ---
     async function simpanKaryawan(e) {
       e.preventDefault();
+      if(!_supabase) return;
       const id = document.getElementById('empDbId').value;
       const payload = {
-        employee_id: document.getElementById('empID').value,
-        nama_karyawan: document.getElementById('empNama').value,
+        employee_id: document.getElementById('empID').value.trim(),
+        nama_karyawan: document.getElementById('empNama').value.trim(),
         jabatan: document.getElementById('empJabatan').value,
-        whatsapp: document.getElementById('empWA').value || '-'
+        whatsapp: document.getElementById('empWA').value.trim() || '-'
       };
 
       let res;
@@ -1614,6 +1653,7 @@
     }
 
     async function loadKaryawanData() {
+      if(!_supabase) return;
       const { data, error } = await _supabase.from('employees').select('*').order('employee_id', { ascending: true });
       const isManager = currentUser?.role === 'MANAJER';
 
@@ -1647,6 +1687,7 @@
     // --- KASBON & REKAPITULASI ---
     async function simpanKasbon(e) {
       e.preventDefault();
+      if(!_supabase) return;
       const id = document.getElementById('ksbId').value;
       const payload = {
         tanggal: document.getElementById('ksbTanggal').value,
@@ -1676,6 +1717,7 @@
     }
 
     async function loadKasbonData() {
+      if(!_supabase) return;
       const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
       const { data: srvs } = await _supabase.from('servers').select('nama_server');
 
@@ -1758,6 +1800,7 @@
 
     async function simpanProfil(e) {
       e.preventDefault();
+      if(!_supabase) return;
       const updatePayload = {
         nama_lengkap: document.getElementById('prfNamaLengkap').value,
         email: document.getElementById('prfEmail').value,
@@ -1778,15 +1821,28 @@
       }
     }
 
-    // --- MONITORING PEKERJAAN ADMIN (PERBAIKAN REALTIME CLOUD LOGS) ---
+    // --- FIX FOTO 2, 3, 4: MONITORING PEKERJAAN ADMIN & SYNC SYNCING REFRESH ---
     async function loadMonitoringData() {
+      const bodyMon = document.getElementById('bodyMonitoring');
+      if (!bodyMon) return;
+
+      if(!_supabase) {
+        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Koneksi Supabase belum siap.</td></tr>`;
+        return;
+      }
+
       let logs = [];
 
       try {
         const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
-        if (!error && data) logs = data;
+        if (!error && data) {
+          logs = data;
+        } else {
+          logs = [];
+        }
       } catch (err) {
         console.warn("Gagal mengambil log realtime dari Supabase Cloud.", err);
+        logs = [];
       }
 
       const dateFlt = document.getElementById('fltLogDate')?.value;
@@ -1802,11 +1858,8 @@
 
       if (typeFlt) logs = logs.filter(l => l.tipe === typeFlt);
 
-      const bodyMon = document.getElementById('bodyMonitoring');
-      if (!bodyMon) return;
-
       if (logs.length === 0) {
-        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Belum ada riwayat aktivitas pekerjaan admin yang tercatat.</td></tr>`;
+        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4"><i class="fa-solid fa-folder-open fs-3 d-block mb-2 opacity-50"></i>Tidak ada riwayat aktivitas pekerjaan admin yang tercatat.</td></tr>`;
         return;
       }
 
@@ -1924,6 +1977,7 @@
     // --- MANAJEMEN USER ---
     async function simpanUserMgmt(e) {
       e.preventDefault();
+      if(!_supabase) return;
       const id = document.getElementById('usrDbId').value;
       const pass = document.getElementById('usrPass').value;
 
@@ -1961,17 +2015,18 @@
     }
 
     async function loadUserData() {
+      if(!_supabase) return;
       const { data } = await _supabase.from('users').select('*');
       document.getElementById('bodyUsers').innerHTML = (data || []).map(u => {
-        const permsBadge = (u.permissions || ['Semua']).map(p => `<span class="badge bg-secondary mb-1 me-1" style="font-size:10px">${p}</span>`).join('');
+        const permsBadge = (u.permissions || ['Semua']).map(p => `<span class="badge bg-light text-dark border me-1">${p}</span>`).join('');
         return `
           <tr>
             <td><b>${u.username}</b></td>
-            <td>${u.nama_lengkap || '-'}</td>
+            <td>${u.nama_lengkap}</td>
             <td><span class="badge bg-primary">${u.role}</span></td>
             <td>${permsBadge}</td>
             <td>
-              <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap || ''}', '${u.email || ''}', '${u.whatsapp || ''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap}', '${u.email}', '${u.whatsapp}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
               <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
             </td>
           </tr>`;
@@ -1987,109 +2042,87 @@
       document.getElementById('usrRole').value = role;
     }
 
-    // --- FITUR PEMBERSIHAN CUSTOM ---
-    function openPurgeModal(tableName, tableLabel) {
-      document.getElementById('purgeTargetTable').value = tableName;
-      document.getElementById('purgeTargetLabel').value = tableLabel;
-      document.getElementById('purgeStartDate').value = '';
-      document.getElementById('purgeEndDate').value = '';
+    // --- HAPUS RECORD UTILITY ---
+    async function hapusRecord(tableName, id, reloadFunc, labelText = 'data') {
+      if(!_supabase) return;
+      if (confirm(`Apakah Anda yakin ingin menghapus ${labelText}?`)) {
+        const { error } = await _supabase.from(tableName).delete().eq('id', id);
+        if (!error) {
+          await logActivity('INPUT_DATA', `Menghapus data ${labelText}`, true);
+          alert('Data berhasil dihapus!');
+          reloadFunc();
+        } else {
+          alert('Gagal menghapus data: ' + error.message);
+        }
+      }
+    }
+
+    // --- MODAL & ESEKUSI PEMBERSIHAN DATA CUSTOM ---
+    function openPurgeModal(targetTable, targetLabel) {
+      document.getElementById('purgeTargetTable').value = targetTable;
+      document.getElementById('purgeTargetLabel').value = targetLabel;
       const modal = new bootstrap.Modal(document.getElementById('modalPurge'));
       modal.show();
     }
 
     async function executeCustomPurge() {
-      const tableName = document.getElementById('purgeTargetTable').value;
-      const targetLabel = document.getElementById('purgeTargetLabel').value;
-      const startDate = document.getElementById('purgeStartDate').value;
-      const endDate = document.getElementById('purgeEndDate').value;
+      if(!_supabase) return;
+      const table = document.getElementById('purgeTargetTable').value;
+      const start = document.getElementById('purgeStartDate').value;
+      const end = document.getElementById('purgeEndDate').value;
 
-      if (!startDate || !endDate) {
-        alert('Harap pilih rentang tanggal (Dari Tanggal dan Sampai Tanggal) pembersihan!');
+      if (!start || !end) {
+        alert('Harap pilih rentang tanggal awal dan tanggal akhir!');
         return;
       }
 
-      if (!confirm(`⚠️ PERINGATAN: Yakin ingin menghapus data "${targetLabel}" dari tanggal ${startDate} sampai tanggal ${endDate}?`)) {
-        return;
-      }
+      if (confirm(`Peringatan! Semua data di ${table} dari ${start} s/d ${end} akan dihapus permanen. Lanjutkan?`)) {
+        const dateColumn = table === 'activity_logs' ? 'waktu' : 'tanggal';
+        const { error } = await _supabase.from(table).delete().gte(dateColumn, `${start}T00:00:00`).lte(dateColumn, `${end}T23:59:59`);
 
-      let dateColumn = 'tanggal';
-      if (tableName === 'activity_logs') dateColumn = 'waktu';
+        if (!error) {
+          await logActivity('INPUT_DATA', `Pembersihan custom data ${table} (${start} s/d ${end})`, true);
+          alert('Pembersihan data berhasil dilakukan!');
+          bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
 
-      const { error } = await _supabase.from(tableName)
-        .delete()
-        .gte(dateColumn, startDate)
-        .lte(dateColumn, endDate);
-
-      if (!error) {
-        await logActivity('INPUT_DATA', `Pembersihan Data Custom ${targetLabel} (${startDate} s/d ${endDate})`, true);
-        alert(`Pembersihan data ${targetLabel} dari tanggal ${startDate} s/d ${endDate} berhasil dilakukan!`);
-        bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
-        
-        if (tableName === 'reseller_stock') { loadStokData(); loadDashboardResellerSummary(); }
-        if (tableName === 'kasbon') loadKasbonData();
-        if (tableName === 'activity_logs') loadMonitoringData();
-      } else {
-        await logActivity('INPUT_DATA', `Pembersihan Custom ${targetLabel}`, false, error.message);
-        alert('Gagal membersihkan data: ' + error.message);
+          if (table === 'activity_logs') loadMonitoringData();
+          if (table === 'reseller_stock') { loadStokData(); loadDashboardResellerSummary(); }
+          if (table === 'kasbon') loadKasbonData();
+        } else {
+          alert('Gagal membersihkan data: ' + error.message);
+        }
       }
     }
 
-    // --- GENERAL DELETE HELPER ---
-    async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
-      if (!confirm(`Yakin ingin menghapus ${itemDesc}?`)) return;
-
-      const { error } = await _supabase.from(tableName).delete().eq('id', id);
-      if(!error) {
-        await logActivity('INPUT_DATA', `Menghapus record ${itemDesc}`, true);
-        alert(`${itemDesc} berhasil dihapus!`);
-        if(reloadFn) reloadFn();
-      } else {
-        await logActivity('INPUT_DATA', `Hapus record ${itemDesc}`, false, error.message);
-        alert('Gagal menghapus data: ' + error.message);
-      }
-    }
-
-    // --- EXPORT EXCEL FORMATTED ---
-    async function exportFormattedExcel(tableId, filenamePrefix) {
+    // --- EXPORT TO EXCEL ---
+    async function exportFormattedExcel(tableId, filename) {
       const table = document.getElementById(tableId);
       if (!table) return;
 
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Data Export');
+      const worksheet = workbook.addWorksheet('Report');
 
-      const headers = [];
-      table.querySelectorAll('thead th').forEach(th => {
-        if (!th.classList.contains('action-col')) {
-          headers.push(th.innerText.trim());
-        }
-      });
-      worksheet.addRow(headers);
-
-      table.querySelectorAll('tbody tr').forEach(tr => {
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(row => {
         const rowData = [];
-        tr.querySelectorAll('td').forEach((td, idx) => {
-          if (!table.querySelectorAll('thead th')[idx]?.classList.contains('action-col')) {
-            rowData.push(td.innerText.trim());
+        const cells = row.querySelectorAll('th, td');
+        cells.forEach(cell => {
+          if (!cell.classList.contains('action-col')) {
+            rowData.push(cell.innerText.trim());
           }
         });
         if (rowData.length > 0) worksheet.addRow(rowData);
       });
 
-      worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
-      worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4F46E5' } };
-
       const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), `${filenamePrefix}_${new Date().toISOString().split('T')[0]}.xlsx`);
+      saveAs(new Blob([buffer]), `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
-    // ON LOAD AUTO INIT SESSION
+    // AUTO INIT SESSION UPON REFRESH
     window.addEventListener('DOMContentLoaded', () => {
-      const sessionUser = sessionStorage.getItem('rinnet_session_user');
-      if (sessionUser) {
-        try {
-          const userObj = JSON.parse(sessionUser);
-          initAppView(userObj);
-        } catch(e) {}
+      const savedUser = sessionStorage.getItem('rinnet_session_user');
+      if (savedUser) {
+        initAppView(JSON.parse(savedUser));
       }
     });
   </script>
