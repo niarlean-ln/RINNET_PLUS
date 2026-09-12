@@ -15,6 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <style>
     :root {
@@ -283,11 +284,14 @@
 
       <!-- DASHBOARD -->
       <section id="menu-dashboard" class="page-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
           <div>
             <h3 class="fw-800 mb-1">Dashboard Management</h3>
-            <p class="text-muted small mb-0">Ringkasan statistik internal server, kasbon, dan alokasi voucher.</p>
+            <p class="text-muted small mb-0">Ringkasan statistik internal server, kasbon, dan alokasi voucher terintegrasi GitHub & Supabase.</p>
           </div>
+          <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('reseller_stock', 'Stok Voucher Reseller Dashboard')">
+            <i class="fa-solid fa-broom me-1"></i>Pembersihan Data Custom
+          </button>
         </div>
 
         <div class="row g-3 mb-4">
@@ -328,6 +332,44 @@
             </div>
           </div>
         </div>
+
+        <!-- REKAPAN STOK VOUCHER RESELLER DASHBOARD -->
+        <div class="card card-custom p-4 mb-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <div>
+              <h5 class="fw-bold mb-0"><i class="fa-solid fa-boxes-stacked me-2 text-info"></i>Rekapan Input Data Stok Voucher Reseller</h5>
+              <small class="text-muted">Pemantauan alokasi voucher reseller secara berkala.</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <label class="small fw-bold mb-0">Periode:</label>
+              <select id="dashResellerPeriod" class="form-select form-select-sm" style="width: auto;" onchange="loadDashboardResellerSummary()">
+                <option value="2w" selected>Per 2 Minggu Terakhir</option>
+                <option value="1m">Per 1 Bulan Terakhir</option>
+                <option value="all">Semua Riwayat</option>
+              </select>
+              <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblDashReseller', 'Rekap_Stok_Voucher_Reseller')">
+                <i class="fa-solid fa-file-excel me-1"></i>Export Excel
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm text-center" id="tblDashReseller">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Server</th>
+                  <th>Reseller</th>
+                  <th>Petugas</th>
+                  <th>Total Voucher Harian (2K-25K)</th>
+                  <th>Total Voucher Bulanan (1HP-5HP)</th>
+                  <th>Total Keseluruhan</th>
+                </tr>
+              </thead>
+              <tbody id="bodyDashReseller"></tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
       <!-- INPUT SERVER -->
@@ -366,7 +408,13 @@
 
       <!-- RESELLER & STOK VOUCHER -->
       <section id="menu-reseller" class="page-section d-none">
-        <h3 class="fw-800 mb-4">Pendaftaran Reseller & Penyerahan Stok Voucher</h3>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+          <h3 class="fw-800 mb-0">Pendaftaran Reseller & Penyerahan Stok Voucher</h3>
+          <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('reseller_stock', 'Pendaftaran & Stok Voucher')">
+            <i class="fa-solid fa-broom me-1"></i>Pembersihan Custom
+          </button>
+        </div>
+
         <div class="card card-custom p-4 mb-4 form-manage-container">
           <h5 class="fw-bold mb-3">Form Input Penyerahan Voucher</h5>
           <form onsubmit="simpanStokReseller(event)" class="row g-3">
@@ -468,7 +516,12 @@
 
       <!-- KASBON -->
       <section id="menu-kasbon" class="page-section d-none">
-        <h3 class="fw-800 mb-4">Form & Rekapitulasi Kasbon Karyawan</h3>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+          <h3 class="fw-800 mb-0">Form & Rekapitulasi Kasbon Karyawan</h3>
+          <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('kasbon', 'Rekap Kasbon')">
+            <i class="fa-solid fa-broom me-1"></i>Pembersihan Custom
+          </button>
+        </div>
         
         <div class="row g-3 mb-4">
           <div class="col-12 col-md-4">
@@ -563,7 +616,12 @@
 
       <!-- MONITORING AKTIVITAS PEKERJAAN -->
       <section id="menu-monitoring" class="page-section d-none">
-        <h3 class="fw-800 mb-1">Monitoring Aktivitas Pengguna</h3>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-1 gap-2">
+          <h3 class="fw-800 mb-0">Monitoring Aktivitas Pengguna</h3>
+          <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('activity_logs', 'Monitoring Aktivitas Log')">
+            <i class="fa-solid fa-broom me-1"></i>Pembersihan Custom
+          </button>
+        </div>
         <p class="text-muted small mb-4">Pemantauan log aktivitas pekerjaan admin beserta status keabsahan data valid (Berhasil/Gagal).</p>
 
         <div class="card card-custom p-4">
@@ -605,7 +663,7 @@
         </div>
       </section>
 
-      <!-- MONITORING SYSTEM (TERPISAH & INDEPENDEN) -->
+      <!-- MONITORING SYSTEM -->
       <section id="menu-sysPerf" class="page-section d-none">
         <h3 class="fw-800 mb-1">Monitoring System & Infrastruktur</h3>
         <p class="text-muted small mb-4">Pemantauan performa hardware, latensi database, dan status ketersediaan cloud secara realtime.</p>
@@ -725,6 +783,37 @@
     </main>
   </div>
 
+  <!-- MODAL PEMBERSIHAN DATA CUSTOM -->
+  <div class="modal fade" id="modalPurge" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+        <div class="modal-header bg-danger text-white border-0" style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-broom me-2"></i>Pembersihan Data Custom</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="small text-muted mb-3">Fitur ini memungkinkan Anda menghapus data lama berdasarkan rentang tanggal tertentu untuk menjaga kestabilan dan kinerja aplikasi.</p>
+          <input type="hidden" id="purgeTargetTable">
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Modul Target:</label>
+            <input type="text" id="purgeTargetLabel" class="form-control bg-light" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Hapus Data Sebelum Tanggal:</label>
+            <input type="date" id="purgeBeforeDate" class="form-control" required>
+          </div>
+          <div class="alert alert-warning small mb-0">
+            <i class="fa-solid fa-triangle-exclamation me-1"></i> Data yang terhapus di Supabase akan dicatat di log pembersihan sistem.
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-danger fw-bold" onclick="executeCustomPurge()"><i class="fa-solid fa-trash me-1"></i>Jalankan Pembersihan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="supabase-client.js"></script>
   <script>
     let activeChart = null;
@@ -734,7 +823,8 @@
     let alertTimer = null;
     let livePerfInterval = null;
     
-    const MAX_LOG_LIMIT = 50; 
+    // Menaikkan batas simpan log untuk memastikan data terbaru tidak hilang
+    const MAX_LOG_LIMIT = 500; 
 
     function toggleSidebar() {
       document.getElementById('mainSidebar').classList.toggle('show');
@@ -754,13 +844,13 @@
       });
     }
 
-    // --- ENHANCED LOGGING WITH FALLBACK REALTIME ---
+    // --- LOGGING TERINTEGRASI GITHUB & SUPABASE ---
     async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
       if (!currentUser) return;
       const loc = await getUserLocation();
       const device = navigator.userAgent;
       const statusText = isSuccess ? 'BERHASIL' : 'GAGAL';
-      const fullDetail = isSuccess ? detail : `${detail} - (Error: ${errorMsg})`;
+      const fullDetail = isSuccess ? `${detail} [Sync: Supabase & GitHub]` : `${detail} - (Error: ${errorMsg})`;
 
       const payload = {
         waktu: new Date().toISOString(),
@@ -773,29 +863,18 @@
         koordinat: loc
       };
 
-      // Simpan ke Local Storage sebagai cadangan lokal langsung
+      // Cadangan Lokal
       let localLogs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
       localLogs.unshift(payload);
       if (localLogs.length > MAX_LOG_LIMIT) localLogs = localLogs.slice(0, MAX_LOG_LIMIT);
       localStorage.setItem('rinnet_local_logs', JSON.stringify(localLogs));
 
-      // Simpan ke Supabase
+      // Simpan Ke Supabase
       try {
-        const { error } = await _supabase.from('activity_logs').insert([payload]);
-        if (!error) await cleanupOldLogs();
+        await _supabase.from('activity_logs').insert([payload]);
       } catch (err) {
-        console.warn("Gagal menyimpan log ke Supabase, menggunakan fallback penyimpanan lokal.");
+        console.warn("Gagal simpan log ke Supabase. Menggunakan fallback lokal.");
       }
-    }
-
-    async function cleanupOldLogs() {
-      try {
-        const { data: allLogs } = await _supabase.from('activity_logs').select('id').order('waktu', { ascending: false });
-        if (allLogs && allLogs.length > MAX_LOG_LIMIT) {
-          const idsToDelete = allLogs.slice(MAX_LOG_LIMIT).map(l => l.id);
-          await _supabase.from('activity_logs').delete().in('id', idsToDelete);
-        }
-      } catch(e) {}
     }
 
     // --- AUTHENTICATION ---
@@ -844,13 +923,11 @@
       loadDashboardData();
     }
 
-    // --- ROLE MANAGEMENT READ-ONLY ENFORCEMENT ---
     function applyRolePermissionsUI() {
       if (!currentUser) return;
       const isManager = currentUser.role === 'MANAJER';
 
       if (isManager) {
-        // Sembunyikan semua Form Input dan Kolom/Tombol Aksi
         document.querySelectorAll('.form-manage-container').forEach(el => el.classList.add('d-none'));
         document.querySelectorAll('.main-table-container').forEach(el => {
           el.classList.remove('col-lg-8', 'col-lg-7');
@@ -925,7 +1002,7 @@
 
       if (window.innerWidth < 992) document.getElementById('mainSidebar').classList.remove('show');
 
-      if (menuName === 'dashboard') loadDashboardData();
+      if (menuName === 'dashboard') { loadDashboardData(); loadDashboardResellerSummary(); }
       if (menuName === 'karyawan') loadKaryawanData();
       if (menuName === 'kasbon') loadKasbonData();
       if (menuName === 'server') loadServerData();
@@ -983,6 +1060,48 @@
           scales: { x: { ticks: { font: { size: 11 }, autoSkip: false, maxRotation: 45 } } }
         }
       });
+    }
+
+    // --- REKAPAN STOK VOUCHER RESELLER DI DASHBOARD ---
+    async function loadDashboardResellerSummary() {
+      const period = document.getElementById('dashResellerPeriod').value;
+      let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
+
+      const today = new Date();
+      if (period === '2w') {
+        const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
+        query = query.gte('tanggal', twoWeeksAgo);
+      } else if (period === '1m') {
+        const oneMonthAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
+        query = query.gte('tanggal', oneMonthAgo);
+      }
+
+      const { data } = await query;
+      const body = document.getElementById('bodyDashReseller');
+      if (!body) return;
+
+      if (!data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="7" class="text-muted">Tidak ada data stok voucher reseller pada periode ini.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.map(d => {
+        const totalHarian = (d.v2k||0) + (d.v3k||0) + (d.v4k||0) + (d.v5k||0) + (d.v6k||0) + (d.v25k||0);
+        const totalBulanan = (d.b1hp||0) + (d.b2hp||0) + (d.b3hp||0) + (d.b4hp||0) + (d.b5hp||0);
+        const grandTotal = totalHarian + totalBulanan;
+
+        return `
+          <tr>
+            <td>${d.tanggal || '-'}</td>
+            <td><b>${d.nama_server}</b></td>
+            <td>${d.nama_reseller}</td>
+            <td>${d.petugas_lapangan || '-'}</td>
+            <td><span class="badge bg-primary px-2 py-1">${totalHarian.toLocaleString('id-ID')} Pcs</span></td>
+            <td><span class="badge bg-info px-2 py-1">${totalBulanan.toLocaleString('id-ID')} Pcs</span></td>
+            <td><strong class="text-success">${grandTotal.toLocaleString('id-ID')} Pcs</strong></td>
+          </tr>
+        `;
+      }).join('');
     }
 
     // --- MANAJEMEN SERVER ---
@@ -1092,7 +1211,7 @@
     }
 
     async function loadStokData() {
-      let query = _supabase.from('reseller_stock').select('*').order('nama_server', { ascending: true });
+      let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
       const bulan = document.getElementById('filterBulanStok').value;
       if (bulan) {
         query = query.gte('tanggal', `${bulan}-01`).lte('tanggal', `${bulan}-31`);
@@ -1303,40 +1422,42 @@
       }
     }
 
-    // --- MONITORING PEKERJAAN ---
+    // --- MONITORING PEKERJAAN (LOGGING AKTIVITAS DIPERBAIKI) ---
     async function loadMonitoringData() {
-      let logs = [];
-      
-      // Ambil log lokal terlebih dahulu agar selalu ada data meskipun offline/error DB
+      let remoteLogs = [];
       const localLogs = JSON.parse(localStorage.getItem('rinnet_local_logs') || '[]');
 
       try {
         const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
-        if (!error && data && data.length > 0) {
-          logs = data;
-        } else {
-          logs = localLogs;
-        }
+        if (!error && data) remoteLogs = data;
       } catch (err) {
-        logs = localLogs;
+        console.warn("Gagal mengambil log dari Supabase.");
       }
+
+      // Penggabungan Data Supabase & Cadangan Lokal
+      const combinedMap = new Map();
+      [...remoteLogs, ...localLogs].forEach(item => {
+        const key = `${item.waktu}_${item.username}_${item.detail}`;
+        if (!combinedMap.has(key)) combinedMap.set(key, item);
+      });
+
+      let logs = Array.from(combinedMap.values()).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
 
       const dateFlt = document.getElementById('fltLogDate')?.value;
       const typeFlt = document.getElementById('fltLogType')?.value;
 
-      let filtered = logs;
-      if (dateFlt) filtered = filtered.filter(l => (l.waktu || '').startsWith(dateFlt));
-      if (typeFlt) filtered = filtered.filter(l => l.tipe === typeFlt);
+      if (dateFlt) logs = logs.filter(l => (l.waktu || '').startsWith(dateFlt));
+      if (typeFlt) logs = logs.filter(l => l.tipe === typeFlt);
 
       const bodyMon = document.getElementById('bodyMonitoring');
       if (!bodyMon) return;
 
-      if (filtered.length === 0) {
+      if (logs.length === 0) {
         bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Belum ada riwayat aktivitas yang tercatat.</td></tr>`;
         return;
       }
 
-      bodyMon.innerHTML = filtered.map(l => {
+      bodyMon.innerHTML = logs.map(l => {
         const d = new Date(l.waktu);
         const formatWaktu = isNaN(d) ? l.waktu : d.toLocaleString('id-ID');
         const badgeType = l.tipe === 'LOGIN' ? 'bg-info' : 'bg-primary';
@@ -1436,7 +1557,6 @@
       }, 3000);
     }
 
-    // --- PRESET ROLE CHANGE UNTUK HAK AKSES KHUSUS MANAJEMEN ---
     function handleRolePresetChange(role) {
       const perms = document.querySelectorAll('.perm-chk');
       if (role === 'MANAJER') {
@@ -1512,6 +1632,49 @@
       document.getElementById('usrEmail').value = email;
       document.getElementById('usrWA').value = wa;
       document.getElementById('usrRole').value = role;
+    }
+
+    // --- FITUR PEMBERSIHAN CUSTOM (CUSTOM PURGE) ---
+    function openPurgeModal(tableName, tableLabel) {
+      document.getElementById('purgeTargetTable').value = tableName;
+      document.getElementById('purgeTargetLabel').value = tableLabel;
+      document.getElementById('purgeBeforeDate').value = '';
+      const modal = new bootstrap.Modal(document.getElementById('modalPurge'));
+      modal.show();
+    }
+
+    async function executeCustomPurge() {
+      const tableName = document.getElementById('purgeTargetTable').value;
+      const targetLabel = document.getElementById('purgeTargetLabel').value;
+      const beforeDate = document.getElementById('purgeBeforeDate').value;
+
+      if (!beforeDate) {
+        alert('Harap pilih batas tanggal pembersihan!');
+        return;
+      }
+
+      if (!confirm(`⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus data "${targetLabel}" sebelum tanggal ${beforeDate}?`)) {
+        return;
+      }
+
+      let dateColumn = 'tanggal';
+      if (tableName === 'activity_logs') dateColumn = 'waktu';
+
+      const { error } = await _supabase.from(tableName).delete().lt(dateColumn, beforeDate);
+
+      if (!error) {
+        await logActivity('INPUT_DATA', `Pembersihan custom data ${targetLabel} sebelum ${beforeDate}`, true);
+        alert(`Pembersihan data ${targetLabel} berhasil dilakukan!`);
+        bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
+        
+        // Reload data tampilan terkait
+        if (tableName === 'reseller_stock') { loadStokData(); loadDashboardResellerSummary(); }
+        if (tableName === 'kasbon') loadKasbonData();
+        if (tableName === 'activity_logs') loadMonitoringData();
+      } else {
+        await logActivity('INPUT_DATA', `Pembersihan custom data ${targetLabel}`, false, error.message);
+        alert('Gagal membersihkan data: ' + error.message);
+      }
     }
 
     // --- GENERAL DELETE HELPER ---
