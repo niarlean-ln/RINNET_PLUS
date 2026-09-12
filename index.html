@@ -39,28 +39,41 @@
       overflow-x: hidden;
     }
 
-    /* LOGO RINNET+ CUSTOM */
+    /* LOGO RINNET+ CUSTOM IMPROVED */
     .brand-logo-container {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .brand-logo-img {
-      height: 48px;
+      height: 44px;
       width: auto;
       object-fit: contain;
+      border-radius: 10px;
     }
     .brand-logo-text {
       font-weight: 900;
-      font-size: 1.8rem;
+      font-size: 1.75rem;
       letter-spacing: -0.5px;
-      color: #ffffff;
+      color: #1e1b4b;
       line-height: 1;
+    }
+    .sidebar .brand-logo-text, .login-left .brand-logo-text, .mobile-header .brand-logo-text {
+      color: #ffffff;
     }
     .brand-logo-text .plus-tag {
       color: #38bdf8;
       font-weight: 900;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+    }
+    .brand-subtitle {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      display: block;
+      margin-top: 2px;
     }
 
     /* LOGIN PAGE SPLIT LAYOUT */
@@ -181,6 +194,36 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     
+    /* QUICK ACCESS CARDS */
+    .quick-access-card {
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      background: #ffffff;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .quick-access-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 25px -5px rgba(99, 102, 241, 0.15);
+      border-color: var(--primary-accent);
+    }
+    .quick-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
     .chart-container-scroll {
       position: relative;
       width: 100%;
@@ -258,8 +301,11 @@
       <div class="login-left">
         <div>
           <div class="brand-logo-container mb-4">
-            <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="brand-logo-img rounded-3 shadow" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
-            <span class="brand-logo-text">RINNET<span class="plus-tag">+</span></span>
+            <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="brand-logo-img shadow" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
+            <div>
+              <span class="brand-logo-text">RINNET<span class="plus-tag">+</span></span>
+              <span class="brand-subtitle text-white-50">Enterprise Infrastructure</span>
+            </div>
           </div>
           <h2 class="fw-800 text-white display-6 mb-3">Enterprise Core Infrastructure</h2>
           <p class="text-secondary small leading-relaxed">Platform manajemen sistem terpadu untuk pengawasan server cloud, distribusi voucher, pengelolaan SDM, dan monitoring finansial interaktif.</p>
@@ -280,8 +326,10 @@
       <!-- Right Form Login -->
       <div class="login-right">
         <div class="text-center mb-4 d-lg-none">
-          <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="rounded-3 shadow mb-2" style="height: 50px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
-          <h3 class="fw-800 text-dark">RINNET<span class="text-primary">+</span></h3>
+          <div class="brand-logo-container justify-content-center mb-2">
+            <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="brand-logo-img shadow" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
+            <span class="brand-logo-text fs-3">RINNET<span class="plus-tag">+</span></span>
+          </div>
         </div>
 
         <h3 class="fw-800 text-dark mb-1">Selamat Datang Kembali</h3>
@@ -321,8 +369,8 @@
   <!-- MAIN APP SYSTEM -->
   <div id="pageApp" class="d-none">
     <div class="mobile-header d-lg-none">
-      <div class="fw-bold fs-5 d-flex align-items-center gap-2">
-        <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" class="rounded-2" style="height: 32px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
+      <div class="brand-logo-container">
+        <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" class="brand-logo-img" style="height: 32px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
         <span class="brand-logo-text fs-5">RINNET<span class="plus-tag">+</span></span>
       </div>
       <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
@@ -331,8 +379,8 @@
     <!-- Sidebar Navigation -->
     <nav class="sidebar" id="mainSidebar">
       <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
-        <div class="d-flex align-items-center justify-content-center gap-2 mb-3 mt-2">
-          <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="rounded-2 shadow-sm" style="height: 36px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
+        <div class="brand-logo-container justify-content-center mb-3 mt-2">
+          <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="brand-logo-img shadow-sm" style="height: 36px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
           <span class="brand-logo-text fs-4">RINNET<span class="plus-tag">+</span></span>
         </div>
         <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
@@ -381,6 +429,86 @@
           <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('reseller_stock', 'Stok Voucher Reseller Dashboard')">
             <i class="fa-solid fa-broom me-1"></i>Pembersihan Data Custom
           </button>
+        </div>
+
+        <!-- AKSES CEPAT (QUICK ACCESS CARDS UNTUK MANAJER & ADMIN) -->
+        <div class="mb-4">
+          <h6 class="fw-bold text-uppercase text-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.8px;">
+            <i class="fa-solid fa-bolt text-warning me-1"></i>Akses Cepat Modul Navigasi
+          </h6>
+          <div class="row g-3">
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="quick-access-card" onclick="switchMenu('server')">
+                <div class="quick-icon-box bg-indigo bg-opacity-10 text-indigo" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                  <i class="fa-solid fa-server"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Server</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Kelola Data</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="quick-access-card" onclick="switchMenu('reseller')">
+                <div class="quick-icon-box bg-success bg-opacity-10 text-success" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                  <i class="fa-solid fa-ticket"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Voucher</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Stok Reseller</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="quick-access-card" onclick="switchMenu('karyawan')">
+                <div class="quick-icon-box bg-dark bg-opacity-10 text-dark" style="background: rgba(15, 23, 42, 0.1); color: #0f172a;">
+                  <i class="fa-solid fa-user-group"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Karyawan</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Data SDM</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="quick-access-card" onclick="switchMenu('kasbon')">
+                <div class="quick-icon-box bg-danger bg-opacity-10 text-danger" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e;">
+                  <i class="fa-solid fa-hand-holding-dollar"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Kasbon</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Rekapitulasi</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2 manager-sa-only d-none">
+              <div class="quick-access-card" onclick="switchMenu('monitoring')">
+                <div class="quick-icon-box bg-info bg-opacity-10 text-info" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
+                  <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Monitoring</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Log Aktivitas</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="quick-access-card" onclick="switchMenu('profil')">
+                <div class="quick-icon-box bg-warning bg-opacity-10 text-warning" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                  <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Profil Saya</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Pengaturan</small>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="row g-3 mb-4">
@@ -723,9 +851,14 @@
       <section id="menu-monitoring" class="page-section d-none">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-1 gap-2">
           <h3 class="fw-800 mb-0">Monitoring Aktivitas Admin (Realtime & Multi-Perangkat)</h3>
-          <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('activity_logs', 'Monitoring Aktivitas Log')">
-            <i class="fa-solid fa-broom me-1"></i>Pembersihan Custom
-          </button>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3" onclick="loadMonitoringData()">
+              <i class="fa-solid fa-rotate me-1"></i>Refresh Data
+            </button>
+            <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('activity_logs', 'Monitoring Aktivitas Log')">
+              <i class="fa-solid fa-broom me-1"></i>Pembersihan Custom
+            </button>
+          </div>
         </div>
         <p class="text-muted small mb-4">Pemantauan log aktivitas pekerjaan admin dari seluruh perangkat/HP secara realtime terintegrasi Supabase Cloud.</p>
 
@@ -888,7 +1021,7 @@
     </main>
   </div>
 
-  <!-- MODAL PEMBERSIHAN DATA CUSTOM (RENTANG TANGGAL DARI - SAMPAI) -->
+  <!-- MODAL PEMBERSIHAN DATA CUSTOM -->
   <div class="modal fade" id="modalPurge" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
@@ -1002,7 +1135,6 @@
         koordinat: loc
       };
 
-      // Simpan Ke Supabase Cloud
       try {
         await _supabase.from('activity_logs').insert([payload]);
       } catch (err) {
@@ -1010,7 +1142,7 @@
       }
     }
 
-    // --- AUTHENTICATION DENGAN PROSES LOADING SPINNER ---
+    // --- AUTHENTICATION ---
     async function handleAuthLogin(e) {
       e.preventDefault();
       const btnText = document.getElementById('btnLoginText');
@@ -1067,7 +1199,7 @@
 
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.remove('d-none'));
-      } else if (user.role === 'MANAJER') {
+      } else if (user.role === 'MANAJER' || user.role === 'ADMIN') {
         document.querySelectorAll('.manager-sa-only').forEach(el => el.classList.remove('d-none'));
       }
 
@@ -1119,14 +1251,12 @@
       alertTimer = setTimeout(() => { closeLoginAlert(); }, 6000);
     }
 
-    // LISTENER REALTIME SUPABASE UNTUK SETIAP PERANGKAT / HP
     function listenRealtimeLogsGlobal() {
       try {
         _supabase.channel('public:activity_logs')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
             if (payload.new) {
               if (payload.new.tipe === 'LOGIN') showLoginNotification(null, payload.new);
-              // Otomatis refresh tabel monitoring jika halaman sedang dibuka
               const monSec = document.getElementById('menu-monitoring');
               if (monSec && !monSec.classList.contains('d-none')) {
                 loadMonitoringData();
@@ -1397,7 +1527,7 @@
         </tr>`).join('');
     }
 
-    // --- MANAJEMEN KARYAWAN (DENGAN JABATAN LENGKAP) ---
+    // --- MANAJEMEN KARYAWAN ---
     async function simpanKaryawan(e) {
       e.preventDefault();
       const id = document.getElementById('empDbId').value;
@@ -1587,7 +1717,7 @@
       }
     }
 
-    // --- MONITORING PEKERJAAN (FETCH DIRECT CLOUD SUPABASE) ---
+    // --- MONITORING PEKERJAAN (FIXED REALTIME PARSING & FETCH) ---
     async function loadMonitoringData() {
       let logs = [];
 
@@ -1595,13 +1725,20 @@
         const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
         if (!error && data) logs = data;
       } catch (err) {
-        console.warn("Gagal mengambil log realtime dari Supabase Cloud.");
+        console.warn("Gagal mengambil log realtime dari Supabase Cloud.", err);
       }
 
       const dateFlt = document.getElementById('fltLogDate')?.value;
       const typeFlt = document.getElementById('fltLogType')?.value;
 
-      if (dateFlt) logs = logs.filter(l => (l.waktu || '').startsWith(dateFlt));
+      if (dateFlt) {
+        logs = logs.filter(l => {
+          if (!l.waktu) return false;
+          const logDateFormatted = l.waktu.substring(0, 10);
+          return logDateFormatted === dateFlt;
+        });
+      }
+
       if (typeFlt) logs = logs.filter(l => l.tipe === typeFlt);
 
       const bodyMon = document.getElementById('bodyMonitoring');
@@ -1718,7 +1855,7 @@
         perms.forEach(chk => {
           chk.checked = ['dashboard', 'server', 'reseller', 'karyawan', 'kasbon'].includes(chk.value);
         });
-      } else if (role === 'SUPERADMIN') {
+      } else if (role === 'SUPERADMIN' || role === 'ADMIN') {
         perms.forEach(chk => chk.checked = true);
       }
     }
@@ -1789,7 +1926,7 @@
       document.getElementById('usrRole').value = role;
     }
 
-    // --- FITUR PEMBERSIHAN CUSTOM RENTANG TANGGAL (DARI - SAMPAI) ---
+    // --- FITUR PEMBERSIHAN CUSTOM ---
     function openPurgeModal(tableName, tableLabel) {
       document.getElementById('purgeTargetTable').value = tableName;
       document.getElementById('purgeTargetLabel').value = tableLabel;
@@ -1817,7 +1954,6 @@
       let dateColumn = 'tanggal';
       if (tableName === 'activity_logs') dateColumn = 'waktu';
 
-      // Menghapus data dalam rentang tanggal
       const { error } = await _supabase.from(tableName)
         .delete()
         .gte(dateColumn, startDate)
@@ -1828,7 +1964,6 @@
         alert(`Pembersihan data ${targetLabel} dari tanggal ${startDate} s/d ${endDate} berhasil dilakukan!`);
         bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
         
-        // Reload data tampilan terkait
         if (tableName === 'reseller_stock') { loadStokData(); loadDashboardResellerSummary(); }
         if (tableName === 'kasbon') loadKasbonData();
         if (tableName === 'activity_logs') loadMonitoringData();
@@ -1871,55 +2006,25 @@
       });
       worksheet.addRow(headers);
 
-      const headerRow = worksheet.getRow(1);
-      headerRow.eachCell((cell) => {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '0F172A' } };
-        cell.font = { name: 'Arial', color: { argb: 'FFFFFF' }, bold: true, size: 10 };
-        cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      });
-
-      table.querySelectorAll('tbody tr').forEach(tr => {
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach(tr => {
         const rowData = [];
         tr.querySelectorAll('td').forEach((td, idx) => {
-          if (idx < headers.length) {
-            rowData.push(td.innerText.trim());
-          }
+          if (idx < headers.length) rowData.push(td.innerText.replace(/\n/g, ' '));
         });
-        if(rowData.length > 0) worksheet.addRow(rowData);
-      });
-
-      worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber > 1) {
-          row.eachCell((cell) => {
-            cell.font = { name: 'Arial', size: 9 };
-            cell.border = {
-              top: { style: 'thin', color: { argb: 'CBD5E1' } },
-              left: { style: 'thin', color: { argb: 'CBD5E1' } },
-              bottom: { style: 'thin', color: { argb: 'CBD5E1' } },
-              right: { style: 'thin', color: { argb: 'CBD5E1' } }
-            };
-          });
-        }
-      });
-
-      worksheet.columns.forEach(column => {
-        let maxLen = 0;
-        column.eachCell({ includeEmpty: true }, cell => {
-          const len = cell.value ? cell.value.toString().length : 10;
-          if (len > maxLen) maxLen = len;
-        });
-        column.width = Math.max(maxLen + 4, 12);
+        if (rowData.length > 0) worksheet.addRow(rowData);
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), `${filename}.xlsx`);
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
-    // --- INITIAL SESSION CHECK ---
-    document.addEventListener('DOMContentLoaded', () => {
-      const activeSession = sessionStorage.getItem('rinnet_session_user');
-      if (activeSession) {
-        initAppView(JSON.parse(activeSession));
+    // Auto load session bila ada
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = sessionStorage.getItem('rinnet_session_user');
+      if (savedUser) {
+        initAppView(JSON.parse(savedUser));
       }
     });
   </script>
