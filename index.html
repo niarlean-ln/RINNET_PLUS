@@ -8,7 +8,7 @@
   <!-- Fonts & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,8 +19,8 @@
 
   <style>
     :root {
-      --bg-dark: #0f0c1b;
-      --card-dark: #18132a;
+      --bg-dark: #0b0914;
+      --card-dark: #161226;
       --primary-accent: #6366f1;
       --primary-hover: #4f46e5;
       --emerald-accent: #10b981;
@@ -30,6 +30,7 @@
       --text-main: #1e1b4b;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
+      --gold-gradient: linear-gradient(135deg, #f39c12 0%, #f1c40f 50%, #e67e22 100%);
     }
 
     body { 
@@ -39,71 +40,102 @@
       overflow-x: hidden;
     }
 
-    /* LOGO RINNET+ CUSTOM IMPROVED */
+    /* TYPOGRAPHY LUXURY RINNET+ BRANDING (NO IMAGE LOGO) */
     .brand-logo-container {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-    }
-    .brand-logo-img {
-      height: 44px;
-      width: auto;
-      object-fit: contain;
-      border-radius: 10px;
+      gap: 8px;
     }
     .brand-logo-text {
+      font-family: 'Cinzel', 'Plus Jakarta Sans', serif;
       font-weight: 900;
-      font-size: 1.75rem;
-      letter-spacing: -0.5px;
-      color: #1e1b4b;
+      font-size: 2.1rem;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       line-height: 1;
-    }
-    .sidebar .brand-logo-text, .login-left .brand-logo-text, .mobile-header .brand-logo-text {
-      color: #ffffff;
+      filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.4));
     }
     .brand-logo-text .plus-tag {
-      color: #38bdf8;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       font-weight: 900;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+      margin-left: 2px;
+      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8));
     }
     .brand-subtitle {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-muted);
+      letter-spacing: 2px;
+      color: #94a3b8;
       font-weight: 700;
       display: block;
-      margin-top: 2px;
+      margin-top: 4px;
+    }
+
+    /* ELEGANT WELCOME BANNER CARD */
+    .welcome-card-lux {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+      border-radius: 24px;
+      padding: 2rem 2.25rem;
+      color: #ffffff;
+      box-shadow: 0 20px 40px -15px rgba(49, 46, 129, 0.4);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .welcome-card-lux::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(129, 140, 248, 0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .quotes-box-lux {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-left: 4px solid #38bdf8;
+      border-radius: 16px;
+      padding: 1.1rem 1.4rem;
+      margin-top: 1.2rem;
     }
 
     /* LOGIN PAGE SPLIT LAYOUT */
     .login-wrapper {
       min-height: 100vh;
       display: flex;
-      background: linear-gradient(135deg, #090514 0%, #17112d 50%, #1e1738 100%);
+      background: linear-gradient(135deg, #06040a 0%, #110c24 50%, #181135 100%);
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
     }
     .login-grid {
       width: 100%;
-      max-width: 1040px;
+      max-width: 1000px;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      background: rgba(24, 19, 42, 0.75);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(22, 18, 38, 0.85);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 28px;
       overflow: hidden;
-      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.56);
+      box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.65);
     }
     .login-left {
       padding: 3.5rem 3rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.15), transparent 70%);
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.2), transparent 70%);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
     .login-right {
       padding: 3.5rem 3rem;
@@ -137,7 +169,7 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
-      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
     .sidebar-menu {
       flex: 1;
@@ -163,12 +195,12 @@
     }
 
     .profile-avatar-nav {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid var(--primary-accent);
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
     }
 
     .content-area {
@@ -301,7 +333,6 @@
       <div class="login-left">
         <div>
           <div class="brand-logo-container mb-4">
-            <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="brand-logo-img shadow" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
             <div>
               <span class="brand-logo-text">RINNET<span class="plus-tag">+</span></span>
               <span class="brand-subtitle text-white-50">Enterprise Infrastructure</span>
@@ -325,15 +356,12 @@
 
       <!-- Right Form Login -->
       <div class="login-right">
-        <div class="text-center mb-4 d-lg-none">
+        <div class="text-center mb-4">
           <div class="brand-logo-container justify-content-center mb-2">
-            <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="brand-logo-img shadow" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
-            <span class="brand-logo-text fs-3">RINNET<span class="plus-tag">+</span></span>
+            <span class="brand-logo-text fs-2">RINNET<span class="plus-tag">+</span></span>
           </div>
+          <span class="brand-subtitle text-muted">Akses Terproteksi Enterprise System</span>
         </div>
-
-        <h3 class="fw-800 text-dark mb-1">Selamat Datang Kembali</h3>
-        <p class="text-muted small mb-4">Masukkan kredensial akun Anda untuk mengakses dashboard sistem.</p>
 
         <form onsubmit="handleAuthLogin(event)">
           <div class="mb-3">
@@ -370,8 +398,7 @@
   <div id="pageApp" class="d-none">
     <div class="mobile-header d-lg-none">
       <div class="brand-logo-container">
-        <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" class="brand-logo-img" style="height: 32px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
-        <span class="brand-logo-text fs-5">RINNET<span class="plus-tag">+</span></span>
+        <span class="brand-logo-text fs-4">RINNET<span class="plus-tag">+</span></span>
       </div>
       <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
     </div>
@@ -380,8 +407,7 @@
     <nav class="sidebar" id="mainSidebar">
       <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
         <div class="brand-logo-container justify-content-center mb-3 mt-2">
-          <img src="https://raw.githubusercontent.com/rinnethome/img/main/logo.jpg" alt="Logo Rinnet" class="brand-logo-img shadow-sm" style="height: 36px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/2099/2099192.png';">
-          <span class="brand-logo-text fs-4">RINNET<span class="plus-tag">+</span></span>
+          <span class="brand-logo-text fs-3">RINNET<span class="plus-tag">+</span></span>
         </div>
         <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
         <h6 class="fw-800 text-white mb-0" id="navUserName">User</h6>
@@ -409,29 +435,47 @@
     <!-- Main Content Area -->
     <main class="content-area">
 
-      <div id="userLoginAlert" class="alert alert-info alert-dismissible fade show d-none mb-4 shadow-sm border-start border-4 border-info" role="alert">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="alert-heading fw-bold mb-1"><i class="fa-solid fa-right-to-bracket me-2"></i>Notifikasi Login Realtime Masuk</h6>
-            <div id="userLoginAlertText" class="small"></div>
-          </div>
-          <button type="button" class="btn-close" onclick="closeLoginAlert()" aria-label="Close"></button>
-        </div>
-      </div>
-
       <!-- DASHBOARD -->
       <section id="menu-dashboard" class="page-section">
+        
+        <!-- BANNER UCAPAN WELCOME LUXURY ELEGAN INTERAKTIF -->
+        <div class="welcome-card-lux mb-4">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+              <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 text-uppercase small mb-2 fw-bold" style="letter-spacing: 1px;">
+                <i class="fa-solid fa-sparkles text-warning me-1"></i>Enterprise System Active
+              </span>
+              <h2 class="fw-900 mb-1" id="dashWelcomeTitle">Selamat Datang di RINNET+</h2>
+              <p class="text-white-50 mb-0 small" id="dashWelcomeSubtitle">Sistem Pengelolaan Infrastruktur Server, Stok Voucher & Monitoring Karyawan.</p>
+            </div>
+            <div class="text-end d-none d-md-block">
+              <span class="d-block small text-white-50 fw-bold">WAKTU SISTEM</span>
+              <h4 class="fw-800 text-white mb-0" id="liveClockText">00:00:00 WIB</h4>
+            </div>
+          </div>
+
+          <div class="quotes-box-lux">
+            <div class="d-flex align-items-start gap-3">
+              <div class="fs-4 text-info mt-1"><i class="fa-solid fa-quote-left"></i></div>
+              <div>
+                <p class="mb-1 fw-600 fst-italic text-white fs-6" id="quoteText">"Kunci keberhasilan adalah fokus pada tujuan, bukan pada hambatan."</p>
+                <small class="text-info fw-bold" id="quoteAuthor">— Kata Bijak Hari Ini</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
           <div>
-            <h3 class="fw-800 mb-1">Dashboard Management</h3>
-            <p class="text-muted small mb-0">Ringkasan statistik internal server, kasbon, dan alokasi voucher terintegrasi Cloud & Supabase Realtime.</p>
+            <h4 class="fw-800 mb-1">Ringkasan Statistik Dashboard</h4>
+            <p class="text-muted small mb-0">Statistik internal server, kasbon, dan alokasi voucher terintegrasi Cloud & Supabase Realtime.</p>
           </div>
           <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('reseller_stock', 'Stok Voucher Reseller Dashboard')">
             <i class="fa-solid fa-broom me-1"></i>Pembersihan Data Custom
           </button>
         </div>
 
-        <!-- AKSES CEPAT (QUICK ACCESS CARDS UNTUK MANAJER & ADMIN) -->
+        <!-- AKSES CEPAT (QUICK ACCESS CARDS) -->
         <div class="mb-4">
           <h6 class="fw-bold text-uppercase text-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.8px;">
             <i class="fa-solid fa-bolt text-warning me-1"></i>Akses Cepat Modul Navigasi
@@ -889,7 +933,7 @@
                   <th>Waktu</th>
                   <th>Pengguna</th>
                   <th>Kategori</th>
-                  <th>Detail Aktivitas</th>
+                  <th>Detail Aktivitas Pekerjaan</th>
                   <th>Status Keabsahan</th>
                   <th>Perangkat / Device</th>
                   <th>GPS / Koordinat</th>
@@ -1066,9 +1110,20 @@
     let perfChart = null;
     let currentUser = null;
     let base64AvatarImage = "";
-    let alertTimer = null;
     let livePerfInterval = null;
+    let liveClockInterval = null;
     const MAX_LOG_LIMIT = 500; 
+
+    // QUOTES RANDOM GENERATOR DINAMIS SORE/PAGI/HARIAN
+    const QUOTES_DATABASE = [
+      { text: "Hasil luar biasa tidak pernah datang dari zona nyaman. Tetap semangat!", author: "Motivasi Kerja" },
+      { text: "Kerja keras dan integritas hari ini adalah investasi kesuksesan esok hari.", author: "Pengingat Diri" },
+      { text: "Satu langkah kecil hari ini adalah awal dari pencapaian besar di masa depan.", author: "Inspirasi Harian" },
+      { text: "Kerja tim yang solid membuat pekerjaan berat terasa ringan dan menyenangkan.", author: "Budaya Kerja" },
+      { text: "Setiap masalah yang terselesaikan adalah bukti kenaikan level kemampuanmu.", author: "Mental Juara" },
+      { text: "Jangan lupa tersenyum dan rehat sejenak, kesehatanmu adalah aset terbaik.", author: "Penghibur Diri" },
+      { text: "Ketelitian dalam data adalah kunci keputusan bisnis yang tepat sasaran.", author: "Prinsip Profesional" }
+    ];
 
     function toggleSidebar() {
       document.getElementById('mainSidebar').classList.toggle('show');
@@ -1099,7 +1154,7 @@
       if (ua.indexOf("Android") !== -1) os = "Android";
       if (ua.indexOf("like Mac") !== -1) os = "iOS";
 
-      return `${deviceType} (${os}) - ${navigator.platform}`;
+      return `${deviceType} (${os})`;
     }
 
     function getUserLocation() {
@@ -1122,7 +1177,7 @@
       const loc = await getUserLocation();
       const deviceDetailed = getDeviceDetailedInfo();
       const statusText = isSuccess ? 'BERHASIL' : 'GAGAL';
-      const fullDetail = isSuccess ? `${detail} [Sync Cloud]` : `${detail} - (Error: ${errorMsg})`;
+      const fullDetail = isSuccess ? `${detail}` : `${detail} - (Error: ${errorMsg})`;
 
       const payload = {
         waktu: new Date().toISOString(),
@@ -1168,7 +1223,7 @@
         if (user.password_hash === p) {
           currentUser = user;
           sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
-          await logActivity('LOGIN', `User ${user.username} (${user.role}) berhasil masuk dari perangkat.`, true);
+          await logActivity('LOGIN', `Akses masuk ke sistem aplikasi dari perangkat`, true);
           initAppView(user);
         } else {
           alert('Password salah!');
@@ -1204,9 +1259,41 @@
       }
 
       applyRolePermissionsUI();
-      showLoginNotification(user);
+      renderWelcomeGreetingAndQuotes();
+      startLiveClock();
       listenRealtimeLogsGlobal();
       loadDashboardData();
+    }
+
+    function renderWelcomeGreetingAndQuotes() {
+      if (!currentUser) return;
+      const now = new Date();
+      const hour = now.getHours();
+      let salam = "Selamat Pagi";
+
+      if (hour >= 11 && hour < 15) salam = "Selamat Siang";
+      else if (hour >= 15 && hour < 18) salam = "Selamat Sore";
+      else if (hour >= 18 || hour < 4) salam = "Selamat Malam";
+
+      const namaUser = currentUser.nama_lengkap || currentUser.username;
+      document.getElementById('dashWelcomeTitle').innerText = `${salam}, ${namaUser}!`;
+
+      // Seleksi Quotes Berdasarkan Karakter User ID / Hari Ini
+      const dayIndex = (now.getDate() + (currentUser.id ? currentUser.id.length : 1)) % QUOTES_DATABASE.length;
+      const selectedQuote = QUOTES_DATABASE[dayIndex];
+
+      document.getElementById('quoteText').innerText = `"${selectedQuote.text}"`;
+      document.getElementById('quoteAuthor').innerText = `— ${selectedQuote.author}`;
+    }
+
+    function startLiveClock() {
+      if (liveClockInterval) clearInterval(liveClockInterval);
+      liveClockInterval = setInterval(() => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('id-ID') + ' WIB';
+        const el = document.getElementById('liveClockText');
+        if (el) el.innerText = timeStr;
+      }, 1000);
     }
 
     function applyRolePermissionsUI() {
@@ -1226,37 +1313,11 @@
       }
     }
 
-    async function showLoginNotification(user, customLog = null) {
-      let recentLog = customLog;
-      if (!recentLog && user) {
-        try {
-          const { data } = await _supabase.from('activity_logs').select('*').eq('tipe', 'LOGIN').order('waktu', { ascending: false }).limit(1);
-          if (data && data.length > 0) recentLog = data[0];
-        } catch (e) {}
-      }
-
-      const alertBox = document.getElementById('userLoginAlert');
-      const alertText = document.getElementById('userLoginAlertText');
-      const targetUser = recentLog?.username || user?.username || 'System User';
-      const targetRole = recentLog?.role || user?.role || 'User';
-      const devInfo = recentLog?.device || getDeviceDetailedInfo();
-      const coordInfo = recentLog?.koordinat || 'N/A';
-
-      alertText.innerHTML = `Perangkat/Pengguna <strong>${targetUser}</strong> (${targetRole}) baru saja aktif di sistem.<br>` +
-        `• <strong>Perangkat:</strong> ${devInfo}<br>` +
-        `• <strong>Koordinat / GPS:</strong> ${coordInfo}`;
-      
-      alertBox.classList.remove('d-none');
-      if (alertTimer) clearTimeout(alertTimer);
-      alertTimer = setTimeout(() => { closeLoginAlert(); }, 6000);
-    }
-
     function listenRealtimeLogsGlobal() {
       try {
         _supabase.channel('public:activity_logs')
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, payload => {
             if (payload.new) {
-              if (payload.new.tipe === 'LOGIN') showLoginNotification(null, payload.new);
               const monSec = document.getElementById('menu-monitoring');
               if (monSec && !monSec.classList.contains('d-none')) {
                 loadMonitoringData();
@@ -1264,11 +1325,6 @@
             }
           }).subscribe();
       } catch (e) {}
-    }
-
-    function closeLoginAlert() {
-      const alertBox = document.getElementById('userLoginAlert');
-      if (alertBox) alertBox.classList.add('d-none');
     }
 
     function handleLogout() {
@@ -1415,13 +1471,13 @@
       }
 
       if (!res.error) {
-        await logActivity('INPUT_DATA', `Simpan server: ${payload.nama_server}`, true);
+        await logActivity('INPUT_DATA', `Simpan/Edit Server Cloud: ${payload.nama_server}`, true);
         alert('Data Server Berhasil Disimpan!');
         document.getElementById('srvId').value = '';
         e.target.reset();
         loadServerData();
       } else {
-        await logActivity('INPUT_DATA', `Simpan server: ${payload.nama_server}`, false, res.error.message);
+        await logActivity('INPUT_DATA', `Simpan Server: ${payload.nama_server}`, false, res.error.message);
         alert('Gagal menyimpan server: ' + res.error.message);
       }
     }
@@ -1491,13 +1547,13 @@
       }
 
       if (!res.error) {
-        await logActivity('INPUT_DATA', `Penyerahan stok voucher ke: ${payload.nama_reseller}`, true);
+        await logActivity('INPUT_DATA', `Penyerahan Stok Voucher Ke Reseller: ${payload.nama_reseller} (Server: ${payload.nama_server})`, true);
         alert('Penyerahan Stok Berhasil Disimpan!');
         document.getElementById('stkId').value = '';
         e.target.reset();
         loadStokData();
       } else {
-        await logActivity('INPUT_DATA', `Penyerahan stok voucher ke: ${payload.nama_reseller}`, false, res.error.message);
+        await logActivity('INPUT_DATA', `Penyerahan Stok Voucher Ke: ${payload.nama_reseller}`, false, res.error.message);
         alert('Gagal menyimpan stok ke Supabase: ' + res.error.message);
       }
     }
@@ -1527,7 +1583,7 @@
         </tr>`).join('');
     }
 
-    // --- MANAJEMEN KARYAWAN ---
+    // --- MANAJEMEN KARYAWAN (FIXED INPUT & EDIT) ---
     async function simpanKaryawan(e) {
       e.preventDefault();
       const id = document.getElementById('empDbId').value;
@@ -1546,20 +1602,25 @@
       }
 
       if(!res.error) {
-        await logActivity('INPUT_DATA', `Simpan data karyawan: ${payload.nama_karyawan} (${payload.jabatan})`, true);
+        await logActivity('INPUT_DATA', `Input/Edit Data Karyawan: ${payload.nama_karyawan} (${payload.jabatan})`, true);
         alert('Data Karyawan Berhasil Disimpan!');
         document.getElementById('empDbId').value = '';
         e.target.reset();
         loadKaryawanData();
       } else {
-        await logActivity('INPUT_DATA', `Simpan data karyawan: ${payload.nama_karyawan}`, false, res.error.message);
+        await logActivity('INPUT_DATA', `Input Data Karyawan: ${payload.nama_karyawan}`, false, res.error.message);
         alert('Gagal menyimpan karyawan: ' + res.error.message);
       }
     }
 
     async function loadKaryawanData() {
-      const { data } = await _supabase.from('employees').select('*');
+      const { data, error } = await _supabase.from('employees').select('*').order('employee_id', { ascending: true });
       const isManager = currentUser?.role === 'MANAJER';
+
+      if (error) {
+        console.error("Gagal load karyawan:", error);
+        return;
+      }
 
       document.getElementById('bodyKaryawan').innerHTML = (data || []).map(e => `
         <tr>
@@ -1603,13 +1664,13 @@
       }
 
       if(!res.error) {
-        await logActivity('INPUT_DATA', `Simpan kasbon karyawan: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`, true);
+        await logActivity('INPUT_DATA', `Pengajuan Kasbon: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon.toLocaleString('id-ID')})`, true);
         alert('Kasbon Berhasil Dicatat!');
         document.getElementById('ksbId').value = '';
         e.target.reset();
         loadKasbonData();
       } else {
-        await logActivity('INPUT_DATA', `Simpan kasbon karyawan: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon})`, false, res.error.message);
+        await logActivity('INPUT_DATA', `Pengajuan Kasbon: ${payload.nama_karyawan}`, false, res.error.message);
         alert('Gagal menyimpan kasbon ke Supabase: ' + res.error.message);
       }
     }
@@ -1709,15 +1770,15 @@
         Object.assign(currentUser, updatePayload);
         sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
         document.getElementById('navUserName').innerText = currentUser.nama_lengkap || currentUser.username;
-        await logActivity('INPUT_DATA', `Memperbarui profil diri`, true);
+        await logActivity('INPUT_DATA', `Memperbarui data profil pengguna`, true);
         alert('Profil berhasil diperbarui!');
       } else {
-        await logActivity('INPUT_DATA', `Memperbarui profil diri`, false, error.message);
+        await logActivity('INPUT_DATA', `Memperbarui data profil`, false, error.message);
         alert('Gagal memperbarui profil: ' + error.message);
       }
     }
 
-    // --- MONITORING PEKERJAAN (FIXED REALTIME PARSING & FETCH) ---
+    // --- MONITORING PEKERJAAN ADMIN (PERBAIKAN REALTIME CLOUD LOGS) ---
     async function loadMonitoringData() {
       let logs = [];
 
@@ -1745,7 +1806,7 @@
       if (!bodyMon) return;
 
       if (logs.length === 0) {
-        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Belum ada riwayat aktivitas yang tercatat.</td></tr>`;
+        bodyMon.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Belum ada riwayat aktivitas pekerjaan admin yang tercatat.</td></tr>`;
         return;
       }
 
@@ -1769,7 +1830,7 @@
             <td><small class="text-muted fw-bold">${formatWaktu}</small></td>
             <td><b>${l.username}</b> <span class="badge bg-light text-dark border">${l.role}</span></td>
             <td><span class="badge ${badgeType}">${l.tipe}</span></td>
-            <td>${l.detail}</td>
+            <td><strong>${l.detail}</strong></td>
             <td>${statusBadge}</td>
             <td><small class="fw-bold text-dark">${l.device || '-'}</small></td>
             <td>${gmapsLink}</td>
@@ -1888,13 +1949,13 @@
       }
 
       if (!res.error) {
-        await logActivity('INPUT_DATA', `Simpan user: ${payload.username}`, true);
+        await logActivity('INPUT_DATA', `Pengelolaan Pengguna Sistem: ${payload.username}`, true);
         alert('Akun User Berhasil Disimpan!');
         document.getElementById('usrDbId').value = '';
         e.target.reset();
         loadUserData();
       } else {
-        await logActivity('INPUT_DATA', `Simpan user: ${payload.username}`, false, res.error.message);
+        await logActivity('INPUT_DATA', `Pengelolaan User: ${payload.username}`, false, res.error.message);
         alert('Gagal menyimpan user: ' + res.error.message);
       }
     }
@@ -1947,7 +2008,7 @@
         return;
       }
 
-      if (!confirm(`⚠️ PERINGATAN BERSAMA: Yakin ingin menghapus data "${targetLabel}" dari tanggal ${startDate} sampai tanggal ${endDate}?`)) {
+      if (!confirm(`⚠️ PERINGATAN: Yakin ingin menghapus data "${targetLabel}" dari tanggal ${startDate} sampai tanggal ${endDate}?`)) {
         return;
       }
 
@@ -1960,7 +2021,7 @@
         .lte(dateColumn, endDate);
 
       if (!error) {
-        await logActivity('INPUT_DATA', `Pembersihan data ${targetLabel} dari ${startDate} s/d ${endDate}`, true);
+        await logActivity('INPUT_DATA', `Pembersihan Data Custom ${targetLabel} (${startDate} s/d ${endDate})`, true);
         alert(`Pembersihan data ${targetLabel} dari tanggal ${startDate} s/d ${endDate} berhasil dilakukan!`);
         bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
         
@@ -1968,63 +2029,67 @@
         if (tableName === 'kasbon') loadKasbonData();
         if (tableName === 'activity_logs') loadMonitoringData();
       } else {
-        await logActivity('INPUT_DATA', `Pembersihan custom data ${targetLabel}`, false, error.message);
+        await logActivity('INPUT_DATA', `Pembersihan Custom ${targetLabel}`, false, error.message);
         alert('Gagal membersihkan data: ' + error.message);
       }
     }
 
     // --- GENERAL DELETE HELPER ---
     async function hapusRecord(tableName, id, reloadFn, itemDesc = 'Data') {
-      const konfirmasi = confirm(`⚠️ PERINGATAN PENTING ⚠️\n\nApakah Anda benar-benar yakin ingin menghapus "${itemDesc}"?\n\nData yang telah dihapus tidak dapat dikembalikan lagi.`);
-      if (konfirmasi) {
-        const { error } = await _supabase.from(tableName).delete().eq('id', id);
-        if (!error) {
-          await logActivity('INPUT_DATA', `Menghapus record: ${itemDesc}`, true);
-          alert('Data berhasil dihapus!');
-          reloadFn();
-        } else {
-          await logActivity('INPUT_DATA', `Menghapus record: ${itemDesc}`, false, error.message);
-          alert('Gagal menghapus: ' + error.message);
-        }
+      if (!confirm(`Yakin ingin menghapus ${itemDesc}?`)) return;
+
+      const { error } = await _supabase.from(tableName).delete().eq('id', id);
+      if(!error) {
+        await logActivity('INPUT_DATA', `Menghapus record ${itemDesc}`, true);
+        alert(`${itemDesc} berhasil dihapus!`);
+        if(reloadFn) reloadFn();
+      } else {
+        await logActivity('INPUT_DATA', `Hapus record ${itemDesc}`, false, error.message);
+        alert('Gagal menghapus data: ' + error.message);
       }
     }
 
-    // --- EXPORT EXCEL ---
-    async function exportFormattedExcel(tableId, filename) {
+    // --- EXPORT EXCEL FORMATTED ---
+    async function exportFormattedExcel(tableId, filenamePrefix) {
       const table = document.getElementById(tableId);
-      if (!table) {
-        alert('Tabel data tidak ditemukan!');
-        return;
-      }
+      if (!table) return;
 
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Sheet1');
+      const worksheet = workbook.addWorksheet('Data Export');
 
       const headers = [];
       table.querySelectorAll('thead th').forEach(th => {
-        if(th.innerText !== 'AKSI') headers.push(th.innerText);
+        if (!th.classList.contains('action-col')) {
+          headers.push(th.innerText.trim());
+        }
       });
       worksheet.addRow(headers);
 
-      const rows = table.querySelectorAll('tbody tr');
-      rows.forEach(tr => {
+      table.querySelectorAll('tbody tr').forEach(tr => {
         const rowData = [];
         tr.querySelectorAll('td').forEach((td, idx) => {
-          if (idx < headers.length) rowData.push(td.innerText.replace(/\n/g, ' '));
+          if (!table.querySelectorAll('thead th')[idx]?.classList.contains('action-col')) {
+            rowData.push(td.innerText.trim());
+          }
         });
         if (rowData.length > 0) worksheet.addRow(rowData);
       });
 
+      worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
+      worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4F46E5' } };
+
       const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
+      saveAs(new Blob([buffer]), `${filenamePrefix}_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
-    // Auto load session bila ada
+    // ON LOAD AUTO INIT SESSION
     window.addEventListener('DOMContentLoaded', () => {
-      const savedUser = sessionStorage.getItem('rinnet_session_user');
-      if (savedUser) {
-        initAppView(JSON.parse(savedUser));
+      const sessionUser = sessionStorage.getItem('rinnet_session_user');
+      if (sessionUser) {
+        try {
+          const userObj = JSON.parse(sessionUser);
+          initAppView(userObj);
+        } catch(e) {}
       }
     });
   </script>
