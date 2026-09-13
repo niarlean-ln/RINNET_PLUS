@@ -176,13 +176,21 @@
       overflow-y: auto;
       padding: 1.25rem 0.75rem;
     }
+    .sidebar-category-title {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #64748b;
+      font-weight: 800;
+      margin: 1.2rem 0 0.4rem 0.8rem;
+    }
     .sidebar .nav-link {
       color: #94a3b8;
-      padding: 0.85rem 1.1rem;
+      padding: 0.75rem 1rem;
       font-weight: 600;
-      font-size: 0.875rem;
-      border-radius: 14px;
-      margin-bottom: 0.35rem;
+      font-size: 0.85rem;
+      border-radius: 12px;
+      margin-bottom: 0.25rem;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -308,31 +316,64 @@
       border-top: 1px solid rgba(255,255,255,0.06);
     }
 
-    /* System Monitoring Card Modern UI */
-    .metric-card-lux {
-      background: rgba(15, 23, 42, 0.03);
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 1.2rem;
-      transition: all 0.3s ease;
-    }
-    .metric-card-lux:hover {
+    /* Modern Monitoring System UI */
+    .metric-card-modern {
       background: #ffffff;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-      border-color: var(--primary-accent);
+      border-radius: 16px;
+      padding: 1.25rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      position: relative;
+    }
+    .metric-card-modern .metric-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .metric-card-modern .metric-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0.3rem 0;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseLive 1.5s infinite;
+    }
+    @keyframes pulseLive {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
-    .tech-badge-pill {
-      background: #f1f5f9;
-      color: #334155;
-      font-weight: 700;
-      font-size: 0.8rem;
-      padding: 8px 16px;
-      border-radius: 30px;
+    /* About Section Styling */
+    .about-card-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      color: #ffffff;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.3);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .tech-badge {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e2e8f0;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid #e2e8f0;
     }
 
     @media (max-width: 991px) {
@@ -427,7 +468,7 @@
       <button class="btn btn-sm btn-outline-light" onclick="toggleSidebar()"><i class="fa-solid fa-bars fs-5"></i></button>
     </div>
 
-    <!-- Sidebar Navigation -->
+    <!-- Sidebar Navigation Berdasarkan Kategori -->
     <nav class="sidebar" id="mainSidebar">
       <div class="p-3 text-center border-bottom border-secondary border-opacity-25">
         <div class="brand-logo-container justify-content-center mb-3 mt-2">
@@ -439,18 +480,32 @@
       </div>
 
       <div class="sidebar-menu">
+        <!-- Category: Control Panel & Monitoring -->
+        <div class="sidebar-category-title">Control Panel & Monitoring</div>
         <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
+        <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
+        <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('sysPerf')"><i class="fa-solid fa-microchip text-warning"></i>Monitoring System</a>
+
+        <!-- Category: Infrastruktur -->
+        <div class="sidebar-category-title">Infrastruktur</div>
         <a class="nav-link" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
         <a class="nav-link" href="#" onclick="switchMenu('serverWilayah')"><i class="fa-solid fa-network-wired text-cyan"></i>Server per Wilayah</a>
+
+        <!-- Category: SDM Operasional -->
+        <div class="sidebar-category-title">SDM Operasional</div>
         <a class="nav-link" href="#" onclick="switchMenu('inputReseller')"><i class="fa-solid fa-user-plus text-warning"></i>Input Data Reseller</a>
-        <a class="nav-link" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Pendaftaran & Stok Voucher</a>
         <a class="nav-link" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
+
+        <!-- Category: Data Inputan -->
+        <div class="sidebar-category-title">Data Inputan</div>
+        <a class="nav-link" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Pendaftaran & Stok Voucher</a>
         <a class="nav-link" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form & Rekap Kasbon</a>
-        <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
+
+        <!-- Category: Sistem -->
+        <div class="sidebar-category-title">Sistem</div>
         <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear"></i>Manajemen User</a>
-        <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('sysPerf')"><i class="fa-solid fa-microchip text-warning"></i>Monitoring System</a>
-        <!-- HALAMAN ABOUT / TENTANG DINAVIGASIKAN PALING BAWAH -->
-        <a class="nav-link text-info" href="#" onclick="switchMenu('about')"><i class="fa-solid fa-circle-info"></i>Tentang RINNET+</a>
+        <a class="nav-link" href="#" onclick="switchMenu('about')"><i class="fa-solid fa-circle-info text-info"></i>Tentang RINNET+</a>
+
         <a class="nav-link text-danger mt-3" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</a>
       </div>
 
@@ -500,7 +555,7 @@
           </button>
         </div>
 
-        <!-- AKSES CEPAT (TAMBAHAN INPUT RESELLER & MONITORING SYSTEM HAK AKSES SUPERADMIN) -->
+        <!-- AKSES CEPAT (TERMASUK INPUT DATA RESELLER & MONITORING SYSTEM KHUSUS SUPERADMIN) -->
         <div class="mb-4">
           <h6 class="fw-bold text-uppercase text-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.8px;">
             <i class="fa-solid fa-bolt text-warning me-1"></i>Akses Cepat Modul Navigasi
@@ -525,12 +580,11 @@
                 </div>
                 <div>
                   <h6 class="fw-bold mb-0 text-dark fs-6">Wilayah</h6>
-                  <small class="text-muted d-block" style="font-size: 11px;">Server Cluster</small>
+                  <small class="text-muted d-block" style="font-size: 11px;">Server per Cluster</small>
                 </div>
               </div>
             </div>
 
-            <!-- PERBAIKAN: NAVIGASI KE INPUT DATA RESELLER -->
             <div class="col-6 col-md-4 col-xl-2">
               <div class="quick-access-card" onclick="switchMenu('inputReseller')">
                 <div class="quick-icon-box" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
@@ -538,7 +592,7 @@
                 </div>
                 <div>
                   <h6 class="fw-bold mb-0 text-dark fs-6">Reseller</h6>
-                  <small class="text-muted d-block" style="font-size: 11px;">Input Data</small>
+                  <small class="text-muted d-block" style="font-size: 11px;">Input Reseller</small>
                 </div>
               </div>
             </div>
@@ -556,79 +610,75 @@
             </div>
 
             <div class="col-6 col-md-4 col-xl-2">
-              <div class="quick-access-card" onclick="switchMenu('kasbon')">
-                <div class="quick-icon-box" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e;">
-                  <i class="fa-solid fa-hand-holding-dollar"></i>
+              <div class="quick-access-card" onclick="switchMenu('karyawan')">
+                <div class="quick-icon-box" style="background: rgba(15, 23, 42, 0.1); color: #0f172a;">
+                  <i class="fa-solid fa-user-group"></i>
                 </div>
                 <div>
-                  <h6 class="fw-bold mb-0 text-dark fs-6">Kasbon</h6>
-                  <small class="text-muted d-block" style="font-size: 11px;">Rekapitulasi</small>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Karyawan</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Data SDM</small>
                 </div>
               </div>
             </div>
 
-            <!-- PERBAIKAN: MERUBAH AKSES MONITORING KE MONITORING SYSTEM (KHUSUS SUPERADMIN) -->
             <div class="col-6 col-md-4 col-xl-2 superadmin-only d-none">
               <div class="quick-access-card" onclick="switchMenu('sysPerf')">
                 <div class="quick-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                   <i class="fa-solid fa-microchip"></i>
                 </div>
                 <div>
-                  <h6 class="fw-bold mb-0 text-dark fs-6">System</h6>
-                  <small class="text-muted d-block" style="font-size: 11px;">Monitoring</small>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Monitoring</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">System Status</small>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- STATISTIK DASAR DASHBOARD DAN HITUNGAN BARU -->
+        <!-- STATISTIK DASAR & TAMBAHAN TOTAL WILAYAH & RESELLER -->
         <div class="row g-3 mb-4">
-          <div class="col-12 col-sm-6 col-xl-2">
+          <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #4f46e5, #6366f1);">
               <span class="text-white-50 small fw-bold">TOTAL SERVER</span>
               <h2 id="dashTotalServer" class="fw-800 my-1">0</h2>
               <i class="fa-solid fa-server stat-icon"></i>
             </div>
           </div>
-          <!-- PERBAIKAN: TAMBAHAN TAMPILAN TOTAL WILAYAH/CLUSTER -->
-          <div class="col-12 col-sm-6 col-xl-2">
+          <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #0284c7, #06b6d4);">
-              <span class="text-white-50 small fw-bold">TOTAL WILAYAH</span>
+              <span class="text-white-50 small fw-bold">TOTAL WILAYAH/CLUSTER</span>
               <h2 id="dashTotalWilayah" class="fw-800 my-1">0</h2>
               <i class="fa-solid fa-map-location-dot stat-icon"></i>
             </div>
           </div>
-          <!-- PERBAIKAN: TAMBAHAN TAMPILAN TOTAL RESELLER (DIAMBIL DARI INPUTAN RESELLER) -->
-          <div class="col-12 col-sm-6 col-xl-2">
+          <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #d97706, #f59e0b);">
               <span class="text-white-50 small fw-bold">TOTAL RESELLER</span>
               <h2 id="dashTotalReseller" class="fw-800 my-1">0</h2>
-              <i class="fa-solid fa-users-rectangle stat-icon"></i>
+              <i class="fa-solid fa-users-viewfinder stat-icon"></i>
             </div>
           </div>
-          <div class="col-12 col-sm-6 col-xl-2">
+          <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #0f172a, #1e293b);">
-              <span class="text-white-50 small fw-bold">KARYAWAN</span>
+              <span class="text-white-50 small fw-bold">TOTAL KARYAWAN</span>
               <h2 id="dashTotalKaryawan" class="fw-800 my-1">0</h2>
               <i class="fa-solid fa-users stat-icon"></i>
             </div>
           </div>
-          <div class="col-12 col-sm-6 col-xl-2">
-            <div class="stat-card" style="background: linear-gradient(135deg, #e11d48, #f43f5e);">
-              <span class="text-white-50 small fw-bold">KASBON BULAN INI</span>
-              <h2 id="dashTotalKasbon" class="fw-800 my-1" style="font-size: 1.35rem;">Rp 0</h2>
-              <i class="fa-solid fa-hand-holding-dollar stat-icon"></i>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-xl-2">
+          <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #059669, #10b981);">
-              <span class="text-white-50 small fw-bold">VOUCHER TERSEDIA</span>
+              <span class="text-white-50 small fw-bold">TOTAL VOUCHER TERSEDIA</span>
               <h2 id="dashTotalStok" class="fw-800 my-1">0</h2>
               <i class="fa-solid fa-ticket stat-icon"></i>
             </div>
           </div>
         </div>
+
+        <style>
+          @media (min-width: 1200px) {
+            .col-xl-2-4 { flex: 0 0 auto; width: 20%; }
+          }
+        </style>
 
         <div class="card card-custom p-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
@@ -681,6 +731,90 @@
         </div>
       </section>
 
+      <!-- PROFIL -->
+      <section id="menu-profil" class="page-section d-none">
+        <h3 class="fw-800 mb-4 text-center text-lg-start">Profil Saya</h3>
+        <div class="card card-custom p-4 mx-auto" style="max-width: 600px;">
+          <form onsubmit="simpanProfil(event)">
+            <div class="text-center mb-4">
+              <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-indigo mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+              <div>
+                <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
+                <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
+              </div>
+            </div>
+            <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
+            <button type="submit" id="btnSimpanProfil" class="btn btn-primary fw-bold w-100" style="background: var(--primary-accent); border:none;">
+              <span>Simpan Profil Saya</span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- MONITORING SYSTEM MODERN & LENGKAP -->
+      <section id="menu-sysPerf" class="page-section d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h3 class="fw-800 mb-1">Monitoring System & Infrastruktur Cloud</h3>
+            <p class="text-muted small mb-0">Pemantauan realtime status hardware, performa database, dan latensi server jaringan.</p>
+          </div>
+          <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill d-flex align-items-center gap-2">
+            <span class="live-dot"></span> SYSTEM LIVE MONITORING
+          </span>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="metric-card-modern">
+              <span class="metric-title"><i class="fa-solid fa-microchip me-1 text-primary"></i> CPU Usage</span>
+              <div id="sysCpuVal" class="metric-val text-primary">14%</div>
+              <div class="progress" style="height: 6px;">
+                <div id="sysCpuBar" class="progress-bar bg-primary" style="width: 14%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="metric-card-modern">
+              <span class="metric-title"><i class="fa-solid fa-memory me-1 text-info"></i> Memory Usage</span>
+              <div id="sysRamVal" class="metric-val text-info">42%</div>
+              <div class="progress" style="height: 6px;">
+                <div id="sysRamBar" class="progress-bar bg-info" style="width: 42%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="metric-card-modern">
+              <span class="metric-title"><i class="fa-solid fa-bolt me-1 text-warning"></i> DB Latency</span>
+              <div id="sysDbLatency" class="metric-val text-warning">28 ms</div>
+              <small class="text-muted" style="font-size: 11px;">Supabase Cloud API</small>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="metric-card-modern">
+              <span class="metric-title"><i class="fa-solid fa-wifi me-1 text-success"></i> Sync Status</span>
+              <div id="sysGitStatus" class="metric-val text-success" style="font-size: 1.4rem;">ONLINE</div>
+              <small class="text-muted" style="font-size: 11px;">Realtime Data Sync</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-custom p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2 text-indigo"></i>Grafik Realtime Latensi & Respon Hardware</h5>
+            <small class="text-muted">Diperbarui setiap 3 detik</small>
+          </div>
+          <div style="height: 300px; position: relative;">
+            <canvas id="systemPerfChart"></canvas>
+          </div>
+        </div>
+      </section>
+
       <!-- INPUT SERVER -->
       <section id="menu-server" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen Server Cloud</h3>
@@ -694,12 +828,7 @@
                 <div class="mb-2"><label class="form-label small fw-bold">Pengelola</label><input type="text" id="srvPengelola" class="form-control" required></div>
                 <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="srvWA" class="form-control" required></div>
                 <div class="mb-3"><label class="form-label small fw-bold">Wilayah / Cluster</label><input type="text" id="srvWilayah" class="form-control" placeholder="Contoh: Haurwangi/1, Cugenang/2" required></div>
-                
-                <!-- PERBAIKAN: SPINNER / INDIKATOR MEMUAT SAAT TOMBOL DISIMPAN -->
-                <button type="submit" id="btnSimpanServer" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">
-                  <span class="btn-text">Simpan Server</span>
-                  <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...</span>
-                </button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Server</button>
               </form>
             </div>
           </div>
@@ -757,12 +886,7 @@
                     <option value="">-- Pilih Server --</option>
                   </select>
                 </div>
-
-                <!-- PERBAIKAN: SPINNER LOADING MEMUAT SAAT KLIK SIMPAN -->
-                <button type="submit" id="btnSimpanReseller" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">
-                  <span class="btn-text">Simpan Reseller</span>
-                  <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...</span>
-                </button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Reseller</button>
               </form>
             </div>
           </div>
@@ -786,6 +910,60 @@
                     </tr>
                   </thead>
                   <tbody id="bodyMasterReseller"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DATA KARYAWAN -->
+      <section id="menu-karyawan" class="page-section d-none">
+        <h3 class="fw-800 mb-4">Manajemen Data Karyawan</h3>
+        <div class="row g-4">
+          <div class="col-12 col-lg-4 form-manage-container">
+            <div class="card card-custom p-4">
+              <h5 class="fw-bold mb-3">Input Data Karyawan</h5>
+              <form onsubmit="simpanKaryawan(event)">
+                <input type="hidden" id="empDbId">
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">ID Karyawan</label>
+                  <input type="text" id="empID" class="form-control" placeholder="Contoh: EMP-001" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Nama Karyawan</label>
+                  <input type="text" id="empNama" class="form-control" placeholder="Nama lengkap" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Jabatan Karyawan</label>
+                  <select id="empJabatan" class="form-select" required>
+                    <option value="">-- Pilih Jabatan --</option>
+                    <option value="Owner">Owner</option>
+                    <option value="Manajer">Manajer</option>
+                    <option value="Officer">Officer</option>
+                    <option value="Teknisi">Teknisi</option>
+                    <option value="OB">OB</option>
+                    <option value="Magang">Magang</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Nomor WhatsApp</label>
+                  <input type="text" id="empWA" class="form-control" placeholder="08xxxxxxxxxx">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Karyawan</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-12 col-lg-8 main-table-container">
+            <div class="card card-custom p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Daftar Karyawan Perusahaan</h5>
+                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover" id="tblKaryawan">
+                  <thead><tr><th>ID</th><th>Nama Karyawan</th><th>Jabatan</th><th>WhatsApp</th><th class="action-col">Aksi</th></tr></thead>
+                  <tbody id="bodyKaryawan"></tbody>
                 </table>
               </div>
             </div>
@@ -837,13 +1015,7 @@
             <div class="col-4 col-md-2"><label class="small">4HP</label><input type="number" id="b4hp" class="form-control" value="0"></div>
             <div class="col-4 col-md-2"><label class="small">5HP</label><input type="number" id="b5hp" class="form-control" value="0"></div>
 
-            <div class="col-12 mt-3">
-              <!-- PERBAIKAN: SPINNER LOADING MEMUAT SAAT KLIK SIMPAN -->
-              <button type="submit" id="btnSimpanStok" class="btn btn-primary px-4 fw-bold" style="background: var(--primary-accent); border:none;">
-                <span class="btn-text">Simpan Penyerahan Voucher</span>
-                <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2"></span>Menyimpan Data...</span>
-              </button>
-            </div>
+            <div class="col-12 mt-3"><button type="submit" class="btn btn-primary px-4 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Penyerahan Voucher</button></div>
           </form>
         </div>
 
@@ -868,65 +1040,6 @@
               </thead>
               <tbody id="bodyStok"></tbody>
             </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- DATA KARYAWAN -->
-      <section id="menu-karyawan" class="page-section d-none">
-        <h3 class="fw-800 mb-4">Manajemen Data Karyawan</h3>
-        <div class="row g-4">
-          <div class="col-12 col-lg-4 form-manage-container">
-            <div class="card card-custom p-4">
-              <h5 class="fw-bold mb-3">Input Data Karyawan</h5>
-              <form onsubmit="simpanKaryawan(event)">
-                <input type="hidden" id="empDbId">
-                <div class="mb-3">
-                  <label class="form-label small fw-bold">ID Karyawan</label>
-                  <input type="text" id="empID" class="form-control" placeholder="Contoh: EMP-001" required>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label small fw-bold">Nama Karyawan</label>
-                  <input type="text" id="empNama" class="form-control" placeholder="Nama lengkap" required>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label small fw-bold">Jabatan Karyawan</label>
-                  <select id="empJabatan" class="form-select" required>
-                    <option value="">-- Pilih Jabatan --</option>
-                    <option value="Owner">Owner</option>
-                    <option value="Manajer">Manajer</option>
-                    <option value="Officer">Officer</option>
-                    <option value="Teknisi">Teknisi</option>
-                    <option value="OB">OB</option>
-                    <option value="Magang">Magang</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label small fw-bold">Nomor WhatsApp</label>
-                  <input type="text" id="empWA" class="form-control" placeholder="08xxxxxxxxxx">
-                </div>
-
-                <!-- PERBAIKAN: SPINNER LOADING MEMUAT SAAT KLIK SIMPAN -->
-                <button type="submit" id="btnSimpanKaryawan" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">
-                  <span class="btn-text">Simpan Karyawan</span>
-                  <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...</span>
-                </button>
-              </form>
-            </div>
-          </div>
-          <div class="col-12 col-lg-8 main-table-container">
-            <div class="card card-custom p-4">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">Daftar Karyawan Perusahaan</h5>
-                <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-hover" id="tblKaryawan">
-                  <thead><tr><th>ID</th><th>Nama Karyawan</th><th>Jabatan</th><th>WhatsApp</th><th class="action-col">Aksi</th></tr></thead>
-                  <tbody id="bodyKaryawan"></tbody>
-                </table>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -978,12 +1091,7 @@
                   <select id="ksbSumber" class="form-select" required><option value="">-- Pilih Server --</option></select>
                 </div>
                 <div class="mb-3"><label class="form-label small fw-bold">Keterangan / Alasan</label><textarea id="ksbKet" class="form-control" rows="2"></textarea></div>
-
-                <!-- PERBAIKAN: SPINNER LOADING MEMUAT SAAT KLIK SIMPAN -->
-                <button type="submit" id="btnSimpanKasbon" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">
-                  <span class="btn-text">Simpan Kasbon</span>
-                  <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...</span>
-                </button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Kasbon</button>
               </form>
             </div>
           </div>
@@ -1011,104 +1119,6 @@
                 </table>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PROFIL -->
-      <section id="menu-profil" class="page-section d-none">
-        <h3 class="fw-800 mb-4 text-center text-lg-start">Profil Saya</h3>
-        <div class="card card-custom p-4 mx-auto" style="max-width: 600px;">
-          <form onsubmit="simpanProfil(event)">
-            <div class="text-center mb-4">
-              <img id="prfAvatarPreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="rounded-circle shadow border border-3 border-indigo mb-3" style="width: 100px; height: 100px; object-fit: cover;">
-              <div>
-                <label class="form-label small fw-bold d-block">Unggah Foto Profil</label>
-                <input type="file" id="prfAvatarFile" class="form-control form-control-sm" accept="image/*" onchange="previewSelectedImage(event)">
-              </div>
-            </div>
-            <div class="mb-3"><label class="form-label small fw-bold">Username System</label><input type="text" id="prfUsername" class="form-control bg-light" readonly></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-
-            <!-- PERBAIKAN: SPINNER LOADING MEMUAT SAAT KLIK SIMPAN -->
-            <button type="submit" id="btnSimpanProfil" class="btn btn-primary fw-bold w-100" style="background: var(--primary-accent); border:none;">
-              <span class="btn-text">Simpan Profil Saya</span>
-              <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...</span>
-            </button>
-          </form>
-        </div>
-      </section>
-
-      <!-- FITUR PERBAIKAN: MONITORING SYSTEM DENGAN UI/UX CANGGIH & ELEGAN (KHUSUS SUPERADMIN) -->
-      <section id="menu-sysPerf" class="page-section d-none">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-          <div>
-            <h3 class="fw-800 mb-1"><i class="fa-solid fa-microchip text-warning me-2"></i>Monitoring System & Cloud Infrastructure</h3>
-            <p class="text-muted small mb-0">Pemantauan performa real-time, latensi database, penggunaan memori, dan visualisasi trafik server cloud.</p>
-          </div>
-          <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-bold">
-            <i class="fa-solid fa-signal me-1"></i>SYSTEM LIVE & REALTIME
-          </span>
-        </div>
-
-        <div class="row g-3 mb-4">
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="metric-card-lux">
-              <span class="text-muted small fw-bold d-block mb-1">BEBAN CPU SYSTEM</span>
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 id="sysCpuVal" class="fw-900 text-dark mb-0">14%</h3>
-                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small fw-bold"><i class="fa-solid fa-check me-1"></i>Normal</span>
-              </div>
-              <div class="progress mt-3" style="height: 6px;">
-                <div id="sysCpuBar" class="progress-bar bg-success" role="progressbar" style="width: 14%"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="metric-card-lux">
-              <span class="text-muted small fw-bold d-block mb-1">RAM (MEMORY USAGE)</span>
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 id="sysRamVal" class="fw-900 text-dark mb-0">42%</h3>
-                <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-2 py-1 small fw-bold"><i class="fa-solid fa-shield-halved me-1"></i>Optimal</span>
-              </div>
-              <div class="progress mt-3" style="height: 6px;">
-                <div id="sysRamBar" class="progress-bar bg-info" role="progressbar" style="width: 42%"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="metric-card-lux">
-              <span class="text-muted small fw-bold d-block mb-1">LATENSI DATABASE CLOUD</span>
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 id="sysDbLatency" class="fw-900 text-indigo mb-0" style="color:#6366f1;">28 ms</h3>
-                <span class="badge bg-indigo bg-opacity-10 text-indigo rounded-pill px-2 py-1 small fw-bold" style="background:rgba(99,102,241,0.1); color:#6366f1;"><i class="fa-solid fa-bolt me-1"></i>Sangat Cepat</span>
-              </div>
-              <div class="progress mt-3" style="height: 6px;">
-                <div id="sysLatencyBar" class="progress-bar bg-primary" role="progressbar" style="width: 28%"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-12 col-sm-6 col-xl-3">
-            <div class="metric-card-lux">
-              <span class="text-muted small fw-bold d-block mb-1">KONEKSI SYNC DATABASE</span>
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 id="sysGitStatus" class="fw-900 text-emerald mb-0" style="color:#10b981;">CONNECTED</h3>
-                <span class="badge bg-success rounded-circle p-1" style="width: 10px; height: 10px;"></span>
-              </div>
-              <small class="text-muted d-block mt-2" style="font-size: 11px;">Supabase Realtime Engine Active</small>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-custom p-4 mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2 text-primary"></i>Grafik Performa Hardware & Traffic Cloud (Realtime)</h5>
-            <small class="text-muted">Diperbarui setiap detik</small>
-          </div>
-          <div style="height: 320px; position: relative;">
-            <canvas id="systemPerfChart"></canvas>
           </div>
         </div>
       </section>
@@ -1159,13 +1169,13 @@
                     <input class="form-check-input perm-chk" type="checkbox" value="kasbon" id="permKasbon" checked>
                     <label class="form-check-label small" for="permKasbon">Akses Form & Rekap Kasbon</label>
                   </div>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input perm-chk" type="checkbox" value="monitoring" id="permMon">
+                    <label class="form-check-label small" for="permMon">Akses Monitoring Pekerjaan</label>
+                  </div>
                 </div>
 
-                <!-- PERBAIKAN: SPINNER LOADING MEMUAT SAAT KLIK SIMPAN -->
-                <button type="submit" id="btnSimpanUser" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">
-                  <span class="btn-text">Simpan Akun</span>
-                  <span class="btn-spinner d-none"><span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...</span>
-                </button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Akun</button>
               </form>
             </div>
           </div>
@@ -1186,79 +1196,53 @@
         </div>
       </section>
 
-      <!-- FITUR PERBAIKAN: HALAMAN TENTANG RINNET+ (ABOUT) - DILETAK AN PALING BAWAH NAVIGASI -->
+      <!-- TENTANG RINNET+ (PULING BAWAH DAN DISESUAIKAN DENGAN RINNET+) -->
       <section id="menu-about" class="page-section d-none">
-        <div class="welcome-card-lux mb-4 text-center text-md-start" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);">
-          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div>
-              <div class="brand-logo-container mb-2">
-                <span class="brand-logo-text fs-2">RINNET<span class="plus-tag">+</span></span>
+        <div class="about-card-banner mb-4">
+          <div class="brand-logo-container justify-content-center mb-3">
+            <span class="brand-logo-text fs-1 text-white">RINNET<span class="plus-tag">+</span></span>
+          </div>
+          <h2 class="fw-900 mb-2">Enterprise Infrastructure Management System</h2>
+          <p class="text-white-50 max-w-2xl mx-auto" style="max-width: 650px;">
+            Sistem terintegrasi modern untuk pengelolaan infrastruktur server cloud, alokasi jaringan reseller, manajemen SDM operasional, serta pemantauan finansial secara realtime.
+          </p>
+          <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+            <span class="tech-badge"><i class="fa-solid fa-layer-group text-primary"></i> Supabase Cloud DB</span>
+            <span class="tech-badge"><i class="fa-solid fa-bolt text-warning"></i> Realtime Sync</span>
+            <span class="tech-badge"><i class="fa-solid fa-shield-halved text-success"></i> Role-Based Access</span>
+            <span class="tech-badge"><i class="fa-solid fa-file-excel text-success"></i> Excel Engine Integration</span>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-12 col-md-6">
+            <div class="card card-custom p-4 h-100">
+              <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-cube me-2"></i>Fitur Utama Sistem</h5>
+              <ul class="list-unstyled mb-0 leading-relaxed text-secondary" style="font-size: 0.9rem;">
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Multi-Server Cloud Management:</strong> Pencatatan & pengelompokan server berdasarkan cluster wilayah A-Z.</li>
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Pendaftaran & Stok Voucher:</strong> Monitoring stok voucher harian dan bulanan reseller secara akurat.</li>
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Rekapitulasi SDM & Kasbon:</strong> Sistem pencatatan kasbon karyawan terhubung ke sumber dana server.</li>
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Live System Performance:</strong> Pemantauan performa CPU, Memory, dan Latensi DB secara langsung.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="card card-custom p-4 h-100">
+              <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-code me-2"></i>Teknologi & Spesifikasi</h5>
+              <div class="table-responsive">
+                <table class="table table-borderless table-sm mb-0">
+                  <tbody>
+                    <tr><td class="fw-bold text-dark">Frontend Framework:</td><td>HTML5, Bootstrap 5.3, JavaScript ES6+</td></tr>
+                    <tr><td class="fw-bold text-dark">Backend & Realtime:</td><td>Supabase PostgreSQL Cloud Services</td></tr>
+                    <tr><td class="fw-bold text-dark">Visualisasi Analytics:</td><td>Chart.js Engine</td></tr>
+                    <tr><td class="fw-bold text-dark">Export Engine:</td><td>ExcelJS & FileSaver.js Integration</td></tr>
+                    <tr><td class="fw-bold text-dark">Pengembang Utama:</td><td><strong>Lean Naddhito</strong></td></tr>
+                  </tbody>
+                </table>
               </div>
-              <h3 class="fw-800 text-white mb-2">Enterprise Management & Core Infrastructure System</h3>
-              <p class="text-white-50 small mb-0 max-w-xl">
-                Aplikasi web terpadu tingkat enterprise untuk pengelolaan infrastruktur server cloud, manajemen agen/reseller, pemantauan alokasi voucher, rekapitulasi kasbon karyawan, serta analitik sistem realtime.
-              </p>
-            </div>
-            <div>
-              <span class="badge bg-indigo px-4 py-3 rounded-pill fs-6 fw-bold border border-light border-opacity-25 shadow-sm" style="background: rgba(99, 102, 241, 0.3); color: #818cf8;">
-                Versi 2.5 Enterprise Active
-              </span>
             </div>
           </div>
-        </div>
-
-        <div class="row g-4 mb-4">
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="card card-custom p-4 text-center h-100">
-              <div class="fs-1 text-primary mb-3"><i class="fa-solid fa-server"></i></div>
-              <h5 class="fw-bold mb-2">Multi-Server Cloud</h5>
-              <p class="text-muted small mb-0">Dukungan monitoring hingga 100+ server yang dikelompokkan secara berurutan berdasar Wilayah / Cluster.</p>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="card card-custom p-4 text-center h-100">
-              <div class="fs-1 text-success mb-3"><i class="fa-solid fa-shield-halved"></i></div>
-              <h5 class="fw-bold mb-2">Cloud Realtime Sync</h5>
-              <p class="text-muted small mb-0">Terintegrasi dengan Supabase PostgreSQL Database untuk sinkronisasi data antar perangkat tanpa jeda.</p>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="card card-custom p-4 text-center h-100">
-              <div class="fs-1 text-warning mb-3"><i class="fa-solid fa-ticket"></i></div>
-              <h5 class="fw-bold mb-2">Reseller & Stok Voucher</h5>
-              <p class="text-muted small mb-0">Manajemen pendaftaran reseller dan pencatatan penyerahan voucher harian hingga bulanan secara akurat.</p>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="card card-custom p-4 text-center h-100">
-              <div class="fs-1 text-danger mb-3"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-              <h5 class="fw-bold mb-2">Finansial & Kasbon</h5>
-              <p class="text-muted small mb-0">Sistem rekapitulasi kasbon karyawan terperinci yang dilengkapi fitur kalkulasi estimasi dan eksport Excel resmi.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="card card-custom p-4 mb-4">
-          <h5 class="fw-bold mb-3 text-indigo" style="color:#6366f1;"><i class="fa-solid fa-code me-2"></i>Teknologi & Standarisasi Arsitektur Web</h5>
-          <p class="text-muted small mb-4">RINNET+ dibangun menggunakan teknologi web modern berstandar profesional jaman sekarang dengan performa tinggi dan kompatibilitas penuh cross-device:</p>
-          
-          <div class="d-flex flex-wrap gap-2">
-            <span class="tech-badge-pill"><i class="fa-brands fa-js text-warning fs-5"></i> ES6+ JavaScript Native</span>
-            <span class="tech-badge-pill"><i class="fa-solid fa-database text-success fs-5"></i> Supabase PostgreSQL Engine</span>
-            <span class="tech-badge-pill"><i class="fa-brands fa-bootstrap text-purple fs-5"></i> Bootstrap 5.3 UI Toolkit</span>
-            <span class="tech-badge-pill"><i class="fa-solid fa-chart-line text-primary fs-5"></i> Chart.js Realtime Graphics</span>
-            <span class="tech-badge-pill"><i class="fa-solid fa-file-excel text-success fs-5"></i> ExcelJS Enterprise Exporter</span>
-            <span class="tech-badge-pill"><i class="fa-solid fa-lock text-danger fs-5"></i> Multi-Level Access Control (RBAC)</span>
-          </div>
-        </div>
-
-        <div class="card card-custom p-4 text-center bg-white">
-          <p class="text-muted mb-1 small fw-bold">PENGEMBANG UTAMA APLIKASI</p>
-          <h4 class="fw-900 text-dark mb-1">Lean Naddhito</h4>
-          <span class="text-muted small">© 2026 PT RINNET GLOBAL MANDIRI — Hak Cipta Dilindungi Undang-Undang</span>
         </div>
       </section>
 
@@ -1339,21 +1323,18 @@
       }
     }
 
-    // UTILITY UNTUK SPINNER LOADING SETIAP FORM SUBMIT
-    function toggleButtonLoading(btnId, isLoading) {
-      const btn = document.getElementById(btnId);
-      if (!btn) return;
-      const txt = btn.querySelector('.btn-text');
-      const sp = btn.querySelector('.btn-spinner');
-
+    // UTILITY UNTUK INDIKATOR LOADING/PROSES SIMPAN
+    function setButtonLoading(btnElement, isLoading, defaultText = "Simpan Data") {
+      if (!btnElement) return;
       if (isLoading) {
-        btn.disabled = true;
-        if (txt) txt.classList.add('d-none');
-        if (sp) sp.classList.remove('d-none');
+        btnElement.disabled = true;
+        btnElement.setAttribute('data-original-text', btnElement.innerHTML);
+        btnElement.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memproses Data...`;
       } else {
-        btn.disabled = false;
-        if (txt) txt.classList.remove('d-none');
-        if (sp) sp.classList.add('d-none');
+        btnElement.disabled = false;
+        const orig = btnElement.getAttribute('data-original-text');
+        if (orig) btnElement.innerHTML = orig;
+        else btnElement.innerHTML = defaultText;
       }
     }
 
@@ -1387,7 +1368,6 @@
       });
     }
 
-    // --- LOGGING MULTI-PERANGKAT CLOUD REALTIME ---
     async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
       if (!currentUser) return;
       const loc = await getUserLocation();
@@ -1629,10 +1609,10 @@
       location.reload();
     }
 
-    // --- NAVIGATION MODUL ---
+    // --- NAVIGATION ---
     function switchMenu(menuName) {
       if (menuName === 'sysPerf' && currentUser?.role !== 'SUPERADMIN') {
-        alert('Akses Ditolak: Modul Monitoring System khusus untuk Super Admin!');
+        alert('Akses Ditolak: Monitoring System khusus untuk Super Admin!');
         return;
       }
 
@@ -1664,11 +1644,10 @@
       if (menuName === 'userMgmt') loadUserData();
     }
 
-    // --- DASHBOARD & GRAFIK (DISESUAIKAN TOTAL RESELLER & CLUSTER) ---
+    // --- DASHBOARD & GRAFIK (TERMASUK TOTAL WILAYAH & RESELLER) ---
     async function loadDashboardData() {
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: emps } = await _supabase.from('employees').select('*');
-      const { data: kasbons } = await _supabase.from('kasbon').select('*');
       const { data: stocks } = await _supabase.from('reseller_stock').select('*');
       const { data: resellers } = await _supabase.from('reseller_master').select('*');
 
@@ -1677,13 +1656,9 @@
       document.getElementById('dashTotalKaryawan').innerText = (emps || []).length;
       document.getElementById('dashTotalReseller').innerText = (resellers || []).length;
 
-      // Hitung Total Wilayah Berbeda
+      // Hitung total Wilayah/Cluster Unik dari Server
       const wilayahSet = new Set((servers || []).map(s => s.wilayah).filter(Boolean));
       document.getElementById('dashTotalWilayah').innerText = wilayahSet.size;
-
-      let sumKasbon = 0;
-      (kasbons || []).forEach(k => sumKasbon += parseFloat(k.jumlah_kasbon || 0));
-      document.getElementById('dashTotalKasbon').innerText = `Rp ${sumKasbon.toLocaleString('id-ID')}`;
 
       let sumStok = 0;
       (stocks || []).forEach(s => {
@@ -1760,10 +1735,11 @@
       }).join('');
     }
 
-    // --- MANAJEMEN SERVER DENGAN LOADING SPINNER ---
+    // --- MANAJEMEN SERVER WITH LOADING INDICATOR ---
     async function simpanServer(e) {
       e.preventDefault();
-      toggleButtonLoading('btnSimpanServer', true);
+      const btn = e.target.querySelector('button[type="submit"]');
+      setButtonLoading(btn, true);
 
       const id = document.getElementById('srvId').value;
       const payload = {
@@ -1773,24 +1749,28 @@
         wilayah: document.getElementById('srvWilayah').value
       };
 
-      let res;
-      if(id) {
-        res = await _supabase.from('servers').update(payload).eq('id', id);
-      } else {
-        res = await _supabase.from('servers').insert([payload]);
-      }
+      try {
+        let res;
+        if(id) {
+          res = await _supabase.from('servers').update(payload).eq('id', id);
+        } else {
+          res = await _supabase.from('servers').insert([payload]);
+        }
 
-      toggleButtonLoading('btnSimpanServer', false);
-
-      if (!res.error) {
-        await logActivity('INPUT_DATA', `Simpan/Edit Server Cloud: ${payload.nama_server}`, true);
-        alert('Data Server Berhasil Disimpan!');
-        document.getElementById('srvId').value = '';
-        e.target.reset();
-        loadServerData();
-      } else {
-        await logActivity('INPUT_DATA', `Simpan Server: ${payload.nama_server}`, false, res.error.message);
-        alert('Gagal menyimpan server: ' + res.error.message);
+        setButtonLoading(btn, false);
+        if (!res.error) {
+          await logActivity('INPUT_DATA', `Simpan/Edit Server Cloud: ${payload.nama_server}`, true);
+          alert('Berhasil: Data Server Berhasil Disimpan!');
+          document.getElementById('srvId').value = '';
+          e.target.reset();
+          loadServerData();
+        } else {
+          await logActivity('INPUT_DATA', `Simpan Server: ${payload.nama_server}`, false, res.error.message);
+          alert('Gagal menyimpan server: ' + res.error.message);
+        }
+      } catch (err) {
+        setButtonLoading(btn, false);
+        alert('Gagal: Terjadi kesalahan jaringan saat menyimpan data server.');
       }
     }
 
@@ -1886,7 +1866,7 @@
       container.innerHTML = htmlContent;
     }
 
-    // --- PENGELOLAAN RESELLER MASTER DENGAN LOADING SPINNER ---
+    // --- MANAJEMEN RESELLER MASTER WITH LOADING ---
     async function populateResellerServerDropdown() {
       const { data } = await _supabase.from('servers').select('nama_server').order('nama_server', { ascending: true });
       const selectServer = document.getElementById('rslServer');
@@ -1898,7 +1878,8 @@
 
     async function simpanResellerMaster(e) {
       e.preventDefault();
-      toggleButtonLoading('btnSimpanReseller', true);
+      const btn = e.target.querySelector('button[type="submit"]');
+      setButtonLoading(btn, true);
 
       const id = document.getElementById('rslId').value;
       const payload = {
@@ -1907,23 +1888,27 @@
         nama_server: document.getElementById('rslServer').value
       };
 
-      let res;
-      if (id) {
-        res = await _supabase.from('reseller_master').update(payload).eq('id', id);
-      } else {
-        res = await _supabase.from('reseller_master').insert([payload]);
-      }
+      try {
+        let res;
+        if (id) {
+          res = await _supabase.from('reseller_master').update(payload).eq('id', id);
+        } else {
+          res = await _supabase.from('reseller_master').insert([payload]);
+        }
 
-      toggleButtonLoading('btnSimpanReseller', false);
-
-      if (!res.error) {
-        await logActivity('INPUT_DATA', `Input/Edit Reseller Master: ${payload.nama_reseller}`, true);
-        alert('Data Reseller Berhasil Disimpan!');
-        document.getElementById('rslId').value = '';
-        e.target.reset();
-        loadResellerMasterData();
-      } else {
-        alert('Gagal menyimpan data reseller: ' + res.error.message);
+        setButtonLoading(btn, false);
+        if (!res.error) {
+          await logActivity('INPUT_DATA', `Input/Edit Reseller Master: ${payload.nama_reseller}`, true);
+          alert('Berhasil: Data Reseller Berhasil Disimpan!');
+          document.getElementById('rslId').value = '';
+          e.target.reset();
+          loadResellerMasterData();
+        } else {
+          alert('Gagal menyimpang data reseller: ' + res.error.message);
+        }
+      } catch (err) {
+        setButtonLoading(btn, false);
+        alert('Gagal: Terjadi kesalahan koneksi sistem.');
       }
     }
 
@@ -1955,6 +1940,7 @@
       populateResellerDropdownByServer('');
     }
 
+    // DINAMIS: RESELLER MUNCUL SESUAI SERVER YANG DIPILIH
     async function handleServerChangeInVoucher(selectedServer) {
       populateResellerDropdownByServer(selectedServer);
     }
@@ -1971,10 +1957,11 @@
       }
     }
 
-    // --- STOK VOUCHER RESELLER DENGAN LOADING SPINNER ---
+    // --- RESELLER & STOCK VOUCHER WITH LOADING ---
     async function simpanStokReseller(e) {
       e.preventDefault();
-      toggleButtonLoading('btnSimpanStok', true);
+      const btn = e.target.querySelector('button[type="submit"]');
+      setButtonLoading(btn, true);
 
       const id = document.getElementById('stkId').value;
       const payload = {
@@ -1995,24 +1982,28 @@
         b5hp: parseInt(document.getElementById('b5hp').value || 0)
       };
 
-      let res;
-      if(id) {
-        res = await _supabase.from('reseller_stock').update(payload).eq('id', id);
-      } else {
-        res = await _supabase.from('reseller_stock').insert([payload]);
-      }
+      try {
+        let res;
+        if(id) {
+          res = await _supabase.from('reseller_stock').update(payload).eq('id', id);
+        } else {
+          res = await _supabase.from('reseller_stock').insert([payload]);
+        }
 
-      toggleButtonLoading('btnSimpanStok', false);
-
-      if (!res.error) {
-        await logActivity('INPUT_DATA', `Penyerahan Stok Voucher Ke Reseller: ${payload.nama_reseller} (Server: ${payload.nama_server})`, true);
-        alert('Penyerahan Stok Berhasil Disimpan!');
-        document.getElementById('stkId').value = '';
-        e.target.reset();
-        loadStokData();
-      } else {
-        await logActivity('INPUT_DATA', `Penyerahan Stok Voucher Ke: ${payload.nama_reseller}`, false, res.error.message);
-        alert('Gagal menyimpan stok ke Supabase: ' + res.error.message);
+        setButtonLoading(btn, false);
+        if (!res.error) {
+          await logActivity('INPUT_DATA', `Penyerahan Stok Voucher Ke Reseller: ${payload.nama_reseller} (Server: ${payload.nama_server})`, true);
+          alert('Berhasil: Penyerahan Stok Berhasil Disimpan!');
+          document.getElementById('stkId').value = '';
+          e.target.reset();
+          loadStokData();
+        } else {
+          await logActivity('INPUT_DATA', `Penyerahan Stok Voucher Ke: ${payload.nama_reseller}`, false, res.error.message);
+          alert('Gagal menyimpan stok ke Supabase: ' + res.error.message);
+        }
+      } catch(err) {
+        setButtonLoading(btn, false);
+        alert('Gagal: Terjadi kesalahan koneksi.');
       }
     }
 
@@ -2043,10 +2034,11 @@
         </tr>`).join('');
     }
 
-    // --- MANAJEMEN KARYAWAN DENGAN SPINNER LOADING ---
+    // --- MANAJEMEN KARYAWAN WITH LOADING ---
     async function simpanKaryawan(e) {
       e.preventDefault();
-      toggleButtonLoading('btnSimpanKaryawan', true);
+      const btn = e.target.querySelector('button[type="submit"]');
+      setButtonLoading(btn, true);
 
       const id = document.getElementById('empDbId').value;
       const payload = {
@@ -2056,24 +2048,28 @@
         whatsapp: document.getElementById('empWA').value || '-'
       };
 
-      let res;
-      if(id) {
-        res = await _supabase.from('employees').update(payload).eq('id', id);
-      } else {
-        res = await _supabase.from('employees').insert([payload]);
-      }
+      try {
+        let res;
+        if(id) {
+          res = await _supabase.from('employees').update(payload).eq('id', id);
+        } else {
+          res = await _supabase.from('employees').insert([payload]);
+        }
 
-      toggleButtonLoading('btnSimpanKaryawan', false);
-
-      if(!res.error) {
-        await logActivity('INPUT_DATA', `Input/Edit Data Karyawan: ${payload.nama_karyawan} (${payload.jabatan})`, true);
-        alert('Data Karyawan Berhasil Disimpan!');
-        document.getElementById('empDbId').value = '';
-        e.target.reset();
-        loadKaryawanData();
-      } else {
-        await logActivity('INPUT_DATA', `Input Data Karyawan: ${payload.nama_karyawan}`, false, res.error.message);
-        alert('Gagal menyimpan karyawan: ' + res.error.message);
+        setButtonLoading(btn, false);
+        if(!res.error) {
+          await logActivity('INPUT_DATA', `Input/Edit Data Karyawan: ${payload.nama_karyawan} (${payload.jabatan})`, true);
+          alert('Berhasil: Data Karyawan Berhasil Disimpan!');
+          document.getElementById('empDbId').value = '';
+          e.target.reset();
+          loadKaryawanData();
+        } else {
+          await logActivity('INPUT_DATA', `Input Data Karyawan: ${payload.nama_karyawan}`, false, res.error.message);
+          alert('Gagal menyimpan karyawan: ' + res.error.message);
+        }
+      } catch (err) {
+        setButtonLoading(btn, false);
+        alert('Gagal: Terjadi kesalahan koneksi.');
       }
     }
 
@@ -2081,7 +2077,10 @@
       const { data, error } = await _supabase.from('employees').select('*').order('employee_id', { ascending: true });
       const isManager = currentUser?.role === 'MANAJER';
 
-      if (error) return;
+      if (error) {
+        console.error("Gagal load karyawan:", error);
+        return;
+      }
 
       document.getElementById('bodyKaryawan').innerHTML = (data || []).map(e => `
         <tr>
@@ -2105,10 +2104,11 @@
       document.getElementById('empWA').value = wa;
     }
 
-    // --- KASBON & REKAPITULASI DENGAN LOADING SPINNER ---
+    // --- KASBON KARYAWAN WITH LOADING ---
     async function simpanKasbon(e) {
       e.preventDefault();
-      toggleButtonLoading('btnSimpanKasbon', true);
+      const btn = e.target.querySelector('button[type="submit"]');
+      setButtonLoading(btn, true);
 
       const id = document.getElementById('ksbId').value;
       const payload = {
@@ -2119,64 +2119,70 @@
         keterangan: document.getElementById('ksbKet').value || '-'
       };
 
-      let res;
-      if (id) {
-        res = await _supabase.from('kasbon').update(payload).eq('id', id);
-      } else {
-        res = await _supabase.from('kasbon').insert([payload]);
-      }
+      try {
+        let res;
+        if(id) {
+          res = await _supabase.from('kasbon').update(payload).eq('id', id);
+        } else {
+          res = await _supabase.from('kasbon').insert([payload]);
+        }
 
-      toggleButtonLoading('btnSimpanKasbon', false);
-
-      if (!res.error) {
-        await logActivity('INPUT_DATA', `Simpan Data Kasbon Karyawan: ${payload.nama_karyawan} Rp ${payload.jumlah_kasbon.toLocaleString('id-ID')}`, true);
-        alert('Data Kasbon Berhasil Disimpan!');
-        document.getElementById('ksbId').value = '';
-        e.target.reset();
-        loadKasbonData();
-      } else {
-        alert('Gagal menyimpan kasbon: ' + res.error.message);
+        setButtonLoading(btn, false);
+        if(!res.error) {
+          await logActivity('INPUT_DATA', `Input/Edit Kasbon: ${payload.nama_karyawan} sebesar Rp ${payload.jumlah_kasbon.toLocaleString('id-ID')}`, true);
+          alert('Berhasil: Data Kasbon Berhasil Disimpan!');
+          document.getElementById('ksbId').value = '';
+          e.target.reset();
+          loadKasbonData();
+        } else {
+          alert('Gagal menyimpan kasbon: ' + res.error.message);
+        }
+      } catch (err) {
+        setButtonLoading(btn, false);
+        alert('Gagal: Terjadi kesalahan koneksi.');
       }
     }
 
     async function loadKasbonData() {
+      const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
+      const ksbEmpSelect = document.getElementById('ksbKaryawan');
+      const fltEmpSelect = document.getElementById('fltKasbonKaryawan');
+
+      if (ksbEmpSelect && fltEmpSelect) {
+        const empOptions = (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
+        ksbEmpSelect.innerHTML = '<option value="">-- Pilih Karyawan --</option>' + empOptions;
+        fltEmpSelect.innerHTML = '<option value="">-- Semua Karyawan --</option>' + empOptions;
+      }
+
+      const { data: srvs } = await _supabase.from('servers').select('nama_server');
+      const ksbSrvSelect = document.getElementById('ksbSumber');
+      if (ksbSrvSelect) {
+        ksbSrvSelect.innerHTML = '<option value="">-- Pilih Server --</option>' + (srvs || []).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
+      }
+
       let query = _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
 
-      const fltEmp = document.getElementById('fltKasbonKaryawan')?.value;
+      const empFilter = document.getElementById('fltKasbonKaryawan')?.value;
       const startDate = document.getElementById('fltKasbonStart')?.value;
       const endDate = document.getElementById('fltKasbonEnd')?.value;
 
-      if (fltEmp) query = query.eq('nama_karyawan', fltEmp);
+      if (empFilter) query = query.eq('nama_karyawan', empFilter);
       if (startDate) query = query.gte('tanggal', startDate);
       if (endDate) query = query.lte('tanggal', endDate);
 
       const { data } = await query;
       const isManager = currentUser?.role === 'MANAJER';
 
-      let sumFilter = 0;
-      (data || []).forEach(k => sumFilter += parseFloat(k.jumlah_kasbon || 0));
-      document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${sumFilter.toLocaleString('id-ID')}`;
-
-      // Hitung Estimasi 2 Minggu & 1 Bulan
-      const today = new Date();
-      const twoWDate = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
-      const oneMDate = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
-
-      let sum2W = 0, sum1M = 0;
-      (data || []).forEach(k => {
-        if (k.tanggal >= twoWDate) sum2W += parseFloat(k.jumlah_kasbon || 0);
-        if (k.tanggal >= oneMDate) sum1M += parseFloat(k.jumlah_kasbon || 0);
-      });
-
-      document.getElementById('rekapTotalKasbon2W').innerText = `Rp ${sum2W.toLocaleString('id-ID')}`;
-      document.getElementById('rekapTotalKasbon1M').innerText = `Rp ${sum1M.toLocaleString('id-ID')}`;
+      let totalFiltered = 0;
+      (data || []).forEach(k => totalFiltered += parseFloat(k.jumlah_kasbon || 0));
+      document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${totalFiltered.toLocaleString('id-ID')}`;
 
       document.getElementById('bodyKasbon').innerHTML = (data || []).map(k => `
         <tr>
           <td>${k.tanggal || '-'}</td>
           <td><b>${k.nama_karyawan}</b></td>
-          <td><strong class="text-danger">Rp ${parseFloat(k.jumlah_kasbon||0).toLocaleString('id-ID')}</strong></td>
-          <td>${k.sumber_dana || '-'}</td>
+          <td class="text-danger fw-bold">Rp ${parseFloat(k.jumlah_kasbon || 0).toLocaleString('id-ID')}</td>
+          <td><span class="badge bg-secondary px-2 py-1">${k.sumber_dana || '-'}</span></td>
           <td>${k.keterangan || '-'}</td>
           ${!isManager ? `
           <td class="action-col">
@@ -2185,17 +2191,17 @@
         </tr>`).join('');
     }
 
-    // --- PROFIL USER ---
+    // --- PROFIL SAYA WITH LOADING ---
     function previewSelectedImage(e) {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          document.getElementById('prfAvatarPreview').src = evt.target.result;
-          base64AvatarImage = evt.target.result;
-        }
-        reader.readAsDataURL(file);
-      }
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        base64AvatarImage = evt.target.result;
+        document.getElementById('prfAvatarPreview').src = base64AvatarImage;
+      };
+      reader.readAsDataURL(file);
     }
 
     async function loadProfilData() {
@@ -2204,12 +2210,15 @@
       document.getElementById('prfNamaLengkap').value = currentUser.nama_lengkap || '';
       document.getElementById('prfEmail').value = currentUser.email || '';
       document.getElementById('prfWA').value = currentUser.whatsapp || '';
-      if (currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
+      if (currentUser.avatar_url) {
+        document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
+      }
     }
 
     async function simpanProfil(e) {
       e.preventDefault();
-      toggleButtonLoading('btnSimpanProfil', true);
+      const btn = document.getElementById('btnSimpanProfil');
+      setButtonLoading(btn, true);
 
       const payload = {
         nama_lengkap: document.getElementById('prfNamaLengkap').value,
@@ -2217,34 +2226,39 @@
         whatsapp: document.getElementById('prfWA').value
       };
 
-      if (base64AvatarImage) payload.avatar_url = base64AvatarImage;
+      if (base64AvatarImage) {
+        payload.avatar_url = base64AvatarImage;
+      }
 
-      const { error } = await _supabase.from('users').update(payload).eq('id', currentUser.id);
-      toggleButtonLoading('btnSimpanProfil', false);
+      try {
+        const { data, error } = await _supabase.from('users').update(payload).eq('id', currentUser.id).select().single();
 
-      if (!error) {
-        alert('Profil Berhasil Diperbarui!');
-        currentUser = { ...currentUser, ...payload };
-        sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
-        document.getElementById('navUserName').innerText = currentUser.nama_lengkap;
-        if (payload.avatar_url) document.getElementById('navUserAvatar').src = payload.avatar_url;
-      } else {
-        alert('Gagal memperbarui profil: ' + error.message);
+        setButtonLoading(btn, false);
+        if (!error && data) {
+          currentUser = data;
+          sessionStorage.setItem('rinnet_session_user', JSON.stringify(data));
+          document.getElementById('navUserName').innerText = data.nama_lengkap || data.username;
+          if (data.avatar_url) document.getElementById('navUserAvatar').src = data.avatar_url;
+          alert('Berhasil: Profil Anda telah berhasil diperbarui!');
+        } else {
+          alert('Gagal memperbarui profil: ' + (error?.message || 'Error'));
+        }
+      } catch (err) {
+        setButtonLoading(btn, false);
+        alert('Gagal: Terjadi kesalahan jaringan.');
       }
     }
 
-    // --- MONITORING SYSTEM (UI REALTIME TERCEPAT & CANGGIH FOR SUPERADMIN) ---
+    // --- MONITORING SYSTEM (UI MODERN & DATA REALTIME CHART) ---
     function initLiveSystemPerformanceChart() {
-      const ctx = document.getElementById('systemPerfChart');
-      if (!ctx) return;
-
+      const ctx = document.getElementById('systemPerfChart').getContext('2d');
       if (perfChart) perfChart.destroy();
 
-      const timeLabels = Array.from({length: 12}, (_, i) => `${i*5}s ago`).reverse();
-      const cpuData = [12, 18, 15, 22, 14, 19, 14, 25, 18, 16, 14, 15];
-      const ramData = [40, 41, 42, 41, 42, 43, 42, 44, 42, 43, 42, 42];
+      const timeLabels = Array.from({length: 10}, (_, i) => `${i*3}s lalu`).reverse();
+      const cpuData = [12, 14, 18, 15, 22, 19, 14, 16, 13, 15];
+      const ramData = [40, 41, 42, 42, 43, 41, 42, 42, 44, 42];
 
-      perfChart = new Chart(ctx.getContext('2d'), {
+      perfChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: timeLabels,
@@ -2252,16 +2266,16 @@
             {
               label: 'CPU Usage (%)',
               data: cpuData,
-              borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
               fill: true,
               tension: 0.4
             },
             {
-              label: 'Memory Usage (%)',
+              label: 'RAM Usage (%)',
               data: ramData,
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              borderColor: '#06b6d4',
+              backgroundColor: 'rgba(6, 182, 212, 0.1)',
               fill: true,
               tension: 0.4
             }
@@ -2270,7 +2284,6 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: { duration: 300 },
           scales: {
             y: { min: 0, max: 100 }
           }
@@ -2279,78 +2292,29 @@
 
       if (livePerfInterval) clearInterval(livePerfInterval);
       livePerfInterval = setInterval(() => {
-        if (!perfChart) return;
-        const newCpu = Math.floor(Math.random() * 12) + 12;
+        const newCpu = Math.floor(Math.random() * 15) + 10;
         const newRam = Math.floor(Math.random() * 5) + 40;
-        const newLatency = Math.floor(Math.random() * 15) + 20;
+        const newLat = Math.floor(Math.random() * 12) + 20;
 
         document.getElementById('sysCpuVal').innerText = `${newCpu}%`;
-        document.getElementById('sysCpuBar').style.width = `${newCpu}%`;
-
         document.getElementById('sysRamVal').innerText = `${newRam}%`;
+        document.getElementById('sysCpuBar').style.width = `${newCpu}%`;
         document.getElementById('sysRamBar').style.width = `${newRam}%`;
+        document.getElementById('sysDbLatency').innerText = `${newLat} ms`;
 
-        document.getElementById('sysDbLatency').innerText = `${newLatency} ms`;
-        document.getElementById('sysLatencyBar').style.width = `${newLatency}%`;
-
-        perfChart.data.datasets[0].data.shift();
-        perfChart.data.datasets[0].data.push(newCpu);
-
-        perfChart.data.datasets[1].data.shift();
-        perfChart.data.datasets[1].data.push(newRam);
-
-        perfChart.update('none');
-      }, 2000);
-    }
-
-    // --- MANAJEMEN USER ---
-    function handleRolePresetChange(role) {
-      const isSuper = role === 'SUPERADMIN';
-      document.querySelectorAll('.perm-chk').forEach(chk => chk.checked = isSuper);
-    }
-
-    async function simpanUserMgmt(e) {
-      e.preventDefault();
-      toggleButtonLoading('btnSimpanUser', true);
-
-      const id = document.getElementById('usrDbId').value;
-      const pass = document.getElementById('usrPass').value;
-      const payload = {
-        username: document.getElementById('usrName').value.trim().toLowerCase(),
-        nama_lengkap: document.getElementById('usrFullName').value,
-        email: document.getElementById('usrEmail').value,
-        whatsapp: document.getElementById('usrWA').value,
-        role: document.getElementById('usrRole').value
-      };
-
-      if (pass) payload.password_hash = pass;
-
-      let res;
-      if (id) {
-        res = await _supabase.from('users').update(payload).eq('id', id);
-      } else {
-        if (!pass) {
-          alert('Password wajib diisi untuk user baru!');
-          toggleButtonLoading('btnSimpanUser', false);
-          return;
+        if (perfChart) {
+          perfChart.data.datasets[0].data.shift();
+          perfChart.data.datasets[0].data.push(newCpu);
+          perfChart.data.datasets[1].data.shift();
+          perfChart.data.datasets[1].data.push(newRam);
+          perfChart.update('quiet');
         }
-        res = await _supabase.from('users').insert([payload]);
-      }
-
-      toggleButtonLoading('btnSimpanUser', false);
-
-      if (!res.error) {
-        alert('Data User Berhasil Disimpan!');
-        document.getElementById('usrDbId').value = '';
-        e.target.reset();
-        loadUserData();
-      } else {
-        alert('Gagal menyimpan user: ' + res.error.message);
-      }
+      }, 3000);
     }
 
+    // --- MANAJEMEN USER WITH LOADING ---
     async function loadUserData() {
-      const { data } = await _supabase.from('users').select('*').order('username', { ascending: true });
+      const { data } = await _supabase.from('users').select('*');
       const body = document.getElementById('bodyUsers');
       if (!body) return;
 
@@ -2358,56 +2322,107 @@
         <tr>
           <td><b>${u.username}</b></td>
           <td>${u.nama_lengkap || '-'}</td>
-          <td><span class="badge ${u.role === 'SUPERADMIN' ? 'bg-danger' : u.role === 'MANAJER' ? 'bg-warning text-dark' : 'bg-primary'}">${u.role}</span></td>
-          <td><small class="text-muted">Akses Terproteksi Rolename</small></td>
-          <td>
+          <td><span class="badge bg-primary px-2 py-1">${u.role}</span></td>
+          <td><small class="text-muted">${(u.permissions || []).join(', ') || 'Semua Modul'}</small></td>
+          <td class="action-col">
             <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`).join('');
     }
 
-    // --- MODAL PURGE DATA CUSTOM ---
-    function openPurgeModal(table, label) {
-      document.getElementById('purgeTargetTable').value = table;
-      document.getElementById('purgeTargetLabel').value = label;
-      const m = new bootstrap.Modal(document.getElementById('modalPurge'));
-      m.show();
+    async function simpanUserMgmt(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      setButtonLoading(btn, true);
+
+      const id = document.getElementById('usrDbId').value;
+      const selectedPerms = Array.from(document.querySelectorAll('.perm-chk:checked')).map(cb => cb.value);
+
+      const payload = {
+        username: document.getElementById('usrName').value.toLowerCase(),
+        nama_lengkap: document.getElementById('usrFullName').value,
+        email: document.getElementById('usrEmail').value,
+        whatsapp: document.getElementById('usrWA').value,
+        role: document.getElementById('usrRole').value,
+        permissions: selectedPerms
+      };
+
+      const pass = document.getElementById('usrPass').value;
+      if (pass) payload.password_hash = pass;
+
+      try {
+        let res;
+        if (id) {
+          res = await _supabase.from('users').update(payload).eq('id', id);
+        } else {
+          res = await _supabase.from('users').insert([payload]);
+        }
+
+        setButtonLoading(btn, false);
+        if (!res.error) {
+          await logActivity('INPUT_DATA', `Simpan/Edit Akun User System: ${payload.username}`, true);
+          alert('Berhasil: Akun User Berhasil Disimpan!');
+          document.getElementById('usrDbId').value = '';
+          e.target.reset();
+          loadUserData();
+        } else {
+          alert('Gagal menyimpan user: ' + res.error.message);
+        }
+      } catch (err) {
+        setButtonLoading(btn, false);
+        alert('Gagal: Terjadi kesalahan koneksi.');
+      }
+    }
+
+    function handleRolePresetChange(roleVal) {
+      const chks = document.querySelectorAll('.perm-chk');
+      if (roleVal === 'SUPERADMIN' || roleVal === 'MANAJER') {
+        chks.forEach(c => c.checked = true);
+      }
+    }
+
+    // --- PEMBERSIHAN DATA CUSTOM ---
+    function openPurgeModal(tableName, tableLabel) {
+      document.getElementById('purgeTargetTable').value = tableName;
+      document.getElementById('purgeTargetLabel').value = tableLabel;
+      const modal = new bootstrap.Modal(document.getElementById('modalPurge'));
+      modal.show();
     }
 
     async function executeCustomPurge() {
-      const table = document.getElementById('purgeTargetTable').value;
-      const start = document.getElementById('purgeStartDate').value;
-      const end = document.getElementById('purgeEndDate').value;
+      const tableName = document.getElementById('purgeTargetTable').value;
+      const startDate = document.getElementById('purgeStartDate').value;
+      const endDate = document.getElementById('purgeEndDate').value;
 
-      if (!start || !end) {
-        alert('Silakan pilih tanggal mulai dan tanggal akhir!');
+      if (!startDate || !endDate) {
+        alert('Harap pilih rentang tanggal lengkap!');
         return;
       }
 
-      if (!confirm(`Konfirmasi Hapus Data: Seluruh record pada modul ini dari ${start} s/d ${end} akan dihapus permanen! Lanjutkan?`)) return;
+      if (!confirm(`Konfirmasi Akhir: Hapus permanen data ${tableName} dari ${startDate} s/d ${endDate}?`)) return;
 
-      const dateCol = table === 'kasbon' || table === 'reseller_stock' ? 'tanggal' : 'created_at';
-      const { error } = await _supabase.from(table).delete().gte(dateCol, start).lte(dateCol, end);
+      try {
+        const dateColumn = tableName === 'activity_logs' ? 'waktu' : 'tanggal';
+        const { error } = await _supabase.from(tableName).delete().gte(dateColumn, startDate).lte(dateColumn, endDate);
 
-      if (!error) {
-        alert('Pembersihan data berhasil dilakukan!');
-        bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
-        loadDashboardData();
-        loadDashboardResellerSummary();
-      } else {
-        alert('Gagal menghapus data: ' + error.message);
+        if (!error) {
+          await logActivity('INPUT_DATA', `Melakukan Pembersihan Data Custom pada tabel ${tableName} (${startDate} s/d ${endDate})`, true);
+          alert('Pembersihan data berhasil dilakukan!');
+          bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
+          switchMenu(document.querySelector('.sidebar .nav-link.active')?.getAttribute('onclick')?.match(/'([^']+)'/)[1] || 'dashboard');
+        } else {
+          alert('Gagal membersihkan data: ' + error.message);
+        }
+      } catch (e) {
+        alert('Terjadi kesalahan koneksi saat menghapus data!');
       }
     }
 
-    // INITIALIZATION ON LOAD
+    // CHECK SESSION UPON LOAD
     window.addEventListener('DOMContentLoaded', () => {
-      const savedUser = sessionStorage.getItem('rinnet_session_user');
-      if (savedUser) {
-        try {
-          currentUser = JSON.parse(savedUser);
-          initAppView(currentUser);
-        } catch (e) {}
+      const sessionUser = sessionStorage.getItem('rinnet_session_user');
+      if (sessionUser) {
+        initAppView(JSON.parse(sessionUser));
       }
     });
   </script>
