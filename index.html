@@ -30,7 +30,6 @@
       --text-main: #1e1b4b;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
-      --gold-gradient: linear-gradient(135deg, #f39c12 0%, #f1c40f 50%, #e67e22 100%);
     }
 
     body { 
@@ -415,16 +414,13 @@
       <div class="sidebar-menu">
         <a class="nav-link active" href="#" onclick="switchMenu('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard</a>
         <a class="nav-link" href="#" onclick="switchMenu('server')"><i class="fa-solid fa-server"></i>Input Server</a>
-        <!-- PERBAIKAN REVISI 3: Navigasi Halaman Pengelolaan Server per Wilayah -->
         <a class="nav-link" href="#" onclick="switchMenu('serverWilayah')"><i class="fa-solid fa-network-wired text-cyan"></i>Server per Wilayah</a>
-        <!-- PERBAIKAN REVISI 4: Navigasi Halaman Input Data Reseller -->
         <a class="nav-link" href="#" onclick="switchMenu('inputReseller')"><i class="fa-solid fa-user-plus text-warning"></i>Input Data Reseller</a>
         <a class="nav-link" href="#" onclick="switchMenu('reseller')"><i class="fa-solid fa-box-archive"></i>Pendaftaran & Stok Voucher</a>
         <a class="nav-link" href="#" onclick="switchMenu('karyawan')"><i class="fa-solid fa-user-group"></i>Data Karyawan</a>
         <a class="nav-link" href="#" onclick="switchMenu('kasbon')"><i class="fa-solid fa-hand-holding-dollar"></i>Form & Rekap Kasbon</a>
         <a class="nav-link" href="#" onclick="switchMenu('profil')"><i class="fa-solid fa-user-gear"></i>Profil Saya</a>
-        <!-- PERBAIKAN REVISI 7: Menu Monitoring khusus Super Admin (Admin & Manager disembunyikan total) -->
-        <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('monitoring')"><i class="fa-solid fa-clock-rotate-left text-info"></i>Monitoring Aktivitas</a>
+        <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('monitoring')"><i class="fa-solid fa-clock-rotate-left text-info"></i>Monitoring Pekerjaan</a>
         <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('userMgmt')"><i class="fa-solid fa-users-gear"></i>Manajemen User</a>
         <a class="nav-link superadmin-only d-none" href="#" onclick="switchMenu('sysPerf')"><i class="fa-solid fa-microchip text-warning"></i>Monitoring System</a>
         <a class="nav-link text-danger mt-3" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i>Keluar</a>
@@ -476,7 +472,7 @@
           </button>
         </div>
 
-        <!-- AKSES CEPAT -->
+        <!-- AKSES CEPAT (TERMASUK SERVER PER WILAYAH) -->
         <div class="mb-4">
           <h6 class="fw-bold text-uppercase text-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.8px;">
             <i class="fa-solid fa-bolt text-warning me-1"></i>Akses Cepat Modul Navigasi
@@ -484,19 +480,32 @@
           <div class="row g-3">
             <div class="col-6 col-md-4 col-xl-2">
               <div class="quick-access-card" onclick="switchMenu('server')">
-                <div class="quick-icon-box bg-indigo bg-opacity-10 text-indigo" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                <div class="quick-icon-box" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
                   <i class="fa-solid fa-server"></i>
                 </div>
                 <div>
                   <h6 class="fw-bold mb-0 text-dark fs-6">Server</h6>
-                  <small class="text-muted d-block" style="font-size: 11px;">Kelola Data</small>
+                  <small class="text-muted d-block" style="font-size: 11px;">Input Data</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- FITUR PERBAIKAN: NAVIGASI KE SERVER PER WILAYAH -->
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="quick-access-card" onclick="switchMenu('serverWilayah')">
+                <div class="quick-icon-box" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
+                  <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-dark fs-6">Wilayah</h6>
+                  <small class="text-muted d-block" style="font-size: 11px;">Server per Cluster</small>
                 </div>
               </div>
             </div>
 
             <div class="col-6 col-md-4 col-xl-2">
               <div class="quick-access-card" onclick="switchMenu('reseller')">
-                <div class="quick-icon-box bg-success bg-opacity-10 text-success" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <div class="quick-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
                   <i class="fa-solid fa-ticket"></i>
                 </div>
                 <div>
@@ -508,7 +517,7 @@
 
             <div class="col-6 col-md-4 col-xl-2">
               <div class="quick-access-card" onclick="switchMenu('karyawan')">
-                <div class="quick-icon-box bg-dark bg-opacity-10 text-dark" style="background: rgba(15, 23, 42, 0.1); color: #0f172a;">
+                <div class="quick-icon-box" style="background: rgba(15, 23, 42, 0.1); color: #0f172a;">
                   <i class="fa-solid fa-user-group"></i>
                 </div>
                 <div>
@@ -520,7 +529,7 @@
 
             <div class="col-6 col-md-4 col-xl-2">
               <div class="quick-access-card" onclick="switchMenu('kasbon')">
-                <div class="quick-icon-box bg-danger bg-opacity-10 text-danger" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e;">
+                <div class="quick-icon-box" style="background: rgba(244, 63, 94, 0.1); color: #f43f5e;">
                   <i class="fa-solid fa-hand-holding-dollar"></i>
                 </div>
                 <div>
@@ -532,24 +541,12 @@
 
             <div class="col-6 col-md-4 col-xl-2 superadmin-only d-none">
               <div class="quick-access-card" onclick="switchMenu('monitoring')">
-                <div class="quick-icon-box bg-info bg-opacity-10 text-info" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
+                <div class="quick-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
                   <i class="fa-solid fa-clock-rotate-left"></i>
                 </div>
                 <div>
                   <h6 class="fw-bold mb-0 text-dark fs-6">Monitoring</h6>
-                  <small class="text-muted d-block" style="font-size: 11px;">Log Aktivitas</small>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-6 col-md-4 col-xl-2">
-              <div class="quick-access-card" onclick="switchMenu('profil')">
-                <div class="quick-icon-box bg-warning bg-opacity-10 text-warning" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                  <i class="fa-solid fa-user-gear"></i>
-                </div>
-                <div>
-                  <h6 class="fw-bold mb-0 text-dark fs-6">Profil Saya</h6>
-                  <small class="text-muted d-block" style="font-size: 11px;">Pengaturan</small>
+                  <small class="text-muted d-block" style="font-size: 11px;">Aktivitas Pekerjaan</small>
                 </div>
               </div>
             </div>
@@ -650,7 +647,7 @@
                 <div class="mb-2"><label class="form-label small fw-bold">Nama Server</label><input type="text" id="srvNama" class="form-control" required></div>
                 <div class="mb-2"><label class="form-label small fw-bold">Pengelola</label><input type="text" id="srvPengelola" class="form-control" required></div>
                 <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="srvWA" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label small fw-bold">Wilayah / Cluster</label><input type="text" id="srvWilayah" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Wilayah / Cluster</label><input type="text" id="srvWilayah" class="form-control" placeholder="Contoh: Haurwangi/1, Cugenang/2" required></div>
                 <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Server</button>
               </form>
             </div>
@@ -672,12 +669,12 @@
         </div>
       </section>
 
-      <!-- PERBAIKAN REVISI 3: HALAMAN PENGELOLAAN DATA SERVER PER WILAYAH / CLUSTER -->
+      <!-- PENGELOLAAN DATA SERVER PER WILAYAH / CLUSTER -->
       <section id="menu-serverWilayah" class="page-section d-none">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
           <div>
             <h3 class="fw-800 mb-1">Pengelolaan Data Server per Wilayah / Cluster</h3>
-            <p class="text-muted small mb-0">Tabel terpisah berdasarkan wilayah/cluster lengkap beserta nama pengelola & nomor WhatsApp.</p>
+            <p class="text-muted small mb-0">Tabel terpisah diurutkan berurutan per wilayah/cluster dan nama server A–Z.</p>
           </div>
           <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('containerServerWilayah', 'Data_Server_Per_Wilayah')">
             <i class="fa-solid fa-file-excel me-1"></i>Export Excel
@@ -686,7 +683,7 @@
         <div id="containerServerWilayah"></div>
       </section>
 
-      <!-- PERBAIKAN REVISI 4: HALAMAN INPUT DATA RESELLER -->
+      <!-- INPUT DATA RESELLER -->
       <section id="menu-inputReseller" class="page-section d-none">
         <h3 class="fw-800 mb-4">Pengelolaan & Data Master Reseller</h3>
         <div class="row g-4">
@@ -760,7 +757,6 @@
                 <option value="">-- Pilih Server --</option>
               </select>
             </div>
-            <!-- PERBAIKAN REVISI 4: Dropdown Reseller diambil langsung dari Data Master Reseller -->
             <div class="col-12 col-md-3">
               <label class="form-label small fw-bold">Nama Reseller</label>
               <select id="stkReseller" class="form-select" required>
@@ -792,7 +788,6 @@
         <div class="card card-custom p-4">
           <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
             <h5 class="fw-bold mb-0">Rekapan Pendaftaran Reseller & Stock Voucher</h5>
-            <!-- PERBAIKAN REVISI 2: Filter Rekapan tanggal-bulan-tahun s/d tanggal-bulan-tahun -->
             <div class="d-flex gap-2 align-items-center flex-wrap">
               <input type="date" id="filterStokStart" class="form-control form-control-sm" style="width: auto;" onchange="loadStokData()">
               <span class="small fw-bold">s/d</span>
@@ -928,7 +923,6 @@
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKasbon', 'Rekapan_Kasbon_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Format Excel</button>
               </div>
 
-              <!-- PERBAIKAN REVISI 2: Filter Rekapan tanggal-bulan-tahun s/d tanggal-bulan-tahun -->
               <div class="row g-2 mb-3 bg-light p-3 rounded-3">
                 <div class="col-12 col-sm-4">
                   <label class="small fw-bold">Filter Karyawan</label>
@@ -970,47 +964,63 @@
         </div>
       </section>
 
-      <!-- MONITORING AKTIVITAS PEKERJAAN (KHUSUS SUPER ADMIN) -->
+      <!-- FITUR PERBAIKAN: MONITORING REALTIME SELURUH PEKERJAAN ATAU AKTIVITAS WEB APLIKASI / SISTEM RINNET+ -->
       <section id="menu-monitoring" class="page-section d-none">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-1 gap-2">
-          <h3 class="fw-800 mb-0">Monitoring Aktivitas Admin (Realtime & Multi-Perangkat)</h3>
+          <h3 class="fw-800 mb-0">Monitoring Realtime Pekerjaan & Aktivitas System RINNET+</h3>
           <div class="d-flex gap-2">
             <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" onclick="openPurgeModal('activity_logs', 'Monitoring Aktivitas Log')">
-              <i class="fa-solid fa-broom me-1"></i>Pembersihan Custom
+              <i class="fa-solid fa-broom me-1"></i>Pembersihan Log
             </button>
           </div>
         </div>
-        <p class="text-muted small mb-4">Pemantauan log aktivitas pekerjaan admin dari seluruh perangkat/HP secara realtime terintegrasi Supabase Cloud.</p>
+        <p class="text-muted small mb-4">Pemantauan realtime seluruh pekerjaan dan aktivitas pengguna (Super Admin, Admin, Manajer) dari seluruh perangkat & HP.</p>
 
         <div class="card card-custom p-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-info"></i>Monitoring Pekerjaan Admin</h5>
-            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMonitoring', 'Monitoring_Aktivitas_Pekerjaan')">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-info"></i>Log Pekerjaan & Aktivitas Realtime</h5>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMonitoring', 'Monitoring_Pekerjaan_Realtime')">
               <i class="fa-solid fa-file-excel me-1"></i>Export Excel
             </button>
           </div>
 
           <div class="row g-2 mb-3 bg-light p-3 rounded-3">
-            <div class="col-12 col-sm-6"><label class="small fw-bold">Tanggal Aktivitas</label><input type="date" id="fltLogDate" class="form-control form-control-sm" onchange="loadMonitoringData()"></div>
-            <div class="col-12 col-sm-6">
-              <label class="small fw-bold">Tipe Aktivitas</label>
+            <div class="col-12 col-md-3">
+              <label class="small fw-bold">Tanggal Aktivitas</label>
+              <input type="date" id="fltLogDate" class="form-control form-control-sm" onchange="loadMonitoringData()">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="small fw-bold">Role Pengguna</label>
+              <select id="fltLogRole" class="form-select form-select-sm" onchange="loadMonitoringData()">
+                <option value="">-- Semua Role --</option>
+                <option value="SUPERADMIN">Super Admin</option>
+                <option value="ADMIN">Admin</option>
+                <option value="MANAJER">Manajer</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="small fw-bold">Kategori Pekerjaan</label>
               <select id="fltLogType" class="form-select form-select-sm" onchange="loadMonitoringData()">
                 <option value="">-- Semua Aktivitas --</option>
-                <option value="LOGIN">Akses Login System</option>
+                <option value="LOGIN">Akses Login</option>
                 <option value="INPUT_DATA">Input / Modifikasi Data</option>
               </select>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="small fw-bold">Cari Detail / Pengguna</label>
+              <input type="text" id="fltLogSearch" class="form-control form-control-sm" placeholder="Ketik kata kunci..." onkeyup="loadMonitoringData()">
             </div>
           </div>
 
           <div class="table-responsive">
-            <table class="table table-hover" id="tblMonitoring">
+            <table class="table table-hover align-middle" id="tblMonitoring">
               <thead>
                 <tr>
                   <th>Waktu</th>
-                  <th>Pengguna</th>
+                  <th>Pengguna (Role)</th>
                   <th>Kategori</th>
-                  <th>Detail Aktivitas Pekerjaan</th>
-                  <th>Status Keabsahan</th>
+                  <th>Detail Pekerjaan / Aktivitas</th>
+                  <th>Status</th>
                   <th>Perangkat / Device</th>
                   <th>GPS / Koordinat</th>
                   <th class="action-col">Aksi</th>
@@ -1114,7 +1124,7 @@
                   </div>
                   <div class="form-check form-switch mb-1">
                     <input class="form-check-input perm-chk" type="checkbox" value="monitoring" id="permMon">
-                    <label class="form-check-label small" for="permMon">Akses Monitoring Aktivitas</label>
+                    <label class="form-check-label small" for="permMon">Akses Monitoring Pekerjaan</label>
                   </div>
                 </div>
 
@@ -1151,7 +1161,7 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
-          <p class="small text-muted mb-3">Pilih rentang tanggal (dari tanggal berapa sampai tanggal berapa) data yang hendak Anda bersihkan/hapus.</p>
+          <p class="small text-muted mb-3">Pilih rentang tanggal data yang hendak Anda bersihkan/hapus.</p>
           <input type="hidden" id="purgeTargetTable">
           <div class="mb-3">
             <label class="form-label small fw-bold">Modul Target:</label>
@@ -1189,7 +1199,6 @@
     let base64AvatarImage = "";
     let livePerfInterval = null;
     let liveClockInterval = null;
-    const MAX_LOG_LIMIT = 500; 
 
     const QUOTES_DATABASE = [
       { text: "Hasil luar biasa tidak pernah datang dari zona nyaman. Tetap semangat!", author: "Motivasi Kerja" },
@@ -1290,7 +1299,7 @@
       }
     }
 
-    // PERBAIKAN REVISI 1: FUNGSI EKSPOR EXCEL UNIVERSAL UNTUK SELURUH HALAMAN
+    // --- EKSPOR EXCEL UNIVERSAL ---
     function exportFormattedExcel(elementId, filename = 'Export_Data') {
       try {
         const targetElement = document.getElementById(elementId);
@@ -1302,7 +1311,6 @@
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Data Export');
 
-        // Mengambil semua tabel dari elemen target (mendukung tabel tunggal maupun multiple tabel)
         const tables = targetElement.tagName === 'TABLE' ? [targetElement] : targetElement.querySelectorAll('table');
 
         if (tables.length === 0) {
@@ -1311,7 +1319,6 @@
         }
 
         tables.forEach((table) => {
-          // Tambahkan judul tabel (jika ada judul wilayah di atasnya)
           const sectionTitle = table.previousElementSibling?.innerText || '';
           if (sectionTitle) {
             const titleRow = worksheet.addRow([sectionTitle]);
@@ -1319,7 +1326,6 @@
             worksheet.addRow([]);
           }
 
-          // Baris Header
           const headerRowValues = [];
           const headerCells = table.querySelectorAll('thead tr th');
           headerCells.forEach(th => {
@@ -1334,7 +1340,6 @@
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
           });
 
-          // Baris Body Data
           const bodyRows = table.querySelectorAll('tbody tr');
           bodyRows.forEach(tr => {
             const rowValues = [];
@@ -1352,10 +1357,9 @@
             }
           });
 
-          worksheet.addRow([]); // Baris pemisah
+          worksheet.addRow([]);
         });
 
-        // Auto Fit Lebar Kolom
         worksheet.columns.forEach(column => {
           let maxLen = 12;
           column.eachCell({ includeEmpty: true }, cell => {
@@ -1402,7 +1406,7 @@
         if (user.password_hash === p) {
           currentUser = user;
           sessionStorage.setItem('rinnet_session_user', JSON.stringify(user));
-          await logActivity('LOGIN', `Akses masuk ke sistem aplikasi dari perangkat`, true);
+          await logActivity('LOGIN', `Akses masuk ke sistem aplikasi RINNET+`, true);
           initAppView(user);
         } else {
           alert('Password salah!');
@@ -1431,7 +1435,6 @@
 
       document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.add('d-none'));
 
-      // PERBAIKAN REVISI 7: Hak Akses Khusus Monitoring & Manajemen User
       if (user.role === 'SUPERADMIN') {
         document.querySelectorAll('.superadmin-only, .manager-sa-only').forEach(el => el.classList.remove('d-none'));
       }
@@ -1512,7 +1515,6 @@
 
     // --- NAVIGATION ---
     function switchMenu(menuName) {
-      // PERBAIKAN REVISI 7: Mencegah Admin & Manager Mengakses Monitoring Aktivitas
       if (menuName === 'monitoring' && currentUser?.role !== 'SUPERADMIN') {
         alert('Akses Ditolak: Modul Monitoring Aktivitas khusus untuk Super Admin!');
         return;
@@ -1693,9 +1695,9 @@
       document.getElementById('srvWilayah').value = wilayah;
     }
 
-    // PERBAIKAN REVISI 3: PENGELOLAAN DATA SERVER PER WILAYAH / CLUSTER
+    // --- PENGELOLAAN DATA SERVER PER WILAYAH / CLUSTER (URUT BERURUTAN & A-Z) ---
     async function loadServerWilayahData() {
-      const { data: servers, error } = await _supabase.from('servers').select('*').order('wilayah', { ascending: true });
+      const { data: servers, error } = await _supabase.from('servers').select('*');
       const container = document.getElementById('containerServerWilayah');
       if (!container) return;
 
@@ -1712,10 +1714,20 @@
         grouped[w].push(srv);
       });
 
+      // Urutkan Nama Wilayah (Mengakomodasi angka/nomor urut seperti Haurwangi/1, Cugenang/2, dll.)
+      const sortedWilayahKeys = Object.keys(grouped).sort((a, b) => {
+        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+      });
+
       let htmlContent = '';
       const isManager = currentUser?.role === 'MANAJER';
 
-      for (const [wilayahName, listServer] of Object.entries(grouped)) {
+      sortedWilayahKeys.forEach(wilayahName => {
+        // Urutkan isi server di dalam wilayah secara A-Z berdasarkan Nama Server
+        const listServer = grouped[wilayahName].sort((a, b) => 
+          a.nama_server.localeCompare(b.nama_server, undefined, { sensitivity: 'base' })
+        );
+
         htmlContent += `
           <div class="card card-custom p-4 mb-4">
             <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-map-location-dot me-2"></i>Wilayah / Cluster: ${wilayahName}</h5>
@@ -1723,7 +1735,7 @@
               <table class="table table-hover align-middle">
                 <thead>
                   <tr>
-                    <th>Nama Server</th>
+                    <th>Nama Server (A–Z)</th>
                     <th>Pengelola Server</th>
                     <th>Nomor WhatsApp</th>
                     <th>Wilayah / Cluster</th>
@@ -1748,12 +1760,12 @@
             </div>
           </div>
         `;
-      }
+      });
 
       container.innerHTML = htmlContent;
     }
 
-    // PERBAIKAN REVISI 4: PENGELOLAAN DATA RESELLER MASTER
+    // --- PENGELOLAAN DATA RESELLER MASTER ---
     async function populateResellerServerDropdown() {
       const { data } = await _supabase.from('servers').select('nama_server').order('nama_server', { ascending: true });
       const selectServer = document.getElementById('rslServer');
@@ -1818,7 +1830,6 @@
       populateResellerDropdownByServer('');
     }
 
-    // PERBAIKAN REVISI 4: Menyesuaikan Dropdown Reseller Berdasarkan Server yang Dipilih
     async function handleServerChangeInVoucher(selectedServer) {
       populateResellerDropdownByServer(selectedServer);
     }
@@ -1876,7 +1887,6 @@
       }
     }
 
-    // PERBAIKAN REVISI 2: Rekapan Input Stok Voucher dari Tanggal-Bulan-Tahun s/d Tanggal-Bulan-Tahun
     async function loadStokData() {
       let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
       
@@ -1974,7 +1984,7 @@
         nama_karyawan: document.getElementById('ksbKaryawan').value,
         jumlah_kasbon: parseFloat(document.getElementById('ksbJumlah').value || 0),
         sumber_dana: document.getElementById('ksbSumber').value,
-        keterangan: document.getElementById('ksbKet').value || '-'
+        keterangan: document.getElementById('ksbKet').value
       };
 
       let res;
@@ -1985,80 +1995,75 @@
       }
 
       if(!res.error) {
-        await logActivity('INPUT_DATA', `Pengajuan Kasbon: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon.toLocaleString('id-ID')})`, true);
-        alert('Kasbon Berhasil Dicatat!');
+        await logActivity('INPUT_DATA', `Simpan Kasbon: ${payload.nama_karyawan} (Rp ${payload.jumlah_kasbon.toLocaleString('id-ID')})`, true);
+        alert('Kasbon Berhasil Disimpan!');
         document.getElementById('ksbId').value = '';
         e.target.reset();
         loadKasbonData();
       } else {
-        await logActivity('INPUT_DATA', `Pengajuan Kasbon: ${payload.nama_karyawan}`, false, res.error.message);
-        alert('Gagal menyimpan kasbon ke Supabase: ' + res.error.message);
+        await logActivity('INPUT_DATA', `Simpan Kasbon: ${payload.nama_karyawan}`, false, res.error.message);
+        alert('Gagal menyimpan kasbon: ' + res.error.message);
       }
     }
 
-    // PERBAIKAN REVISI 5: Perbaikan Perhitungan Akurat Rekapitulasi Kasbon Karyawan
     async function loadKasbonData() {
+      // Load dropdown karyawan & server jika belum terisi
       const { data: emps } = await _supabase.from('employees').select('nama_karyawan');
-      const { data: srvs } = await _supabase.from('servers').select('nama_server');
-
-      document.getElementById('ksbKaryawan').innerHTML = '<option value="">-- Pilih Karyawan --</option>' + 
-        (emps || []).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
-      
-      const currentFltUser = document.getElementById('fltKasbonKaryawan').value;
-      document.getElementById('fltKasbonKaryawan').innerHTML = '<option value="">-- Semua Karyawan --</option>' + 
-        (emps || []).map(e => `<option value="${e.nama_karyawan}" ${e.nama_karyawan === currentFltUser ? 'selected':''}>${e.nama_karyawan}</option>`).join('');
-      
-      document.getElementById('ksbSumber').innerHTML = '<option value="">-- Pilih Server --</option>' + 
-        (srvs || []).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
-
-      // Mengambil seluruh data kasbon untuk kalkulasi 2-minggu & 1-bulan secara independen
-      const { data: allKasbon } = await _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
-
-      const empFlt = document.getElementById('fltKasbonKaryawan').value;
-      const startFlt = document.getElementById('fltKasbonStart').value;
-      const endFlt = document.getElementById('fltKasbonEnd').value;
-
-      let filteredKasbon = allKasbon || [];
-
-      if (empFlt) {
-        filteredKasbon = filteredKasbon.filter(k => k.nama_karyawan === empFlt);
+      const selectKsbEmp = document.getElementById('ksbKaryawan');
+      const selectFltEmp = document.getElementById('fltKasbonKaryawan');
+      if(selectKsbEmp && selectKsbEmp.options.length <= 1) {
+        selectKsbEmp.innerHTML = '<option value="">-- Pilih Karyawan --</option>' + (emps||[]).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
       }
-      if (startFlt) {
-        filteredKasbon = filteredKasbon.filter(k => k.tanggal >= startFlt);
-      }
-      if (endFlt) {
-        filteredKasbon = filteredKasbon.filter(k => k.tanggal <= endFlt);
+      if(selectFltEmp && selectFltEmp.options.length <= 1) {
+        selectFltEmp.innerHTML = '<option value="">-- Semua Karyawan --</option>' + (emps||[]).map(e => `<option value="${e.nama_karyawan}">${e.nama_karyawan}</option>`).join('');
       }
 
-      // Calculation 1: Total Rekap Hasil Filter
-      let totalFiltered = filteredKasbon.reduce((acc, curr) => acc + parseFloat(curr.jumlah_kasbon || 0), 0);
+      const { data: servers } = await _supabase.from('servers').select('nama_server');
+      const selectKsbSrv = document.getElementById('ksbSumber');
+      if(selectKsbSrv && selectKsbSrv.options.length <= 1) {
+        selectKsbSrv.innerHTML = '<option value="">-- Pilih Server --</option>' + (servers||[]).map(s => `<option value="${s.nama_server}">${s.nama_server}</option>`).join('');
+      }
 
-      // Calculation 2: Estimasi Kasbon 2 Minggu Terakhir (Berdasarkan tanggal saat ini / filter karyawan jika dipilih)
-      const today = new Date();
-      const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
-      
-      let kasbon2WList = (allKasbon || []).filter(k => k.tanggal >= twoWeeksAgo);
-      if (empFlt) kasbon2WList = kasbon2WList.filter(k => k.nama_karyawan === empFlt);
-      let total2W = kasbon2WList.reduce((acc, curr) => acc + parseFloat(curr.jumlah_kasbon || 0), 0);
+      let query = _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
 
-      // Calculation 3: Total Kasbon Bulan Ini (Berdasarkan bulan berjalan saat ini)
-      const currentMonthStr = today.toISOString().substring(0, 7); // Contoh: "2026-09"
-      let kasbon1MList = (allKasbon || []).filter(k => k.tanggal && k.tanggal.startsWith(currentMonthStr));
-      if (empFlt) kasbon1MList = kasbon1MList.filter(k => k.nama_karyawan === empFlt);
-      let total1M = kasbon1MList.reduce((acc, curr) => acc + parseFloat(curr.jumlah_kasbon || 0), 0);
+      const empFilter = document.getElementById('fltKasbonKaryawan')?.value;
+      const startFilter = document.getElementById('fltKasbonStart')?.value;
+      const endFilter = document.getElementById('fltKasbonEnd')?.value;
 
-      document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${totalFiltered.toLocaleString('id-ID')}`;
-      document.getElementById('rekapTotalKasbon2W').innerText = `Rp ${total2W.toLocaleString('id-ID')}`;
-      document.getElementById('rekapTotalKasbon1M').innerText = `Rp ${total1M.toLocaleString('id-ID')}`;
+      if(empFilter) query = query.eq('nama_karyawan', empFilter);
+      if(startFilter) query = query.gte('tanggal', startFilter);
+      if(endFilter) query = query.lte('tanggal', endFilter);
 
+      const { data } = await query;
       const isManager = currentUser?.role === 'MANAJER';
 
-      document.getElementById('bodyKasbon').innerHTML = filteredKasbon.map(k => `
+      let totalFilter = 0;
+      (data || []).forEach(k => totalFilter += parseFloat(k.jumlah_kasbon || 0));
+      document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${totalFilter.toLocaleString('id-ID')}`;
+
+      // Hitung Estimasi 2 Minggu & Total Bulan Ini
+      const today = new Date();
+      const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+
+      const { data: allKasbon } = await _supabase.from('kasbon').select('*');
+      let sum2W = 0, sum1M = 0;
+
+      (allKasbon || []).forEach(k => {
+        const val = parseFloat(k.jumlah_kasbon || 0);
+        if (k.tanggal >= twoWeeksAgo) sum2W += val;
+        if (k.tanggal >= startOfMonth) sum1M += val;
+      });
+
+      document.getElementById('rekapTotalKasbon2W').innerText = `Rp ${sum2W.toLocaleString('id-ID')}`;
+      document.getElementById('rekapTotalKasbon1M').innerText = `Rp ${sum1M.toLocaleString('id-ID')}`;
+
+      document.getElementById('bodyKasbon').innerHTML = (data || []).map(k => `
         <tr>
-          <td>${k.tanggal}</td>
+          <td>${k.tanggal || '-'}</td>
           <td><b>${k.nama_karyawan}</b></td>
-          <td>Rp ${parseFloat(k.jumlah_kasbon || 0).toLocaleString('id-ID')}</td>
-          <td><span class="badge bg-secondary">${k.sumber_dana}</span></td>
+          <td><strong class="text-danger">Rp ${parseFloat(k.jumlah_kasbon||0).toLocaleString('id-ID')}</strong></td>
+          <td><span class="badge bg-secondary px-2 py-1">${k.sumber_dana}</span></td>
           <td>${k.keterangan || '-'}</td>
           ${!isManager ? `
           <td class="action-col">
@@ -2068,15 +2073,6 @@
     }
 
     // --- PROFIL SAYA ---
-    function loadProfilData() {
-      if (!currentUser) return;
-      document.getElementById('prfUsername').value = currentUser.username || '';
-      document.getElementById('prfNamaLengkap').value = currentUser.nama_lengkap || '';
-      document.getElementById('prfEmail').value = currentUser.email || '';
-      document.getElementById('prfWA').value = currentUser.whatsapp || '';
-      if (currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
-    }
-
     function previewSelectedImage(e) {
       const file = e.target.files[0];
       if (file) {
@@ -2089,223 +2085,183 @@
       }
     }
 
+    function loadProfilData() {
+      if (!currentUser) return;
+      document.getElementById('prfUsername').value = currentUser.username || '';
+      document.getElementById('prfNamaLengkap').value = currentUser.nama_lengkap || '';
+      document.getElementById('prfEmail').value = currentUser.email || '';
+      document.getElementById('prfWA').value = currentUser.whatsapp || '';
+      if (currentUser.avatar_url) {
+        document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
+      }
+    }
+
     async function simpanProfil(e) {
       e.preventDefault();
-      const updatePayload = {
+      const payload = {
         nama_lengkap: document.getElementById('prfNamaLengkap').value,
         email: document.getElementById('prfEmail').value,
         whatsapp: document.getElementById('prfWA').value
       };
-      if (base64AvatarImage) updatePayload.avatar_url = base64AvatarImage;
 
-      const { error } = await _supabase.from('users').update(updatePayload).eq('id', currentUser.id);
-      if(!error) {
-        Object.assign(currentUser, updatePayload);
-        sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
-        document.getElementById('navUserName').innerText = currentUser.nama_lengkap || currentUser.username;
-        await logActivity('INPUT_DATA', `Memperbarui data profil pengguna`, true);
-        alert('Profil berhasil diperbarui!');
+      if (base64AvatarImage) {
+        payload.avatar_url = base64AvatarImage;
+      }
+
+      const { data, error } = await _supabase.from('users').update(payload).eq('id', currentUser.id).select().single();
+
+      if (!error && data) {
+        currentUser = data;
+        sessionStorage.setItem('rinnet_session_user', JSON.stringify(data));
+        await logActivity('INPUT_DATA', `Memperbarui Data Profil Pribadi`, true);
+        alert('Profil Berhasil Diperbarui!');
+        initAppView(currentUser);
       } else {
-        await logActivity('INPUT_DATA', `Memperbarui data profil`, false, error.message);
-        alert('Gagal memperbarui profil: ' + error.message);
+        alert('Gagal memperbarui profil: ' + (error ? error.message : 'Error tidak diketahui'));
       }
     }
 
-    // PERBAIKAN REVISI 6: MONITORING PEKERJAAN ADMIN (PERBAIKAN FITUR TERMASUK AKSI HAPUS SATUAN)
+    // --- FITUR PERBAIKAN: MONITORING REALTIME SELURUH PEKERJAAN & AKTIVITAS SYSTEM RINNET+ ---
     async function loadMonitoringData() {
-      if (currentUser?.role !== 'SUPERADMIN') return;
+      let query = _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(200);
 
-      let logs = [];
+      const logDate = document.getElementById('fltLogDate')?.value;
+      const logRole = document.getElementById('fltLogRole')?.value;
+      const logType = document.getElementById('fltLogType')?.value;
+      const searchKey = document.getElementById('fltLogSearch')?.value?.trim()?.toLowerCase();
 
-      try {
-        const { data, error } = await _supabase.from('activity_logs').select('*').order('waktu', { ascending: false }).limit(MAX_LOG_LIMIT);
-        if (!error && data) logs = data;
-      } catch (err) {
-        console.warn("Gagal mengambil log realtime dari Supabase Cloud.", err);
+      if (logDate) {
+        query = query.gte('waktu', `${logDate}T00:00:00`).lte('waktu', `${logDate}T23:59:59`);
       }
+      if (logRole) query = query.eq('role', logRole);
+      if (logType) query = query.eq('tipe', logType);
 
-      const dateFlt = document.getElementById('fltLogDate')?.value;
-      const typeFlt = document.getElementById('fltLogType')?.value;
-
-      if (dateFlt) {
-        logs = logs.filter(l => l.waktu && l.waktu.substring(0, 10) === dateFlt);
-      }
-      if (typeFlt) {
-        logs = logs.filter(l => l.tipe === typeFlt);
-      }
-
+      const { data, error } = await query;
       const body = document.getElementById('bodyMonitoring');
       if (!body) return;
 
-      if (logs.length === 0) {
-        body.innerHTML = `<tr><td colspan="8" class="text-center text-muted">Tidak ada log aktivitas pekerjaan admin.</td></tr>`;
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="text-muted text-center">Belum ada riwayat aktivitas atau pekerjaan sistem pada filter ini.</td></tr>`;
         return;
       }
 
-      body.innerHTML = logs.map(l => {
-        const timeFormatted = l.waktu ? new Date(l.waktu).toLocaleString('id-ID') : '-';
-        const isSuccess = l.status === 'BERHASIL';
-        const badgeStatus = isSuccess ? '<span class="badge bg-success">Valid / Berhasil</span>' : '<span class="badge bg-danger">Gagal</span>';
+      let filteredData = data;
+      if (searchKey) {
+        filteredData = data.filter(item => 
+          (item.username && item.username.toLowerCase().includes(searchKey)) ||
+          (item.detail && item.detail.toLowerCase().includes(searchKey)) ||
+          (item.device && item.device.toLowerCase().includes(searchKey))
+        );
+      }
+
+      body.innerHTML = filteredData.map(log => {
+        const dateObj = new Date(log.waktu);
+        const formatWaktu = dateObj.toLocaleDateString('id-ID') + ' ' + dateObj.toLocaleTimeString('id-ID');
+
+        let badgeRole = 'bg-secondary';
+        if (log.role === 'SUPERADMIN') badgeRole = 'bg-danger';
+        else if (log.role === 'MANAJER') badgeRole = 'bg-primary';
+        else if (log.role === 'ADMIN') badgeRole = 'bg-success';
+
+        let badgeStatus = log.status === 'BERHASIL' ? 'bg-success' : 'bg-danger';
 
         return `
           <tr>
-            <td><small class="fw-bold text-secondary">${timeFormatted}</small></td>
-            <td><b>${l.username || 'System'}</b> <br><small class="text-muted">${l.role || '-'}</small></td>
-            <td><span class="badge bg-primary bg-opacity-10 text-primary">${l.tipe || 'LOG'}</span></td>
-            <td>${l.detail || '-'}</td>
-            <td>${badgeStatus}</td>
-            <td><small>${l.device || 'Desktop Laptop'}</small></td>
-            <td><small class="text-indigo fw-bold">${l.koordinat || 'Terdeteksi'}</small></td>
+            <td style="font-size: 0.8rem;">${formatWaktu}</td>
+            <td><b>${log.username}</b> <span class="badge ${badgeRole} ms-1" style="font-size: 0.65rem;">${log.role}</span></td>
+            <td><span class="badge bg-light text-dark border">${log.tipe}</span></td>
+            <td>${log.detail}</td>
+            <td><span class="badge ${badgeStatus}">${log.status}</span></td>
+            <td><small class="text-muted"><i class="fa-solid fa-mobile-screen-button me-1"></i>${log.device || 'Unknown'}</small></td>
+            <td><small class="text-primary">${log.koordinat || '-'}</small></td>
             <td class="action-col">
-              <button class="btn btn-sm btn-danger" onclick="hapusRecord('activity_logs', '${l.id}', loadMonitoringData, 'Log Aktivitas ${l.username}')"><i class="fa-solid fa-trash"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="hapusRecord('activity_logs', '${log.id}', loadMonitoringData, 'Log Pekerjaan ID ${log.id}')"><i class="fa-solid fa-trash"></i></button>
             </td>
           </tr>
         `;
       }).join('');
     }
 
-    // PERBAIKAN REVISI 8: MONITORING SYSTEM DENGAN GRAFIK REAL-TIME BERGERAK TERUS
+    // --- MONITORING SYSTEM (HARDWARE & PERFORMANCE) ---
     function initLiveSystemPerformanceChart() {
-      const ctx = document.getElementById('systemPerfChart')?.getContext('2d');
-      if (!ctx) return;
-
+      const ctx = document.getElementById('systemPerfChart').getContext('2d');
       if (perfChart) perfChart.destroy();
-      if (livePerfInterval) clearInterval(livePerfInterval);
-
-      const labels = [];
-      const cpuData = [];
-      const ramData = [];
-      const maxDataPoints = 15;
-
-      // Inisialisasi awal 15 titik data
-      const now = new Date();
-      for (let i = maxDataPoints - 1; i >= 0; i--) {
-        const timeVal = new Date(now.getTime() - i * 3000);
-        labels.push(timeVal.toLocaleTimeString('id-ID'));
-        cpuData.push(Math.floor(Math.random() * 20) + 10);
-        ramData.push(Math.floor(Math.random() * 15) + 35);
-      }
 
       perfChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: labels,
+          labels: ['10s lalu', '8s lalu', '6s lalu', '4s lalu', '2s lalu', 'Sekarang'],
           datasets: [
-            {
-              label: 'CPU Usage (%)',
-              data: cpuData,
-              borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              fill: true,
-              tension: 0.4
-            },
-            {
-              label: 'RAM Usage (%)',
-              data: ramData,
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)',
-              fill: true,
-              tension: 0.4
-            }
+            { label: 'CPU Usage (%)', data: [12, 15, 14, 18, 13, 14], borderColor: '#10b981', tension: 0.3, fill: false },
+            { label: 'RAM Usage (%)', data: [40, 41, 42, 41, 43, 42], borderColor: '#6366f1', tension: 0.3, fill: false }
           ]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 400 },
-          scales: {
-            y: { min: 0, max: 100 }
-          }
+          responsive: true, maintainAspectRatio: false,
+          scales: { y: { min: 0, max: 100 } }
         }
       });
 
-      // Update Grafik dan Indikator secara Realtime setiap 3 detik
+      if (livePerfInterval) clearInterval(livePerfInterval);
       livePerfInterval = setInterval(() => {
-        const newTimeStr = new Date().toLocaleTimeString('id-ID');
-        const nextCpu = Math.floor(Math.random() * 25) + 10;
-        const nextRam = Math.floor(Math.random() * 15) + 38;
-        const nextLatency = Math.floor(Math.random() * 12) + 20;
+        const randomCpu = Math.floor(Math.random() * 10) + 10;
+        const randomRam = Math.floor(Math.random() * 5) + 40;
+        const randomDb = Math.floor(Math.random() * 8) + 24;
 
-        // Update Indikator Kartu
-        document.getElementById('sysCpuVal').innerText = `${nextCpu}%`;
-        document.getElementById('sysRamVal').innerText = `${nextRam}%`;
-        document.getElementById('sysDbLatency').innerText = `${nextLatency} ms`;
+        document.getElementById('sysCpuVal').innerText = `${randomCpu}%`;
+        document.getElementById('sysRamVal').innerText = `${randomRam}%`;
+        document.getElementById('sysDbLatency').innerText = `${randomDb} ms`;
 
-        // Push data baru & hapus data lama
-        perfChart.data.labels.push(newTimeStr);
-        perfChart.data.datasets[0].data.push(nextCpu);
-        perfChart.data.datasets[1].data.push(nextRam);
-
-        if (perfChart.data.labels.length > maxDataPoints) {
-          perfChart.data.labels.shift();
+        if (perfChart) {
           perfChart.data.datasets[0].data.shift();
+          perfChart.data.datasets[0].data.push(randomCpu);
           perfChart.data.datasets[1].data.shift();
+          perfChart.data.datasets[1].data.push(randomRam);
+          perfChart.update();
         }
-
-        perfChart.update('none');
       }, 3000);
     }
 
-    // PERBAIKAN REVISI 7: MANAJEMEN USER & KERAPIAN TAMPILAN PERMISSIONS
+    // --- MANAJEMEN USER ---
     async function loadUserData() {
-      if (currentUser?.role !== 'SUPERADMIN') return;
-
       const { data } = await _supabase.from('users').select('*').order('username', { ascending: true });
       const body = document.getElementById('bodyUsers');
-      if (!body) return;
+      if(!body) return;
 
-      body.innerHTML = (data || []).map(u => {
-        let permsDisplay = '-';
-        if (u.permissions) {
-          try {
-            const parsed = typeof u.permissions === 'string' ? JSON.parse(u.permissions) : u.permissions;
-            if (Array.isArray(parsed)) {
-              permsDisplay = parsed.map(p => `<span class="badge bg-secondary me-1 mb-1">${p}</span>`).join('');
-            } else {
-              permsDisplay = `<span class="badge bg-secondary">${String(u.permissions)}</span>`;
-            }
-          } catch(e) {
-            permsDisplay = `<span class="badge bg-secondary">${String(u.permissions).replace(/[\[\]"]/g, '')}</span>`;
-          }
-        }
-
-        return `
-          <tr>
-            <td><b>${u.username}</b></td>
-            <td>${u.nama_lengkap || '-'}</td>
-            <td><span class="badge bg-primary">${u.role}</span></td>
-            <td>${permsDisplay}</td>
-            <td class="action-col">
-              <button class="btn btn-sm btn-warning text-white me-1" onclick="editUser('${u.id}', '${u.username}', '${u.nama_lengkap || ''}', '${u.email || ''}', '${u.whatsapp || ''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
-              <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      body.innerHTML = (data || []).map(u => `
+        <tr>
+          <td><b>${u.username}</b></td>
+          <td>${u.nama_lengkap || '-'}</td>
+          <td><span class="badge bg-indigo px-2 py-1" style="background:rgba(99,102,241,0.15); color:#4f46e5;">${u.role}</span></td>
+          <td><small class="text-muted">${(u.permissions || []).join(', ') || 'Semua Modul'}</small></td>
+          <td>
+            <button class="btn btn-sm btn-warning text-white me-1" onclick="editUserMgmt('${u.id}', '${u.username}', '${u.nama_lengkap||''}', '${u.email||''}', '${u.whatsapp||''}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${u.username}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`).join('');
     }
 
-    function editUser(id, username, nama, email, wa, role) {
+    function editUserMgmt(id, uname, fullName, email, wa, role) {
       document.getElementById('usrDbId').value = id;
-      document.getElementById('usrName').value = username;
-      document.getElementById('usrFullName').value = nama;
+      document.getElementById('usrName').value = uname;
+      document.getElementById('usrFullName').value = fullName;
       document.getElementById('usrEmail').value = email;
       document.getElementById('usrWA').value = wa;
       document.getElementById('usrRole').value = role;
     }
 
-    function handleRolePresetChange(role) {
-      const isSuperAdmin = role === 'SUPERADMIN';
-      document.querySelectorAll('.perm-chk').forEach(chk => {
-        if (chk.value === 'monitoring') chk.checked = isSuperAdmin;
-        else chk.checked = true;
-      });
+    function handleRolePresetChange(roleVal) {
+      const perms = document.querySelectorAll('.perm-chk');
+      perms.forEach(chk => chk.checked = (roleVal === 'SUPERADMIN'));
     }
 
     async function simpanUserMgmt(e) {
       e.preventDefault();
       const id = document.getElementById('usrDbId').value;
-      const selectedPerms = [];
-      document.querySelectorAll('.perm-chk:checked').forEach(c => selectedPerms.push(c.value));
+      const pass = document.getElementById('usrPass').value;
+
+      const perms = [];
+      document.querySelectorAll('.perm-chk:checked').forEach(c => perms.push(c.value));
 
       const payload = {
         username: document.getElementById('usrName').value.trim().toLowerCase(),
@@ -2313,21 +2269,22 @@
         email: document.getElementById('usrEmail').value,
         whatsapp: document.getElementById('usrWA').value,
         role: document.getElementById('usrRole').value,
-        permissions: selectedPerms
+        permissions: perms
       };
 
-      const pass = document.getElementById('usrPass').value;
       if (pass) payload.password_hash = pass;
 
       let res;
       if (id) {
         res = await _supabase.from('users').update(payload).eq('id', id);
       } else {
+        if (!pass) { alert('Password wajib diisi untuk user baru!'); return; }
+        payload.password_hash = pass;
         res = await _supabase.from('users').insert([payload]);
       }
 
       if (!res.error) {
-        await logActivity('INPUT_DATA', `Simpan/Edit User Management: ${payload.username}`, true);
+        await logActivity('INPUT_DATA', `Simpan/Edit Akun User System: ${payload.username}`, true);
         alert('Data User Berhasil Disimpan!');
         document.getElementById('usrDbId').value = '';
         e.target.reset();
@@ -2337,53 +2294,57 @@
       }
     }
 
-    // --- PEMBERSIHAN DATA CUSTOM ---
-    function openPurgeModal(tableName, tableLabel) {
-      document.getElementById('purgeTargetTable').value = tableName;
-      document.getElementById('purgeTargetLabel').value = tableLabel;
+    // --- PEMBERSIHAN DATA CUSTOM MODAL ---
+    function openPurgeModal(targetTable, labelInfo) {
+      document.getElementById('purgeTargetTable').value = targetTable;
+      document.getElementById('purgeTargetLabel').value = labelInfo;
       const modal = new bootstrap.Modal(document.getElementById('modalPurge'));
       modal.show();
     }
 
     async function executeCustomPurge() {
-      const tableName = document.getElementById('purgeTargetTable').value;
-      const startDate = document.getElementById('purgeStartDate').value;
-      const endDate = document.getElementById('purgeEndDate').value;
+      const table = document.getElementById('purgeTargetTable').value;
+      const label = document.getElementById('purgeTargetLabel').value;
+      const start = document.getElementById('purgeStartDate').value;
+      const end = document.getElementById('purgeEndDate').value;
 
-      if (!startDate || !endDate) {
-        alert('Harap isi rentang tanggal pembersihan data!');
+      if (!start || !end) {
+        alert('Harap pilih rentang tanggal lengkap!');
         return;
       }
 
-      if (!confirm(`Konfirmasi Akhir: Hapus permanen data ${tableName} dari tanggal ${startDate} s/d ${endDate}?`)) return;
+      if (!confirm(`Konfirmasi Akhir: Apakah Anda benar-benar yakin ingin menghapus data ${label} dari tanggal ${start} s/d ${end}?`)) return;
 
-      const dateField = (tableName === 'activity_logs') ? 'waktu' : 'tanggal';
+      let dateCol = 'tanggal';
+      if (table === 'activity_logs') dateCol = 'waktu';
 
-      const { error } = await _supabase
-        .from(tableName)
-        .delete()
-        .gte(dateField, startDate)
-        .lte(dateField, `${endDate}T23:59:59`);
+      const { error } = await _supabase.from(table).delete().gte(dateCol, start).lte(dateCol, end + 'T23:59:59');
 
       if (!error) {
-        await logActivity('INPUT_DATA', `Pembersihan custom data pada tabel ${tableName} dari ${startDate} s/d ${endDate}`, true);
-        alert('Pembersihan data custom berhasil dijalankan!');
+        await logActivity('INPUT_DATA', `Pembersihan Data Custom pada Modul ${label} (${start} s/d ${end})`, true);
+        alert('Pembersihan data berhasil dilakukan!');
         const modalEl = document.getElementById('modalPurge');
         const modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) modal.hide();
         
-        // Reload data sesuai modul aktif
-        switchMenu(document.querySelector('.sidebar .nav-link.active').getAttribute('onclick').match(/'([^']+)'/)[1]);
+        // Reload tampilan aktif
+        if (table === 'reseller_stock') loadStokData();
+        if (table === 'activity_logs') loadMonitoringData();
+        if (table === 'kasbon') loadKasbonData();
       } else {
         alert('Gagal menghapus data: ' + error.message);
       }
     }
 
-    // Inisialisasi awal saat dokumen dimuat
-    document.addEventListener('DOMContentLoaded', () => {
-      const sessionUser = sessionStorage.getItem('rinnet_session_user');
-      if (sessionUser) {
-        initAppView(JSON.parse(sessionUser));
+    // --- INITIAL LOAD ---
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = sessionStorage.getItem('rinnet_session_user');
+      if (savedUser) {
+        try {
+          initAppView(JSON.parse(savedUser));
+        } catch (e) {
+          sessionStorage.removeItem('rinnet_session_user');
+        }
       }
     });
   </script>
