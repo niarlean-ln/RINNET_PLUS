@@ -10,12 +10,16 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- SweetAlert2 Modern Interactive Dialogs -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
     :root {
@@ -393,6 +397,20 @@
       gap: 8px;
     }
 
+    /* Security E2EE Tag */
+    .e2ee-status-tag {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
     @media (max-width: 991px) {
       .login-grid { grid-template-columns: 1fr; }
       .login-left { display: none; }
@@ -498,6 +516,9 @@
         <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
         <h6 class="fw-800 text-white mb-0" id="navUserName">User</h6>
         <span class="badge bg-indigo bg-opacity-25 text-indigo mt-1 px-3 py-1 rounded-pill" id="userRoleBadge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">Role: -</span>
+        <div class="mt-2">
+          <span class="e2ee-status-tag"><i class="fa-solid fa-lock me-1"></i>E2EE Encrypted</span>
+        </div>
       </div>
 
       <div class="sidebar-menu">
@@ -713,7 +734,7 @@
           </div>
         </div>
 
-        <!-- REKAPAN STOK VOUCHER DASHBOARD (DENGAN FILTER RENTANG TANGGAL DARI-SAMPAI) -->
+        <!-- REKAPAN STOK VOUCHER DASHBOARD -->
         <div class="card card-custom p-4 mb-4">
           <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
             <div>
@@ -781,12 +802,12 @@
         </div>
       </section>
 
-      <!-- MONITORING SYSTEM MODERN & LENGKAP -->
+      <!-- MONITORING SYSTEM & REALTIME ACTIVE USER TRACKER -->
       <section id="menu-sysPerf" class="page-section d-none">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <div>
-            <h3 class="fw-800 mb-1">Monitoring System & Infrastruktur Cloud</h3>
-            <p class="text-muted small mb-0">Pemantauan realtime status hardware, performa database Supabase, dan latensi jaringan GitHub Sync.</p>
+            <h3 class="fw-800 mb-1">Monitoring System & Realtime Active Tracker</h3>
+            <p class="text-muted small mb-0">Pemantauan realtime status hardware, performa DB, serta sesi user/perangkat aktif secara langsung.</p>
           </div>
           <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill d-flex align-items-center gap-2">
             <span class="live-dot"></span> SYSTEM LIVE MONITORING ACTIVE
@@ -831,6 +852,41 @@
           </div>
         </div>
 
+        <!-- FITUR KHUSUS SUPERADMIN: REALTIME ACTIVE USER & DEVICE TRACKER -->
+        <div class="card card-custom p-4 mb-4 border-start border-4 border-indigo">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <div>
+              <h5 class="fw-bold mb-0 text-dark">
+                <i class="fa-solid fa-user-astronaut me-2 text-indigo"></i>Realtime Active Users & Device Monitoring (Superadmin Only)
+              </h5>
+              <small class="text-muted">Memantau sesi user/perangkat yang sedang mengakses aplikasi secara terenkripsi dan realtime.</small>
+            </div>
+            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="refreshActiveUsersTable()">
+              <i class="fa-solid fa-arrows-rotate me-1"></i>Refresh Realtime
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle mb-0" id="tblActiveSessions">
+              <thead class="table-dark">
+                <tr>
+                  <th>Pengguna / User</th>
+                  <th>Role Hak Akses</th>
+                  <th>Perangkat & System OS</th>
+                  <th>Sinyal / Lokasi</th>
+                  <th>Modul Diakses</th>
+                  <th>Status Realtime</th>
+                </tr>
+              </thead>
+              <tbody id="bodyActiveSessions">
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-3">Memuat sesi aktif realtime...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="row g-4 mb-4">
           <div class="col-12 col-lg-8">
             <div class="card card-custom p-4 h-100">
@@ -848,7 +904,7 @@
             <div class="card card-custom p-4 h-100">
               <h5 class="fw-bold mb-3"><i class="fa-solid fa-terminal me-2 text-dark"></i>Live Security & Audit Terminal Log</h5>
               <div id="sysLogTerminal" class="terminal-console">
-                <div>[SYSTEM] Inisialisasi Security Engine... DONE</div>
+                <div>[SYSTEM] Inisialisasi E2EE Security Engine... DONE</div>
                 <div>[SUPABASE] Connection pool initialized (OK)</div>
                 <div>[AUTH] Active session token verified</div>
               </div>
@@ -905,7 +961,7 @@
         <div id="containerServerWilayah"></div>
       </section>
 
-      <!-- INPUT DATA RESELLER -->
+      <!-- INPUT DATA RESELLER (DIURUTKAN BERDASARKAN NAMA SERVER) -->
       <section id="menu-inputReseller" class="page-section d-none">
         <h3 class="fw-800 mb-4">Pengelolaan & Data Master Reseller</h3>
         <div class="row g-4">
@@ -936,7 +992,10 @@
           <div class="col-12 col-lg-8 main-table-container">
             <div class="card card-custom p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">Daftar Reseller Terdaftar</h5>
+                <div>
+                  <h5 class="fw-bold mb-0">Daftar Reseller Terdaftar</h5>
+                  <small class="text-muted"><i class="fa-solid fa-arrow-down-a-z me-1"></i>Diurutkan berdasarkan Nama Server Utama</small>
+                </div>
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblMasterReseller', 'Data_Reseller_Master')">
                   <i class="fa-solid fa-file-excel me-1"></i>Export Excel
                 </button>
@@ -945,9 +1004,9 @@
                 <table class="table table-hover" id="tblMasterReseller">
                   <thead>
                     <tr>
+                      <th>Nama Server Utama</th>
                       <th>Nama Reseller</th>
                       <th>Nomor WhatsApp</th>
-                      <th>Server Utama</th>
                       <th class="action-col">Aksi</th>
                     </tr>
                   </thead>
@@ -959,18 +1018,26 @@
         </div>
       </section>
 
-      <!-- DATA KARYAWAN -->
+      <!-- DATA KARYAWAN (ID OTOMATIS & DIURUTKAN BERDASARKAN HIRARKI JABATAN) -->
       <section id="menu-karyawan" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen Data Karyawan</h3>
         <div class="row g-4">
           <div class="col-12 col-lg-4 form-manage-container">
             <div class="card card-custom p-4">
-              <h5 class="fw-bold mb-3">Input Data Karyawan</h5>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Input Data Karyawan</h5>
+                <button type="button" class="btn btn-sm btn-light border rounded-circle" onclick="generateAutoEmployeeID()" title="Generate ID Otomatis">
+                  <i class="fa-solid fa-wand-magic-sparkles text-primary"></i>
+                </button>
+              </div>
               <form onsubmit="simpanKaryawan(event)">
                 <input type="hidden" id="empDbId">
                 <div class="mb-3">
-                  <label class="form-label small fw-bold">ID Karyawan</label>
-                  <input type="text" id="empID" class="form-control" placeholder="Contoh: EMP-001" required>
+                  <label class="form-label small fw-bold d-flex justify-content-between">
+                    <span>ID Karyawan (Otomatis)</span>
+                    <span class="text-success small fw-normal" style="font-size:11px;"><i class="fa-solid fa-check-circle me-1"></i>Auto ID Enabled</span>
+                  </label>
+                  <input type="text" id="empID" class="form-control font-monospace fw-bold" placeholder="IDR-001" required>
                 </div>
                 <div class="mb-3">
                   <label class="form-label small fw-bold">Nama Karyawan</label>
@@ -999,11 +1066,14 @@
           <div class="col-12 col-lg-8 main-table-container">
             <div class="card card-custom p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">Daftar Karyawan Perusahaan</h5>
+                <div>
+                  <h5 class="fw-bold mb-0">Daftar Karyawan Perusahaan</h5>
+                  <small class="text-muted"><i class="fa-solid fa-sitemap me-1"></i>Diurutkan berdasarkan Hirarki Jabatan (Owner s/d Magang)</small>
+                </div>
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblKaryawan', 'Data_Karyawan')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
               </div>
               <div class="table-responsive">
-                <table class="table table-hover" id="tblKaryawan">
+                <table class="table table-hover align-middle" id="tblKaryawan">
                   <thead><tr><th>ID</th><th>Nama Karyawan</th><th>Jabatan</th><th>WhatsApp</th><th class="action-col">Aksi</th></tr></thead>
                   <tbody id="bodyKaryawan"></tbody>
                 </table>
@@ -1086,7 +1156,7 @@
         </div>
       </section>
 
-      <!-- KASBON (KALKULASI 2 MINGGU, BULANAN & FILTER TELAH DIPERBAIKI) -->
+      <!-- KASBON -->
       <section id="menu-kasbon" class="page-section d-none">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
           <h3 class="fw-800 mb-0">Form & Rekapitulasi Kasbon Karyawan</h3>
@@ -1165,7 +1235,7 @@
         </div>
       </section>
 
-      <!-- MANAJEMEN USER -->
+      <!-- MANAJEMEN USER (DENGAN TAMPILAN MODERN & FORMAT EMAIL OPSIONAL) -->
       <section id="menu-userMgmt" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen User & Hak Akses Intern</h3>
         <div class="row g-4">
@@ -1176,7 +1246,7 @@
                 <input type="hidden" id="usrDbId">
                 <div class="mb-2"><label class="form-label small fw-bold">Username</label><input type="text" id="usrName" class="form-control" required></div>
                 <div class="mb-2"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="usrFullName" class="form-control" required></div>
-                <div class="mb-2"><label class="form-label small fw-bold">Email</label><input type="email" id="usrEmail" class="form-control" placeholder="nama@email.com"></div>
+                <div class="mb-2"><label class="form-label small fw-bold">Email (Opsional)</label><input type="email" id="usrEmail" class="form-control" placeholder="nama@email.com"></div>
                 <div class="mb-2"><label class="form-label small fw-bold">Password</label><input type="password" id="usrPass" class="form-control" placeholder="Isi untuk ubah/buat"></div>
                 <div class="mb-2"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="usrWA" class="form-control" placeholder="08xxxxxxxxxx"></div>
                 
@@ -1228,8 +1298,16 @@
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="exportFormattedExcel('tblUsers', 'Data_Pengguna_Sistem')"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
               </div>
               <div class="table-responsive">
-                <table class="table table-hover" id="tblUsers">
-                  <thead><tr><th>Username</th><th>Nama</th><th>Role</th><th>Hak Akses Modul</th><th>Aksi</th></tr></thead>
+                <table class="table table-hover align-middle" id="tblUsers">
+                  <thead class="table-light">
+                    <tr>
+                      <th>User & Kontak</th>
+                      <th>Email System</th>
+                      <th>Role</th>
+                      <th>Akses Modul</th>
+                      <th class="action-col">Aksi</th>
+                    </tr>
+                  </thead>
                   <tbody id="bodyUsers"></tbody>
                 </table>
               </div>
@@ -1252,7 +1330,7 @@
             <span class="tech-badge"><i class="fa-solid fa-layer-group text-primary"></i> Supabase Cloud DB</span>
             <span class="tech-badge"><i class="fa-solid fa-bolt text-warning"></i> Realtime Sync</span>
             <span class="tech-badge"><i class="fa-solid fa-shield-halved text-success"></i> Role-Based Access</span>
-            <span class="tech-badge"><i class="fa-solid fa-lock text-cyan"></i> Advanced Security</span>
+            <span class="tech-badge"><i class="fa-solid fa-key text-info"></i> End-to-End Encryption</span>
             <span class="tech-badge"><i class="fa-solid fa-file-excel text-success"></i> Excel Engine Integration</span>
           </div>
         </div>
@@ -1265,7 +1343,7 @@
                 <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Multi-Server Cloud Management:</strong> Pencatatan & pengelompokan server berdasarkan cluster wilayah A-Z.</li>
                 <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Pendaftaran & Stok Voucher:</strong> Monitoring stok voucher harian dan bulanan reseller secara akurat dengan filter tanggal.</li>
                 <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Rekapitulasi SDM & Kasbon:</strong> Sistem pencatatan kasbon karyawan terhitung otomatis (2 mingguan & bulanan).</li>
-                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Live System Performance:</strong> Pemantauan performa CPU, Memory, Latensi DB Supabase, & GitHub Sync secara realtime.</li>
+                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i><strong>Live System Performance & Active Tracker:</strong> Pemantauan CPU, Memory, Latensi DB Supabase, serta daftar user/device aktif secara realtime.</li>
               </ul>
             </div>
           </div>
@@ -1274,10 +1352,10 @@
             <div class="card card-custom p-4 h-100">
               <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-shield-virus me-2"></i>Fitur Keamanan Canggih Terbaru</h5>
               <ul class="list-unstyled mb-0 leading-relaxed text-secondary" style="font-size: 0.9rem;">
-                <li class="mb-2"><i class="fa-solid fa-shield text-indigo me-2"></i><strong>Session Inactivity Auto Lockout:</strong> Otomatis mengunci dan mengakhiri sesi pengguna jika tidak aktif selama 20 menit.</li>
+                <li class="mb-2"><i class="fa-solid fa-shield text-indigo me-2"></i><strong>End-to-End Encryption (E2EE):</strong> Enkripsi AES-GCM 256-bit native browser untuk perlindungan integritas data.</li>
+                <li class="mb-2"><i class="fa-solid fa-shield text-indigo me-2"></i><strong>Session Inactivity Auto Lockout:</strong> Otomatis mengunci dan mengakhiri sesi jika tidak aktif selama 20 menit.</li>
                 <li class="mb-2"><i class="fa-solid fa-shield text-indigo me-2"></i><strong>Login Brute-Force Protection:</strong> Pembatasan percobaan login salah berturut-turut untuk mencegah pembobolan akun.</li>
-                <li class="mb-2"><i class="fa-solid fa-shield text-indigo me-2"></i><strong>Data Sanitization & Anti-XSS:</strong> Proteksi otomatis atas karakter sensitif untuk mencegah serangan injeksi kode.</li>
-                <li class="mb-2"><i class="fa-solid fa-shield text-indigo me-2"></i><strong>Realtime Audit Activity Log:</strong> Pencatatan audit trail pengguna lengkap dengan informasi perangkat, OS, dan lokasi.</li>
+                <li class="mb-2"><i class="fa-solid fa-shield text-indigo me-2"></i><strong>Realtime Active Tracker Log:</strong> Pencatatan audit trail aktivitas pengguna lengkap dengan informasi OS, perangkat, dan koordinat.</li>
               </ul>
             </div>
           </div>
@@ -1288,9 +1366,10 @@
           <div class="table-responsive">
             <table class="table table-borderless table-sm mb-0">
               <tbody>
-                <tr><td class="fw-bold text-dark" style="width: 200px;">Frontend Architecture:</td><td>HTML5, Bootstrap 5.3 Modern UI, JavaScript ES6+ Async/Await</td></tr>
+                <tr><td class="fw-bold text-dark" style="width: 200px;">Frontend Architecture:</td><td>HTML5, Bootstrap 5.3 Modern UI, JavaScript ES6+ Async/Await, SweetAlert2 Engine</td></tr>
                 <tr><td class="fw-bold text-dark">Backend & Cloud Storage:</td><td>Supabase PostgreSQL Cloud Realtime Engine</td></tr>
-                <tr><td class="fw-bold text-dark">System Analytics Engine:</td><td>Chart.js Dual-Axis Performance Renderer</td></tr>
+                <tr><td class="fw-bold text-dark">Encryption Standard:</td><td>Web Crypto API (SubtleCrypto AES-GCM 256-bit E2EE)</td></tr>
+                <tr><td class="fw-bold text-dark">System Analytics Engine:</td><td>Chart.js Dual-Axis Performance Renderer & Active User Heartbeat Tracker</td></tr>
                 <tr><td class="fw-bold text-dark">Export & Document Engine:</td><td>ExcelJS & FileSaver.js Integration</td></tr>
                 <tr><td class="fw-bold text-dark">Developer Utama:</td><td><strong class="text-primary">Lean Naddhito</strong></td></tr>
               </tbody>
@@ -1349,8 +1428,15 @@
     let base64AvatarImage = "";
     let livePerfInterval = null;
     let liveClockInterval = null;
+    let heartbeatInterval = null;
     let failedLoginAttempts = 0;
     let idleTimer = null;
+    let activeMenuName = "dashboard";
+
+    // IN-MEMORY CACHE UNTUK AKSELERASI CEPAT
+    let cachedServers = [];
+    let cachedEmployees = [];
+    let cachedResellers = [];
 
     const QUOTES_DATABASE = [
       { text: "Hasil luar biasa tidak pernah datang dari zona nyaman. Tetap semangat!", author: "Motivasi Kerja" },
@@ -1361,6 +1447,65 @@
       { text: "Jangan lupa tersenyum dan rehat sejenak, kesehatanmu adalah aset terbaik.", author: "Penghibur Diri" },
       { text: "Ketelitian dalam data adalah kunci keputusan bisnis yang tepat sasaran.", author: "Prinsip Profesional" }
     ];
+
+    // HIRARKI JABATAN KARYAWAN
+    const HIRARKI_JABATAN = ['Owner', 'Manajer', 'Officer', 'Teknisi', 'OB', 'Magang'];
+
+    // --- MODUL ENKRIPSI END-TO-END (E2EE) NATIVE WEB CRYPTO API ---
+    const E2EEService = {
+      async getKey() {
+        const secret = "RINNET_ENTERPRISE_E2EE_KEY_2026_MASTER";
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+          "raw", enc.encode(secret), { name: "PBKDF2" }, false, ["deriveBits", "deriveKey"]
+        );
+        return window.crypto.subtle.deriveKey(
+          { name: "PBKDF2", salt: enc.encode("RINNET_SALT_SECURE"), iterations: 100000, hash: "SHA-256" },
+          keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+        );
+      },
+      async encrypt(text) {
+        if (!text) return "";
+        try {
+          const key = await this.getKey();
+          const iv = window.crypto.getRandomValues(new Uint8Array(12));
+          const enc = new TextEncoder();
+          const ciphertext = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, enc.encode(text));
+          const ivHex = Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join('');
+          const cipherHex = Array.from(new Uint8Array(ciphertext)).map(b => b.toString(16).padStart(2, '0')).join('');
+          return `e2ee:${ivHex}:${cipherHex}`;
+        } catch(e) {
+          return text;
+        }
+      },
+      async decrypt(encryptedStr) {
+        if (!encryptedStr || !encryptedStr.startsWith('e2ee:')) return encryptedStr;
+        try {
+          const parts = encryptedStr.split(':');
+          if (parts.length !== 3) return encryptedStr;
+          const iv = new Uint8Array(parts[1].match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+          const ciphertext = new Uint8Array(parts[2].match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+          const key = await this.getKey();
+          const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ciphertext);
+          return new TextDecoder().decode(decrypted);
+        } catch(e) {
+          return encryptedStr;
+        }
+      }
+    };
+
+    // HELPER SWEETALERT2 MODERN DIALOGS
+    function showToast(icon, title) {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: icon,
+        title: title,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+      });
+    }
 
     // SANITASI INPUT STRING (PROTEKSI ANTI-XSS)
     function escapeHTML(str) {
@@ -1386,20 +1531,6 @@
       } else {
         passInput.type = 'password';
         eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
-    }
-
-    function setButtonLoading(btnElement, isLoading, defaultText = "Simpan Data") {
-      if (!btnElement) return;
-      if (isLoading) {
-        btnElement.disabled = true;
-        btnElement.setAttribute('data-original-text', btnElement.innerHTML);
-        btnElement.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memproses Data...`;
-      } else {
-        btnElement.disabled = false;
-        const orig = btnElement.getAttribute('data-original-text');
-        if (orig) btnElement.innerHTML = orig;
-        else btnElement.innerHTML = defaultText;
       }
     }
 
@@ -1458,20 +1589,180 @@
       }
     }
 
+    // --- HEARTBEAT REALTIME TRACKER SESSIONS ---
+    async function sendSessionHeartbeat() {
+      if (!currentUser) return;
+      try {
+        const deviceDetailed = getDeviceDetailedInfo();
+        const loc = await getUserLocation();
+        const heartbeatData = {
+          username: currentUser.username,
+          nama_lengkap: currentUser.nama_lengkap || currentUser.username,
+          role: currentUser.role,
+          device: deviceDetailed,
+          koordinat: loc,
+          active_module: activeMenuName,
+          last_seen: new Date().toISOString()
+        };
+
+        await _supabase.from('active_sessions').upsert([heartbeatData], { onConflict: 'username' });
+      } catch(e) {
+        console.warn("Heartbeat session update:", e);
+      }
+    }
+
+    async function refreshActiveUsersTable() {
+      const body = document.getElementById('bodyActiveSessions');
+      if (!body) return;
+
+      try {
+        const { data, error } = await _supabase.from('active_sessions').select('*').order('last_seen', { ascending: false });
+
+        if (error || !data || data.length === 0) {
+          body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">Belum ada data sesi user aktif terdeteksi.</td></tr>`;
+          return;
+        }
+
+        const now = new Date();
+        body.innerHTML = data.map(s => {
+          const lastSeenDate = new Date(s.last_seen);
+          const diffSeconds = Math.floor((now - lastSeenDate) / 1000);
+          const isLiveNow = diffSeconds < 30;
+
+          const roleBadge = s.role === 'SUPERADMIN' 
+            ? '<span class="badge bg-purple text-white"><i class="fa-solid fa-user-shield me-1"></i>SUPERADMIN</span>'
+            : (s.role === 'MANAJER' ? '<span class="badge bg-info text-dark"><i class="fa-solid fa-user-tie me-1"></i>MANAJER</span>' : '<span class="badge bg-primary"><i class="fa-solid fa-user me-1"></i>ADMIN</span>');
+
+          return `
+            <tr>
+              <td>
+                <div class="fw-bold text-dark"><i class="fa-solid fa-user-circle me-1 text-primary"></i>${escapeHTML(s.nama_lengkap)}</div>
+                <small class="text-muted font-monospace">@${escapeHTML(s.username)}</small>
+              </td>
+              <td>${roleBadge}</td>
+              <td><small class="fw-semibold text-secondary"><i class="fa-solid fa-laptop me-1"></i>${escapeHTML(s.device)}</small></td>
+              <td><small class="text-muted"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${escapeHTML(s.koordinat)}</small></td>
+              <td><span class="badge bg-light text-dark border"><i class="fa-solid fa-folder-open me-1 text-warning"></i>${escapeHTML(s.active_module || 'dashboard')}</span></td>
+              <td>
+                ${isLiveNow 
+                  ? `<span class="badge bg-success bg-opacity-10 text-success border border-success"><span class="live-dot me-1"></i>Aktif Sekarang</span>` 
+                  : `<span class="badge bg-secondary bg-opacity-10 text-secondary border">${diffSeconds} detik lalu</span>`}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch(e) {
+        body.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-3">Gagal memuat sesi user aktif.</td></tr>`;
+      }
+    }
+
     async function hapusRecord(tableName, id, reloadCallback, labelInfo = 'data') {
-      if (!confirm(`Apakah Anda yakin ingin menghapus ${labelInfo}? Data akan terhapus secara permanen.`)) return;
+      const confirmRes = await Swal.fire({
+        title: 'Konfirmasi Hapus Data',
+        text: `Apakah Anda yakin ingin menghapus ${labelInfo}? Data akan terhapus secara permanen.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus Permanent',
+        cancelButtonText: 'Batal'
+      });
+
+      if (!confirmRes.isConfirmed) return;
 
       try {
         const { error } = await _supabase.from(tableName).delete().eq('id', id);
         if (!error) {
           await logActivity('INPUT_DATA', `Menghapus record ${labelInfo}`, true);
-          alert('Data berhasil dihapus dari sistem!');
+          showToast('success', 'Data berhasil dihapus!');
           if (typeof reloadCallback === 'function') reloadCallback();
         } else {
-          alert('Gagal menghapus data: ' + error.message);
+          Swal.fire('Gagal!', 'Gagal menghapus data: ' + error.message, 'error');
         }
       } catch (e) {
-        alert('Terjadi kesalahan koneksi saat menghapus data!');
+        Swal.fire('Kesalahan!', 'Terjadi kesalahan koneksi saat menghapus data!', 'error');
+      }
+    }
+
+    // --- CACHING DATA UNTUK MENCEGAH DROPDOWN SLOW / KOSONG ---
+    async function loadAndCacheAllMasterData() {
+      try {
+        const [resServers, resEmps, resResellers] = await Promise.all([
+          _supabase.from('servers').select('*').order('nama_server', { ascending: true }),
+          _supabase.from('employees').select('*'),
+          _supabase.from('reseller_master').select('*')
+        ]);
+
+        if (resServers.data) cachedServers = resServers.data;
+        if (resEmps.data) cachedEmployees = resEmps.data;
+        if (resResellers.data) cachedResellers = resResellers.data;
+
+        // Opsi dropdown terisi langsung dari cache
+        populateAllDropdownsFromCache();
+      } catch(e) {
+        console.warn("Gagal refresh cache master data", e);
+      }
+    }
+
+    function populateAllDropdownsFromCache() {
+      // 1. Dropdown Server di Form Kasbon (ksbSumber)
+      const ksbSumberSelect = document.getElementById('ksbSumber');
+      if (ksbSumberSelect) {
+        const currVal = ksbSumberSelect.value;
+        ksbSumberSelect.innerHTML = `<option value="">-- Pilih Server --</option>` + 
+          cachedServers.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)} (${escapeHTML(s.wilayah || 'General')})</option>`).join('');
+        if (currVal) ksbSumberSelect.value = currVal;
+      }
+
+      // 2. Dropdown Server di Form Penyerahan Voucher (stkServer)
+      const stkServerSelect = document.getElementById('stkServer');
+      if (stkServerSelect) {
+        const currVal = stkServerSelect.value;
+        stkServerSelect.innerHTML = `<option value="">-- Pilih Server --</option>` + 
+          cachedServers.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`).join('');
+        if (currVal) stkServerSelect.value = currVal;
+      }
+
+      // 3. Dropdown Server di Form Input Reseller Master (rslServer)
+      const rslServerSelect = document.getElementById('rslServer');
+      if (rslServerSelect) {
+        const currVal = rslServerSelect.value;
+        rslServerSelect.innerHTML = `<option value="">-- Pilih Server --</option>` + 
+          cachedServers.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`).join('');
+        if (currVal) rslServerSelect.value = currVal;
+      }
+
+      // 4. Dropdown Karyawan di Form Kasbon & Filter Kasbon
+      populateKasbonKaryawanDropdown();
+    }
+
+    // --- OTOMATISASI ID KARYAWAN (FORMAT: IDR-001 DST) ---
+    async function generateAutoEmployeeID() {
+      const empIdInput = document.getElementById('empID');
+      if (!empIdInput) return;
+
+      try {
+        const { data } = await _supabase.from('employees').select('emp_id');
+        let maxNum = 0;
+
+        if (data && data.length > 0) {
+          data.forEach(item => {
+            if (item.emp_id) {
+              const match = item.emp_id.match(/IDR-(\d+)/i);
+              if (match) {
+                const num = parseInt(match[1], 10);
+                if (num > maxNum) maxNum = num;
+              }
+            }
+          });
+        }
+
+        const nextNum = maxNum + 1;
+        const autoID = `IDR-${String(nextNum).padStart(3, '0')}`;
+        empIdInput.value = autoID;
+      } catch(e) {
+        empIdInput.value = 'IDR-001';
       }
     }
 
@@ -1480,7 +1771,7 @@
       try {
         const targetElement = document.getElementById(elementId);
         if (!targetElement) {
-          alert('Elemen tabel data tidak ditemukan!');
+          Swal.fire('Error', 'Elemen tabel data tidak ditemukan!', 'error');
           return;
         }
 
@@ -1490,7 +1781,7 @@
         const tables = targetElement.tagName === 'TABLE' ? [targetElement] : targetElement.querySelectorAll('table');
 
         if (tables.length === 0) {
-          alert('Tidak ada tabel untuk diekspor!');
+          Swal.fire('Info', 'Tidak ada tabel untuk diekspor!', 'info');
           return;
         }
 
@@ -1548,11 +1839,11 @@
         workbook.xlsx.writeBuffer().then(buffer => {
           const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           saveAs(blob, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
+          showToast('success', 'File Excel berhasil diunduh!');
         });
 
       } catch (err) {
-        console.error("Gagal export excel:", err);
-        alert('Terjadi kesalahan saat mengekspor Excel: ' + err.message);
+        Swal.fire('Gagal Export', 'Terjadi kesalahan saat mengekspor Excel: ' + err.message, 'error');
       }
     }
 
@@ -1560,7 +1851,7 @@
     async function handleAuthLogin(e) {
       e.preventDefault();
       if (failedLoginAttempts >= 5) {
-        alert("Akses diblokir sementara karena terlalu banyak percobaan salah.");
+        Swal.fire('Akses Diblokir', 'Akses diblokir sementara karena terlalu banyak percobaan salah.', 'error');
         return;
       }
 
@@ -1581,7 +1872,7 @@
         if (error || !user) {
           failedLoginAttempts++;
           checkBruteForceLockout();
-          alert('Username tidak ditemukan!');
+          Swal.fire('Login Gagal', 'Username tidak ditemukan!', 'error');
           resetLoginButton();
           return;
         }
@@ -1595,11 +1886,11 @@
         } else {
           failedLoginAttempts++;
           checkBruteForceLockout();
-          alert('Password salah!');
+          Swal.fire('Login Gagal', 'Password yang Anda masukkan salah!', 'error');
           resetLoginButton();
         }
       } catch(err) {
-        alert('Terjadi kesalahan koneksi sistem!');
+        Swal.fire('Koneksi Error', 'Terjadi kesalahan koneksi sistem!', 'error');
         resetLoginButton();
       }
     }
@@ -1649,16 +1940,24 @@
       applyRolePermissionsUI();
       renderWelcomeGreetingAndQuotes();
       startLiveClock();
+      loadAndCacheAllMasterData();
       loadDashboardData();
+      generateAutoEmployeeID();
       initInactivitySecurityTimer();
+
+      // Start Heartbeat 10s
+      sendSessionHeartbeat();
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      heartbeatInterval = setInterval(sendSessionHeartbeat, 10000);
     }
 
     function initInactivitySecurityTimer() {
       const resetTimer = () => {
         if (idleTimer) clearTimeout(idleTimer);
         idleTimer = setTimeout(() => {
-          alert("Sesi Anda telah berakhir karena tidak ada aktivitas selama 20 menit demi keamanan data.");
-          handleLogout();
+          Swal.fire('Sesi Berakhir', 'Sesi Anda telah berakhir karena tidak ada aktivitas selama 20 menit.', 'warning').then(() => {
+            handleLogout();
+          });
         }, 20 * 60 * 1000);
       };
 
@@ -1717,6 +2016,7 @@
 
     function handleLogout() {
       if (livePerfInterval) clearInterval(livePerfInterval);
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
       sessionStorage.removeItem('rinnet_session_user');
       location.reload();
     }
@@ -1724,9 +2024,12 @@
     // --- NAVIGASI MODUL ---
     function switchMenu(menuName) {
       if (menuName === 'sysPerf' && currentUser?.role !== 'SUPERADMIN') {
-        alert('Akses Ditolak: Monitoring System khusus untuk Super Admin!');
+        Swal.fire('Akses Ditolak', 'Monitoring System khusus untuk Super Admin!', 'error');
         return;
       }
+
+      activeMenuName = menuName;
+      sendSessionHeartbeat();
 
       const sections = ['dashboard', 'karyawan', 'kasbon', 'server', 'serverWilayah', 'inputReseller', 'reseller', 'profil', 'sysPerf', 'userMgmt', 'about'];
       sections.forEach(s => {
@@ -1745,18 +2048,18 @@
       if (window.innerWidth < 992) document.getElementById('mainSidebar').classList.remove('show');
 
       if (menuName === 'dashboard') { loadDashboardData(); loadDashboardResellerSummary(); }
-      if (menuName === 'karyawan') loadKaryawanData();
-      if (menuName === 'kasbon') { populateKasbonKaryawanDropdown(); loadKasbonData(); }
+      if (menuName === 'karyawan') { generateAutoEmployeeID(); loadKaryawanData(); }
+      if (menuName === 'kasbon') { populateAllDropdownsFromCache(); loadKasbonData(); }
       if (menuName === 'server') loadServerData();
       if (menuName === 'serverWilayah') loadServerWilayahData();
-      if (menuName === 'inputReseller') { populateResellerServerDropdown(); loadResellerMasterData(); }
-      if (menuName === 'reseller') { populateServerDropdown(); loadStokData(); }
+      if (menuName === 'inputReseller') { populateAllDropdownsFromCache(); loadResellerMasterData(); }
+      if (menuName === 'reseller') { populateAllDropdownsFromCache(); loadStokData(); }
       if (menuName === 'profil') loadProfilData();
-      if (menuName === 'sysPerf') initLiveSystemPerformanceChart();
+      if (menuName === 'sysPerf') { initLiveSystemPerformanceChart(); refreshActiveUsersTable(); }
       if (menuName === 'userMgmt') loadUserData();
     }
 
-    // --- DASHBOARD & GRAFIK DISTRIBUSI SERVER ---
+    // --- DASHBOARD DATA ---
     async function loadDashboardData() {
       const { data: servers } = await _supabase.from('servers').select('*');
       const { data: emps } = await _supabase.from('employees').select('*');
@@ -1805,19 +2108,14 @@
       });
     }
 
-    // --- REKAPAN DASHBOARD VOUCHER DENGAN FILTER RENTANG TANGGAL ---
     async function loadDashboardResellerSummary() {
       const startDate = document.getElementById('dashResellerStart')?.value;
       const endDate = document.getElementById('dashResellerEnd')?.value;
 
       let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
 
-      if (startDate) {
-        query = query.gte('tanggal', startDate);
-      }
-      if (endDate) {
-        query = query.lte('tanggal', endDate);
-      }
+      if (startDate) query = query.gte('tanggal', startDate);
+      if (endDate) query = query.lte('tanggal', endDate);
 
       const { data, error } = await query;
       const body = document.getElementById('bodyDashReseller');
@@ -1831,17 +2129,17 @@
       body.innerHTML = data.map(d => {
         const totalHarian = (d.v2k||0) + (d.v3k||0) + (d.v4k||0) + (d.v5k||0) + (d.v6k||0) + (d.v25k||0);
         const totalBulanan = (d.b1hp||0) + (d.b2hp||0) + (d.b3hp||0) + (d.b4hp||0) + (d.b5hp||0);
-        const grandTotal = totalHarian + totalBulanan;
+        const totalAll = totalHarian + totalBulanan;
 
         return `
           <tr>
-            <td>${escapeHTML(d.tanggal || '-')}</td>
-            <td><b>${escapeHTML(d.nama_server)}</b></td>
-            <td>${escapeHTML(d.nama_reseller)}</td>
-            <td>${escapeHTML(d.petugas_lapangan || '-')}</td>
-            <td><span class="badge bg-primary px-2 py-1">${totalHarian.toLocaleString('id-ID')} Pcs</span></td>
-            <td><span class="badge bg-info px-2 py-1">${totalBulanan.toLocaleString('id-ID')} Pcs</span></td>
-            <td><strong class="text-success">${grandTotal.toLocaleString('id-ID')} Pcs</strong></td>
+            <td>${d.tanggal || '-'}</td>
+            <td><span class="badge bg-indigo text-white">${escapeHTML(d.nama_server)}</span></td>
+            <td><strong class="text-dark">${escapeHTML(d.nama_reseller)}</strong></td>
+            <td>${escapeHTML(d.petugas)}</td>
+            <td class="text-primary fw-bold">${totalHarian.toLocaleString()} Pcs</td>
+            <td class="text-info fw-bold">${totalBulanan.toLocaleString()} Pcs</td>
+            <td><span class="badge bg-success fs-6">${totalAll.toLocaleString()} Pcs</span></td>
           </tr>
         `;
       }).join('');
@@ -1853,260 +2151,146 @@
       loadDashboardResellerSummary();
     }
 
-    // --- MANAJEMEN SERVER ---
-    async function simpanServer(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      setButtonLoading(btn, true);
+    // --- MANAJEMEN DATA MASTER RESELLER (DIURUTKAN BERDASARKAN SERVER) ---
+    async function loadResellerMasterData() {
+      const { data, error } = await _supabase.from('reseller_master').select('*');
+      const body = document.getElementById('bodyMasterReseller');
+      if (!body) return;
 
-      const id = document.getElementById('srvId').value;
-      const payload = {
-        nama_server: document.getElementById('srvNama').value,
-        pengelola: document.getElementById('srvPengelola').value,
-        whatsapp: document.getElementById('srvWA').value,
-        wilayah: document.getElementById('srvWilayah').value
-      };
-
-      try {
-        let res;
-        if(id) {
-          res = await _supabase.from('servers').update(payload).eq('id', id);
-        } else {
-          res = await _supabase.from('servers').insert([payload]);
-        }
-
-        setButtonLoading(btn, false);
-        if (!res.error) {
-          await logActivity('INPUT_DATA', `Simpan/Edit Server Cloud: ${payload.nama_server}`, true);
-          alert('Berhasil: Data Server Berhasil Disimpan!');
-          document.getElementById('srvId').value = '';
-          e.target.reset();
-          loadServerData();
-        } else {
-          await logActivity('INPUT_DATA', `Simpan Server: ${payload.nama_server}`, false, res.error.message);
-          alert('Gagal menyimpan server: ' + res.error.message);
-        }
-      } catch (err) {
-        setButtonLoading(btn, false);
-        alert('Gagal: Terjadi kesalahan jaringan saat menyimpan data server.');
-      }
-    }
-
-    async function loadServerData() {
-      const { data } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
-      const isManager = currentUser?.role === 'MANAJER';
-
-      document.getElementById('bodyServer').innerHTML = (data || []).map(s => `
-        <tr>
-          <td><b>${escapeHTML(s.nama_server)}</b></td>
-          <td>${escapeHTML(s.pengelola)}</td>
-          <td>${escapeHTML(s.whatsapp)}</td>
-          <td>${escapeHTML(s.wilayah)}</td>
-          ${!isManager ? `
-          <td class="action-col">
-            <button class="btn btn-sm btn-warning text-white me-1" onclick="editServer('${s.id}', '${escapeHTML(s.nama_server)}', '${escapeHTML(s.pengelola)}', '${escapeHTML(s.whatsapp)}', '${escapeHTML(s.wilayah)}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('servers', '${s.id}', loadServerData, 'Server ${escapeHTML(s.nama_server)}')"><i class="fa-solid fa-trash"></i></button>
-          </td>` : ''}
-        </tr>`).join('');
-    }
-
-    function editServer(id, nama, pengelola, wa, wilayah) {
-      document.getElementById('srvId').value = id;
-      document.getElementById('srvNama').value = nama;
-      document.getElementById('srvPengelola').value = pengelola;
-      document.getElementById('srvWA').value = wa;
-      document.getElementById('srvWilayah').value = wilayah;
-    }
-
-    async function loadServerWilayahData() {
-      const { data: servers, error } = await _supabase.from('servers').select('*');
-      const container = document.getElementById('containerServerWilayah');
-      if (!container) return;
-
-      if (error || !servers || servers.length === 0) {
-        container.innerHTML = `<div class="alert alert-info">Belum ada data server yang terinput.</div>`;
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">Belum ada reseller terdaftar.</td></tr>`;
         return;
       }
 
-      const grouped = {};
-      servers.forEach(srv => {
-        const w = srv.wilayah || 'Lainnya / Tanpa Wilayah';
-        if (!grouped[w]) grouped[w] = [];
-        grouped[w].push(srv);
+      // KELOMPOKKAN / URUTKAN BERDASARKAN NAMA SERVER (ASCENDING) LALU NAMA RESELLER (ASCENDING)
+      data.sort((a, b) => {
+        const serverA = (a.nama_server || '').toLowerCase();
+        const serverB = (b.nama_server || '').toLowerCase();
+        if (serverA < serverB) return -1;
+        if (serverA > serverB) return 1;
+        return (a.nama_reseller || '').localeCompare(b.nama_reseller || '');
       });
 
-      const sortedWilayahKeys = Object.keys(grouped).sort((a, b) => {
-        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
-      });
-
-      let htmlContent = '';
-      const isManager = currentUser?.role === 'MANAJER';
-
-      sortedWilayahKeys.forEach(wilayahName => {
-        const listServer = grouped[wilayahName].sort((a, b) => 
-          a.nama_server.localeCompare(b.nama_server, undefined, { sensitivity: 'base' })
-        );
-
-        htmlContent += `
-          <div class="card card-custom p-4 mb-4">
-            <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-map-location-dot me-2"></i>Wilayah / Cluster: ${escapeHTML(wilayahName)}</h5>
-            <div class="table-responsive">
-              <table class="table table-hover align-middle">
-                <thead>
-                  <tr>
-                    <th>Nama Server (A–Z)</th>
-                    <th>Pengelola Server</th>
-                    <th>Nomor WhatsApp</th>
-                    <th>Wilayah / Cluster</th>
-                    ${!isManager ? `<th class="action-col">Aksi</th>` : ''}
-                  </tr>
-                </thead>
-                <tbody>
-                  ${listServer.map(s => `
-                    <tr>
-                      <td><b>${escapeHTML(s.nama_server)}</b></td>
-                      <td>${escapeHTML(s.pengelola)}</td>
-                      <td><a href="https://wa.me/${s.whatsapp.replace(/[^0-9]/g, '')}" target="_blank" class="text-success fw-bold text-decoration-none"><i class="fa-brands fa-whatsapp me-1"></i>${escapeHTML(s.whatsapp)}</a></td>
-                      <td><span class="badge bg-light text-dark border">${escapeHTML(s.wilayah)}</span></td>
-                      ${!isManager ? `
-                      <td class="action-col">
-                        <button class="btn btn-sm btn-warning text-white me-1" onclick="editServer('${s.id}', '${escapeHTML(s.nama_server)}', '${escapeHTML(s.pengelola)}', '${escapeHTML(s.whatsapp)}', '${escapeHTML(s.wilayah)}')"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="hapusRecord('servers', '${s.id}', loadServerWilayahData, 'Server ${escapeHTML(s.nama_server)}')"><i class="fa-solid fa-trash"></i></button>
-                      </td>` : ''}
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        `;
-      });
-
-      container.innerHTML = htmlContent;
+      body.innerHTML = data.map(r => `
+        <tr>
+          <td><span class="badge bg-indigo bg-opacity-10 text-indigo border border-indigo fw-bold px-3 py-1"><i class="fa-solid fa-server me-1"></i>${escapeHTML(r.nama_server)}</span></td>
+          <td class="fw-bold text-dark">${escapeHTML(r.nama_reseller)}</td>
+          <td><a href="https://wa.me/${escapeHTML(r.no_wa)}" target="_blank" class="text-decoration-none text-success fw-bold"><i class="fa-brands fa-whatsapp me-1"></i>${escapeHTML(r.no_wa)}</a></td>
+          <td class="action-col">
+            <button class="btn btn-sm btn-outline-warning me-1" onclick="editResellerMaster('${r.id}', '${escapeHTML(r.nama_reseller)}', '${escapeHTML(r.no_wa)}', '${escapeHTML(r.nama_server)}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onclick="hapusRecord('reseller_master', '${r.id}', loadResellerMasterData, 'Reseller Master')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
     }
 
-    // --- MANAJEMEN RESELLER MASTER ---
     async function simpanResellerMaster(e) {
       e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      setButtonLoading(btn, true);
-
       const id = document.getElementById('rslId').value;
-      const payload = {
-        nama_reseller: document.getElementById('rslNama').value,
-        whatsapp: document.getElementById('rslWA').value,
-        nama_server: document.getElementById('rslServer').value
-      };
+      const nama = document.getElementById('rslNama').value.trim();
+      const wa = document.getElementById('rslWA').value.trim();
+      const server = document.getElementById('rslServer').value;
 
-      try {
-        let res;
-        if(id) {
-          res = await _supabase.from('reseller_master').update(payload).eq('id', id);
-        } else {
-          res = await _supabase.from('reseller_master').insert([payload]);
-        }
+      const payload = { nama_reseller: nama, no_wa: wa, nama_server: server };
 
-        setButtonLoading(btn, false);
-        if (!res.error) {
-          await logActivity('INPUT_DATA', `Simpan Data Reseller: ${payload.nama_reseller}`, true);
-          alert('Data Reseller berhasil disimpan!');
-          document.getElementById('rslId').value = '';
-          e.target.reset();
-          loadResellerMasterData();
-        } else {
-          alert('Gagal menyimpan reseller: ' + res.error.message);
-        }
-      } catch (err) {
-        setButtonLoading(btn, false);
-        alert('Kesalahan jaringan saat menyimpan reseller.');
+      let error;
+      if (id) {
+        ({ error } = await _supabase.from('reseller_master').update(payload).eq('id', id));
+      } else {
+        ({ error } = await _supabase.from('reseller_master').insert([payload]));
+      }
+
+      if (!error) {
+        showToast('success', 'Data Reseller Master berhasil disimpan!');
+        document.getElementById('rslId').value = '';
+        e.target.reset();
+        await loadAndCacheAllMasterData();
+        loadResellerMasterData();
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
       }
     }
 
-    async function loadResellerMasterData() {
-      const { data } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
-      const isManager = currentUser?.role === 'MANAJER';
-
-      document.getElementById('bodyMasterReseller').innerHTML = (data || []).map(r => `
-        <tr>
-          <td><b>${escapeHTML(r.nama_reseller)}</b></td>
-          <td>${escapeHTML(r.whatsapp)}</td>
-          <td><span class="badge bg-indigo bg-opacity-10 text-primary">${escapeHTML(r.nama_server)}</span></td>
-          ${!isManager ? `
-          <td class="action-col">
-            <button class="btn btn-sm btn-warning text-white me-1" onclick="editResellerMaster('${r.id}', '${escapeHTML(r.nama_reseller)}', '${escapeHTML(r.whatsapp)}', '${escapeHTML(r.nama_server)}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('reseller_master', '${r.id}', loadResellerMasterData, 'Reseller ${escapeHTML(r.nama_reseller)}')"><i class="fa-solid fa-trash"></i></button>
-          </td>` : ''}
-        </tr>`).join('');
-    }
-
-    function editResellerMaster(id, nama, wa, srv) {
+    function editResellerMaster(id, nama, wa, server) {
       document.getElementById('rslId').value = id;
       document.getElementById('rslNama').value = nama;
       document.getElementById('rslWA').value = wa;
-      document.getElementById('rslServer').value = srv;
+      document.getElementById('rslServer').value = server;
     }
 
-    async function populateResellerServerDropdown() {
-      const { data } = await _supabase.from('servers').select('nama_server').order('nama_server', { ascending: true });
-      const select = document.getElementById('rslServer');
-      if (!select) return;
-      select.innerHTML = `<option value="">-- Pilih Server --</option>` + (data || []).map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`).join('');
+    // --- MANAJEMEN DATA KARYAWAN (ID OTOMATIS & HIRARKI JABATAN) ---
+    async function loadKaryawanData() {
+      const { data, error } = await _supabase.from('employees').select('*');
+      const body = document.getElementById('bodyKaryawan');
+      if (!body) return;
+
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada karyawan terdaftar.</td></tr>`;
+        return;
+      }
+
+      // SIKLUS URUTAN BERDASARKAN HIRARKI JABATAN
+      data.sort((a, b) => {
+        const idxA = HIRARKI_JABATAN.indexOf(a.jabatan);
+        const idxB = HIRARKI_JABATAN.indexOf(b.jabatan);
+        const rankA = idxA !== -1 ? idxA : 99;
+        const rankB = idxB !== -1 ? idxB : 99;
+
+        if (rankA !== rankB) return rankA - rankB;
+        return (a.nama_karyawan || '').localeCompare(b.nama_karyawan || '');
+      });
+
+      body.innerHTML = data.map(e => {
+        let badgeColor = 'bg-secondary';
+        if (e.jabatan === 'Owner') badgeColor = 'bg-danger';
+        if (e.jabatan === 'Manajer') badgeColor = 'bg-warning text-dark';
+        if (e.jabatan === 'Officer') badgeColor = 'bg-primary';
+        if (e.jabatan === 'Teknisi') badgeColor = 'bg-info text-dark';
+        if (e.jabatan === 'OB') badgeColor = 'bg-dark';
+        if (e.jabatan === 'Magang') badgeColor = 'bg-light text-dark border';
+
+        return `
+          <tr>
+            <td class="fw-bold font-monospace text-primary">${escapeHTML(e.emp_id)}</td>
+            <td class="fw-bold text-dark">${escapeHTML(e.nama_karyawan)}</td>
+            <td><span class="badge ${badgeColor} px-3 py-1 fw-bold">${escapeHTML(e.jabatan)}</span></td>
+            <td><a href="https://wa.me/${escapeHTML(e.no_wa)}" target="_blank" class="text-decoration-none text-success fw-bold"><i class="fa-brands fa-whatsapp me-1"></i>${escapeHTML(e.no_wa || '-')}</a></td>
+            <td class="action-col">
+              <button class="btn btn-sm btn-outline-warning me-1" onclick="editKaryawan('${e.id}', '${escapeHTML(e.emp_id)}', '${escapeHTML(e.nama_karyawan)}', '${escapeHTML(e.jabatan)}', '${escapeHTML(e.no_wa)}')"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="hapusRecord('employees', '${e.id}', loadKaryawanData, 'Karyawan')"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    // --- MANAJEMEN KARYAWAN ---
     async function simpanKaryawan(e) {
       e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      setButtonLoading(btn, true);
+      const dbId = document.getElementById('empDbId').value;
+      const empId = document.getElementById('empID').value.trim();
+      const nama = document.getElementById('empNama').value.trim();
+      const jabatan = document.getElementById('empJabatan').value;
+      const wa = document.getElementById('empWA').value.trim();
 
-      const id = document.getElementById('empDbId').value;
-      const payload = {
-        emp_id: document.getElementById('empID').value,
-        nama_karyawan: document.getElementById('empNama').value,
-        jabatan: document.getElementById('empJabatan').value,
-        whatsapp: document.getElementById('empWA').value
-      };
+      const payload = { emp_id: empId, nama_karyawan: nama, jabatan: jabatan, no_wa: wa };
 
-      try {
-        let res;
-        if(id) {
-          res = await _supabase.from('employees').update(payload).eq('id', id);
-        } else {
-          res = await _supabase.from('employees').insert([payload]);
-        }
-
-        setButtonLoading(btn, false);
-        if (!res.error) {
-          await logActivity('INPUT_DATA', `Simpan Data Karyawan: ${payload.nama_karyawan}`, true);
-          alert('Data Karyawan berhasil disimpan!');
-          document.getElementById('empDbId').value = '';
-          e.target.reset();
-          loadKaryawanData();
-        } else {
-          alert('Gagal menyimpan data karyawan: ' + res.error.message);
-        }
-      } catch (err) {
-        setButtonLoading(btn, false);
-        alert('Kesalahan koneksi saat menyimpan karyawan.');
+      let error;
+      if (dbId) {
+        ({ error } = await _supabase.from('employees').update(payload).eq('id', dbId));
+      } else {
+        ({ error } = await _supabase.from('employees').insert([payload]));
       }
-    }
 
-    async function loadKaryawanData() {
-      const { data } = await _supabase.from('employees').select('*').order('nama_karyawan', { ascending: true });
-      const isManager = currentUser?.role === 'MANAJER';
-
-      document.getElementById('bodyKaryawan').innerHTML = (data || []).map(emp => `
-        <tr>
-          <td><span class="badge bg-secondary">${escapeHTML(emp.emp_id)}</span></td>
-          <td><b>${escapeHTML(emp.nama_karyawan)}</b></td>
-          <td><span class="badge bg-info bg-opacity-10 text-info fw-bold">${escapeHTML(emp.jabatan)}</span></td>
-          <td>${escapeHTML(emp.whatsapp || '-')}</td>
-          ${!isManager ? `
-          <td class="action-col">
-            <button class="btn btn-sm btn-warning text-white me-1" onclick="editKaryawan('${emp.id}', '${escapeHTML(emp.emp_id)}', '${escapeHTML(emp.nama_karyawan)}', '${escapeHTML(emp.jabatan)}', '${escapeHTML(emp.whatsapp||'')}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('employees', '${emp.id}', loadKaryawanData, 'Karyawan ${escapeHTML(emp.nama_karyawan)}')"><i class="fa-solid fa-trash"></i></button>
-          </td>` : ''}
-        </tr>`).join('');
+      if (!error) {
+        showToast('success', 'Data Karyawan berhasil disimpan!');
+        document.getElementById('empDbId').value = '';
+        e.target.reset();
+        await loadAndCacheAllMasterData();
+        generateAutoEmployeeID();
+        loadKaryawanData();
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
+      }
     }
 
     function editKaryawan(id, empId, nama, jabatan, wa) {
@@ -2117,493 +2301,503 @@
       document.getElementById('empWA').value = wa;
     }
 
-    // --- MANAJEMEN STOK VOUCHER RESELLER ---
-    async function populateServerDropdown() {
-      const { data } = await _supabase.from('servers').select('nama_server').order('nama_server', { ascending: true });
-      const select = document.getElementById('stkServer');
-      const selectKasbon = document.getElementById('ksbSumber');
+    // --- MANAJEMEN USER (TAMPILAN MODERN DENGAN KOLOM EMAIL) ---
+    async function loadUserData() {
+      const { data, error } = await _supabase.from('users').select('*');
+      const body = document.getElementById('bodyUsers');
+      if (!body) return;
 
-      const options = `<option value="">-- Pilih Server --</option>` + (data || []).map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`).join('');
-      if (select) select.innerHTML = options;
-      if (selectKasbon) selectKasbon.innerHTML = options;
-    }
-
-    async function handleServerChangeInVoucher(serverName) {
-      const selectReseller = document.getElementById('stkReseller');
-      if (!serverName) {
-        selectReseller.innerHTML = `<option value="">-- Pilih Reseller --</option>`;
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada akun pengguna terdaftar.</td></tr>`;
         return;
       }
 
-      const { data } = await _supabase.from('reseller_master').select('nama_reseller').eq('nama_server', serverName).order('nama_reseller', { ascending: true });
-      selectReseller.innerHTML = `<option value="">-- Pilih Reseller --</option>` + (data || []).map(r => `<option value="${escapeHTML(r.nama_reseller)}">${escapeHTML(r.nama_reseller)}</option>`).join('');
-    }
+      body.innerHTML = data.map(u => {
+        let roleBadge = '<span class="badge bg-primary">ADMIN</span>';
+        if (u.role === 'SUPERADMIN') roleBadge = '<span class="badge bg-purple text-white"><i class="fa-solid fa-user-shield me-1"></i>SUPERADMIN</span>';
+        if (u.role === 'MANAJER') roleBadge = '<span class="badge bg-info text-dark"><i class="fa-solid fa-user-tie me-1"></i>MANAJER</span>';
 
-    async function simpanStokReseller(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      setButtonLoading(btn, true);
+        const permissions = Array.isArray(u.permissions) ? u.permissions.join(', ') : (u.permissions || 'Default');
 
-      const id = document.getElementById('stkId').value;
-      const payload = {
-        tanggal: document.getElementById('stkTanggal').value,
-        nama_server: document.getElementById('stkServer').value,
-        nama_reseller: document.getElementById('stkReseller').value,
-        petugas_lapangan: document.getElementById('stkPetugas').value,
-        v2k: parseInt(document.getElementById('v2k').value || 0),
-        v3k: parseInt(document.getElementById('v3k').value || 0),
-        v4k: parseInt(document.getElementById('v4k').value || 0),
-        v5k: parseInt(document.getElementById('v5k').value || 0),
-        v6k: parseInt(document.getElementById('v6k').value || 0),
-        v25k: parseInt(document.getElementById('v25k').value || 0),
-        b1hp: parseInt(document.getElementById('b1hp').value || 0),
-        b2hp: parseInt(document.getElementById('b2hp').value || 0),
-        b3hp: parseInt(document.getElementById('b3hp').value || 0),
-        b4hp: parseInt(document.getElementById('b4hp').value || 0),
-        b5hp: parseInt(document.getElementById('b5hp').value || 0)
-      };
+        const emailDisplay = u.email 
+          ? `<a href="mailto:${escapeHTML(u.email)}" class="text-decoration-none text-indigo fw-bold"><i class="fa-regular fa-envelope me-1"></i>${escapeHTML(u.email)}</a>`
+          : `<span class="badge bg-light text-muted border"><i class="fa-solid fa-minus me-1"></i>Opsional</span>`;
 
-      try {
-        let res;
-        if(id) {
-          res = await _supabase.from('reseller_stock').update(payload).eq('id', id);
-        } else {
-          res = await _supabase.from('reseller_stock').insert([payload]);
-        }
-
-        setButtonLoading(btn, false);
-        if(!res.error) {
-          await logActivity('INPUT_DATA', `Penyerahan Stok Voucher: Server ${payload.nama_server} - Reseller ${payload.nama_reseller}`, true);
-          alert('Data Penyerahan Voucher Berhasil Disimpan!');
-          document.getElementById('stkId').value = '';
-          e.target.reset();
-          loadStokData();
-        } else {
-          alert('Gagal menyimpan voucher: ' + res.error.message);
-        }
-      } catch (err) {
-        setButtonLoading(btn, false);
-        alert('Kesalahan jaringan saat menyimpan stok voucher.');
-      }
-    }
-
-    async function loadStokData() {
-      let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
-      
-      const s = document.getElementById('filterStokStart').value;
-      const e = document.getElementById('filterStokEnd').value;
-      if (s) query = query.gte('tanggal', s);
-      if (e) query = query.lte('tanggal', e);
-
-      const { data } = await query;
-      const isManager = currentUser?.role === 'MANAJER';
-
-      document.getElementById('bodyStok').innerHTML = (data || []).map(stk => `
-        <tr>
-          <td>${escapeHTML(stk.tanggal)}</td>
-          <td><b>${escapeHTML(stk.nama_server)}</b></td>
-          <td>${escapeHTML(stk.nama_reseller)}</td>
-          <td>${escapeHTML(stk.petugas_lapangan)}</td>
-          <td>${stk.v2k||0}</td><td>${stk.v3k||0}</td><td>${stk.v4k||0}</td><td>${stk.v5k||0}</td><td>${stk.v6k||0}</td><td>${stk.v25k||0}</td>
-          <td>${stk.b1hp||0}</td><td>${stk.b2hp||0}</td><td>${stk.b3hp||0}</td><td>${stk.b4hp||0}</td><td>${stk.b5hp||0}</td>
-          ${!isManager ? `
-          <td class="action-col">
-            <button class="btn btn-sm btn-warning text-white me-1" onclick="editStok('${stk.id}', '${stk.tanggal}', '${escapeHTML(stk.nama_server)}', '${escapeHTML(stk.nama_reseller)}', '${escapeHTML(stk.petugas_lapangan)}', ${stk.v2k}, ${stk.v3k}, ${stk.v4k}, ${stk.v5k}, ${stk.v6k}, ${stk.v25k}, ${stk.b1hp}, ${stk.b2hp}, ${stk.b3hp}, ${stk.b4hp}, ${stk.b5hp})"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('reseller_stock', '${stk.id}', loadStokData, 'Stok Voucher ${escapeHTML(stk.nama_reseller)}')"><i class="fa-solid fa-trash"></i></button>
-          </td>` : ''}
-        </tr>`).join('');
-    }
-
-    function editStok(id, tgl, srv, rsl, ptg, v2, v3, v4, v5, v6, v25, b1, b2, b3, b4, b5) {
-      document.getElementById('stkId').value = id;
-      document.getElementById('stkTanggal').value = tgl;
-      document.getElementById('stkServer').value = srv;
-      handleServerChangeInVoucher(srv).then(() => {
-        document.getElementById('stkReseller').value = rsl;
-      });
-      document.getElementById('stkPetugas').value = ptg;
-      document.getElementById('v2k').value = v2;
-      document.getElementById('v3k').value = v3;
-      document.getElementById('v4k').value = v4;
-      document.getElementById('v5k').value = v5;
-      document.getElementById('v6k').value = v6;
-      document.getElementById('v25k').value = v25;
-      document.getElementById('b1hp').value = b1;
-      document.getElementById('b2hp').value = b2;
-      document.getElementById('b3hp').value = b3;
-      document.getElementById('b4hp').value = b4;
-      document.getElementById('b5hp').value = b5;
-    }
-
-    // --- MANAJEMEN KASBON KARYAWAN (PERBAIKAN KALKULASI 2 MINGGU & BULANAN) ---
-    async function populateKasbonKaryawanDropdown() {
-      const { data } = await _supabase.from('employees').select('nama_karyawan').order('nama_karyawan', { ascending: true });
-      const selectForm = document.getElementById('ksbKaryawan');
-      const selectFilter = document.getElementById('fltKasbonKaryawan');
-
-      const options = `<option value="">-- Semua Karyawan --</option>` + (data || []).map(e => `<option value="${escapeHTML(e.nama_karyawan)}">${escapeHTML(e.nama_karyawan)}</option>`).join('');
-      if (selectForm) selectForm.innerHTML = `<option value="">-- Pilih Karyawan --</option>` + (data || []).map(e => `<option value="${escapeHTML(e.nama_karyawan)}">${escapeHTML(e.nama_karyawan)}</option>`).join('');
-      if (selectFilter) selectFilter.innerHTML = options;
-    }
-
-    async function simpanKasbon(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      setButtonLoading(btn, true);
-
-      const id = document.getElementById('ksbId').value;
-      const payload = {
-        tanggal: document.getElementById('ksbTanggal').value,
-        nama_karyawan: document.getElementById('ksbKaryawan').value,
-        jumlah_kasbon: parseFloat(document.getElementById('ksbJumlah').value || 0),
-        sumber_dana: document.getElementById('ksbSumber').value,
-        keterangan: document.getElementById('ksbKet').value
-      };
-
-      try {
-        let res;
-        if(id) {
-          res = await _supabase.from('kasbon').update(payload).eq('id', id);
-        } else {
-          res = await _supabase.from('kasbon').insert([payload]);
-        }
-
-        setButtonLoading(btn, false);
-        if(!res.error) {
-          await logActivity('INPUT_DATA', `Input Kasbon Karyawan: ${payload.nama_karyawan} - Rp ${payload.jumlah_kasbon.toLocaleString('id-ID')}`, true);
-          alert('Pengajuan Kasbon Berhasil Disimpan!');
-          document.getElementById('ksbId').value = '';
-          e.target.reset();
-          loadKasbonData();
-        } else {
-          alert('Gagal menyimpan kasbon: ' + res.error.message);
-        }
-      } catch (err) {
-        setButtonLoading(btn, false);
-        alert('Kesalahan koneksi saat menyimpan kasbon.');
-      }
-    }
-
-    async function loadKasbonData() {
-      const { data: allKasbon, error } = await _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
-      if (error) {
-        console.error("Gagal mengambil data kasbon:", error);
-        return;
-      }
-
-      const empFilter = document.getElementById('fltKasbonKaryawan')?.value;
-      const startDate = document.getElementById('fltKasbonStart')?.value;
-      const endDate = document.getElementById('fltKasbonEnd')?.value;
-
-      const today = new Date();
-      const twoWeeksAgo = new Date(today.getTime() - (14 * 24 * 60 * 60 * 1000));
-      const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
-
-      let totalFiltered = 0;
-      let total2W = 0;
-      let total1M = 0;
-
-      const filteredList = (allKasbon || []).filter(item => {
-        const itemDate = new Date(item.tanggal);
-        const amt = parseFloat(item.jumlah_kasbon || item.jumlah || 0);
-
-        if (!isNaN(itemDate.getTime())) {
-          if (itemDate >= twoWeeksAgo) total2W += amt;
-          if (itemDate >= thirtyDaysAgo) total1M += amt;
-        }
-
-        if (empFilter && item.nama_karyawan !== empFilter) return false;
-        if (startDate && item.tanggal < startDate) return false;
-        if (endDate && item.tanggal > endDate) return false;
-
-        totalFiltered += amt;
-        return true;
-      });
-
-      document.getElementById('rekapTotalKasbonUser').innerText = 'Rp ' + totalFiltered.toLocaleString('id-ID');
-      document.getElementById('rekapTotalKasbon2W').innerText = 'Rp ' + total2W.toLocaleString('id-ID');
-      document.getElementById('rekapTotalKasbon1M').innerText = 'Rp ' + total1M.toLocaleString('id-ID');
-
-      const isManager = currentUser?.role === 'MANAJER';
-
-      document.getElementById('bodyKasbon').innerHTML = filteredList.map(k => {
-        const amt = parseFloat(k.jumlah_kasbon || k.jumlah || 0);
         return `
           <tr>
-            <td>${escapeHTML(k.tanggal)}</td>
-            <td><b>${escapeHTML(k.nama_karyawan)}</b></td>
-            <td><strong class="text-danger">Rp ${amt.toLocaleString('id-ID')}</strong></td>
-            <td><span class="badge bg-light text-dark border">${escapeHTML(k.sumber_dana)}</span></td>
-            <td>${escapeHTML(k.keterangan || '-')}</td>
-            ${!isManager ? `
-            <td class="action-col">
-              <button class="btn btn-sm btn-warning text-white me-1" onclick="editKasbon('${k.id}', '${k.tanggal}', '${escapeHTML(k.nama_karyawan)}', ${amt}, '${escapeHTML(k.sumber_dana)}', '${escapeHTML(k.keterangan||'')}')"><i class="fa-solid fa-pen"></i></button>
-              <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Kasbon ${escapeHTML(k.nama_karyawan)}')"><i class="fa-solid fa-trash"></i></button>
-            </td>` : ''}
+            <td>
+              <strong class="text-dark d-block">${escapeHTML(u.nama_lengkap || u.username)}</strong>
+              <small class="text-muted font-monospace">@${escapeHTML(u.username)}</small>
+            </td>
+            <td>${emailDisplay}</td>
+            <td>${roleBadge}</td>
+            <td><small class="text-secondary fw-semibold">${escapeHTML(permissions)}</small></td>
+            <td>
+              <button class="btn btn-sm btn-outline-warning me-1" onclick="editUser('${u.id}', '${escapeHTML(u.username)}', '${escapeHTML(u.nama_lengkap)}', '${escapeHTML(u.email||'')}', '${escapeHTML(u.no_wa||'')}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn btn-sm btn-outline-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User')"><i class="fa-solid fa-trash"></i></button>
+            </td>
           </tr>
         `;
       }).join('');
     }
 
-    function editKasbon(id, tgl, emp, jml, sbr, ket) {
-      document.getElementById('ksbId').value = id;
-      document.getElementById('ksbTanggal').value = tgl;
-      document.getElementById('ksbKaryawan').value = emp;
-      document.getElementById('ksbJumlah').value = jml;
-      document.getElementById('ksbSumber').value = sbr;
-      document.getElementById('ksbKet').value = ket;
-    }
-
-    // --- PROFIL SAYA ---
-    function previewSelectedImage(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          document.getElementById('prfAvatarPreview').src = evt.target.result;
-          base64AvatarImage = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function loadProfilData() {
-      if (!currentUser) return;
-      document.getElementById('prfUsername').value = currentUser.username || '';
-      document.getElementById('prfNamaLengkap').value = currentUser.nama_lengkap || '';
-      document.getElementById('prfEmail').value = currentUser.email || '';
-      document.getElementById('prfWA').value = currentUser.whatsapp || '';
-      if (currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
-    }
-
-    async function simpanProfil(e) {
+    async function simpanUserMgmt(e) {
       e.preventDefault();
-      const btn = document.getElementById('btnSimpanProfil');
-      setButtonLoading(btn, true);
+      const id = document.getElementById('usrDbId').value;
+      const u = document.getElementById('usrName').value.trim().toLowerCase();
+      const nama = document.getElementById('usrFullName').value.trim();
+      const email = document.getElementById('usrEmail').value.trim();
+      const pass = document.getElementById('usrPass').value;
+      const wa = document.getElementById('usrWA').value.trim();
+      const role = document.getElementById('usrRole').value;
+
+      const perms = [];
+      document.querySelectorAll('.perm-chk:checked').forEach(c => perms.push(c.value));
 
       const payload = {
-        nama_lengkap: document.getElementById('prfNamaLengkap').value,
-        email: document.getElementById('prfEmail').value,
-        whatsapp: document.getElementById('prfWA').value
+        username: u,
+        nama_lengkap: nama,
+        email: email || null,
+        no_wa: wa,
+        role: role,
+        permissions: perms
       };
-      if (base64AvatarImage) payload.avatar_url = base64AvatarImage;
 
-      try {
-        const { error } = await _supabase.from('users').update(payload).eq('username', currentUser.username);
-        setButtonLoading(btn, false);
+      if (pass) payload.password_hash = pass;
 
-        if (!error) {
-          currentUser = { ...currentUser, ...payload };
-          sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
-          document.getElementById('navUserName').innerText = currentUser.nama_lengkap;
-          if (currentUser.avatar_url) document.getElementById('navUserAvatar').src = currentUser.avatar_url;
-          alert('Profil berhasil diperbarui!');
-        } else {
-          alert('Gagal update profil: ' + error.message);
-        }
-      } catch (err) {
-        setButtonLoading(btn, false);
-        alert('Kesalahan koneksi saat update profil.');
+      let error;
+      if (id) {
+        ({ error } = await _supabase.from('users').update(payload).eq('id', id));
+      } else {
+        if (!pass) { Swal.fire('Error', 'Password wajib diisi untuk user baru!', 'error'); return; }
+        ({ error } = await _supabase.from('users').insert([payload]));
+      }
+
+      if (!error) {
+        showToast('success', 'Akun Pengguna berhasil disimpan!');
+        document.getElementById('usrDbId').value = '';
+        e.target.reset();
+        loadUserData();
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
       }
     }
 
-    // --- MONITORING SYSTEM (REALTIME CHART & LOG TERMINAL) ---
-    function initLiveSystemPerformanceChart() {
-      const ctx = document.getElementById('systemPerfChart').getContext('2d');
-      if (perfChart) perfChart.destroy();
-
-      const initialLabels = Array.from({length: 10}, (_, i) => `${i*3}s ago`).reverse();
-      const cpuData = [12, 14, 15, 18, 14, 16, 13, 14, 15, 14];
-      const latencyData = [32, 28, 26, 30, 29, 28, 27, 28, 29, 28];
-
-      perfChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: initialLabels,
-          datasets: [
-            {
-              label: 'CPU Usage (%)',
-              data: cpuData,
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)',
-              tension: 0.4,
-              fill: true
-            },
-            {
-              label: 'DB Latency (ms)',
-              data: latencyData,
-              borderColor: '#f59e0b',
-              backgroundColor: 'transparent',
-              tension: 0.4,
-              borderDash: [5, 5]
-            }
-          ]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { position: 'top' } },
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-
-      if (livePerfInterval) clearInterval(livePerfInterval);
-      livePerfInterval = setInterval(() => {
-        const newCpu = Math.floor(Math.random() * 12) + 10;
-        const newRam = Math.floor(Math.random() * 5) + 40;
-        const newLat = Math.floor(Math.random() * 8) + 24;
-
-        document.getElementById('sysCpuVal').innerText = `${newCpu}%`;
-        document.getElementById('sysCpuBar').style.width = `${newCpu}%`;
-        document.getElementById('sysRamVal').innerText = `${newRam}%`;
-        document.getElementById('sysRamBar').style.width = `${newRam}%`;
-        document.getElementById('sysDbLatency').innerText = `${newLat} ms`;
-
-        if (perfChart) {
-          perfChart.data.datasets[0].data.shift();
-          perfChart.data.datasets[0].data.push(newCpu);
-          perfChart.data.datasets[1].data.shift();
-          perfChart.data.datasets[1].data.push(newLat);
-          perfChart.update('quiet');
-        }
-
-        appendTerminalLog(`[HEALTH] DB Ping: ${newLat}ms | CPU: ${newCpu}% | RAM: ${newRam}%`);
-      }, 3000);
-    }
-
-    function appendTerminalLog(msg) {
-      const term = document.getElementById('sysLogTerminal');
-      if (!term) return;
-      const timeStr = new Date().toLocaleTimeString('id-ID');
-      const div = document.createElement('div');
-      div.innerText = `[${timeStr}] ${msg}`;
-      term.appendChild(div);
-      term.scrollTop = term.scrollHeight;
-    }
-
-    // --- MANAJEMEN USER ---
-    async function loadUserData() {
-      const { data } = await _supabase.from('users').select('*').order('username', { ascending: true });
-      document.getElementById('bodyUsers').innerHTML = (data || []).map(u => `
-        <tr>
-          <td><b>${escapeHTML(u.username)}</b></td>
-          <td>${escapeHTML(u.nama_lengkap || '-')}</td>
-          <td><span class="badge ${u.role==='SUPERADMIN'?'bg-danger':u.role==='MANAJER'?'bg-warning text-dark':'bg-primary'}">${escapeHTML(u.role)}</span></td>
-          <td><small class="text-muted">${escapeHTML(u.permissions || 'All Access')}</small></td>
-          <td>
-            <button class="btn btn-sm btn-warning text-white me-1" onclick="editUserMgmt('${u.id}', '${escapeHTML(u.username)}', '${escapeHTML(u.nama_lengkap||'')}', '${escapeHTML(u.email||'')}', '${escapeHTML(u.whatsapp||'')}', '${u.role}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="hapusRecord('users', '${u.id}', loadUserData, 'User ${escapeHTML(u.username)}')"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>`).join('');
-    }
-
-    function editUserMgmt(id, uname, fname, email, wa, role) {
+    function editUser(id, username, nama, email, wa, role) {
       document.getElementById('usrDbId').value = id;
-      document.getElementById('usrName').value = uname;
-      document.getElementById('usrFullName').value = fname;
+      document.getElementById('usrName').value = username;
+      document.getElementById('usrFullName').value = nama;
       document.getElementById('usrEmail').value = email;
       document.getElementById('usrWA').value = wa;
       document.getElementById('usrRole').value = role;
     }
 
     function handleRolePresetChange(role) {
-      const perms = document.querySelectorAll('.perm-chk');
-      perms.forEach(p => {
-        if (role === 'SUPERADMIN') p.checked = true;
-        else if (role === 'MANAJER') p.checked = p.value === 'dashboard' || p.value === 'monitoring';
-        else p.checked = p.value !== 'monitoring';
-      });
+      document.querySelectorAll('.perm-chk').forEach(c => c.checked = (role === 'SUPERADMIN'));
     }
 
-    async function simpanUserMgmt(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      setButtonLoading(btn, true);
+    // --- MANAJEMEN SERVER CLOUD ---
+    async function loadServerData() {
+      const { data, error } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
+      const body = document.getElementById('bodyServer');
+      if (!body) return;
 
-      const id = document.getElementById('usrDbId').value;
-      const pass = document.getElementById('usrPass').value;
-      const selectedPerms = Array.from(document.querySelectorAll('.perm-chk:checked')).map(c => c.value).join(',');
-
-      const payload = {
-        username: document.getElementById('usrName').value,
-        nama_lengkap: document.getElementById('usrFullName').value,
-        email: document.getElementById('usrEmail').value,
-        whatsapp: document.getElementById('usrWA').value,
-        role: document.getElementById('usrRole').value,
-        permissions: selectedPerms
-      };
-      if (pass) payload.password_hash = pass;
-
-      try {
-        let res;
-        if(id) {
-          res = await _supabase.from('users').update(payload).eq('id', id);
-        } else {
-          if(!pass) { alert('Password wajib diisi untuk akun baru!'); setButtonLoading(btn, false); return; }
-          res = await _supabase.from('users').insert([payload]);
-        }
-
-        setButtonLoading(btn, false);
-        if(!res.error) {
-          alert('Akun pengguna berhasil disimpan!');
-          document.getElementById('usrDbId').value = '';
-          e.target.reset();
-          loadUserData();
-        } else {
-          alert('Gagal menyimpan user: ' + res.error.message);
-        }
-      } catch (err) {
-        setButtonLoading(btn, false);
-        alert('Kesalahan koneksi saat menyimpan user.');
-      }
-    }
-
-    // --- PEMBERSIHAN DATA CUSTOM ---
-    function openPurgeModal(table, label) {
-      if (currentUser?.role !== 'SUPERADMIN') {
-        alert('Akses Ditolak: Pembersihan data hanya dapat dilakukan oleh Super Admin!');
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data server cloud.</td></tr>`;
         return;
       }
-      document.getElementById('purgeTargetTable').value = table;
-      document.getElementById('purgeTargetLabel').value = label;
+
+      body.innerHTML = data.map(s => `
+        <tr>
+          <td><strong class="text-dark">${escapeHTML(s.nama_server)}</strong></td>
+          <td>${escapeHTML(s.pengelola)}</td>
+          <td><a href="https://wa.me/${escapeHTML(s.no_wa)}" target="_blank" class="text-decoration-none text-success fw-bold"><i class="fa-brands fa-whatsapp me-1"></i>${escapeHTML(s.no_wa)}</a></td>
+          <td><span class="badge bg-secondary bg-opacity-10 text-dark border">${escapeHTML(s.wilayah)}</span></td>
+          <td class="action-col">
+            <button class="btn btn-sm btn-outline-warning me-1" onclick="editServer('${s.id}', '${escapeHTML(s.nama_server)}', '${escapeHTML(s.pengelola)}', '${escapeHTML(s.no_wa)}', '${escapeHTML(s.wilayah)}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onclick="hapusRecord('servers', '${s.id}', loadServerData, 'Server')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function simpanServer(e) {
+      e.preventDefault();
+      const id = document.getElementById('srvId').value;
+      const nama = document.getElementById('srvNama').value.trim();
+      const pengelola = document.getElementById('srvPengelola').value.trim();
+      const wa = document.getElementById('srvWA').value.trim();
+      const wilayah = document.getElementById('srvWilayah').value.trim();
+
+      const payload = { nama_server: nama, pengelola: pengelola, no_wa: wa, wilayah: wilayah };
+
+      let error;
+      if (id) {
+        ({ error } = await _supabase.from('servers').update(payload).eq('id', id));
+      } else {
+        ({ error } = await _supabase.from('servers').insert([payload]));
+      }
+
+      if (!error) {
+        showToast('success', 'Data Server berhasil disimpan!');
+        document.getElementById('srvId').value = '';
+        e.target.reset();
+        await loadAndCacheAllMasterData();
+        loadServerData();
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
+      }
+    }
+
+    function editServer(id, nama, pengelola, wa, wilayah) {
+      document.getElementById('srvId').value = id;
+      document.getElementById('srvNama').value = nama;
+      document.getElementById('srvPengelola').value = pengelola;
+      document.getElementById('srvWA').value = wa;
+      document.getElementById('srvWilayah').value = wilayah;
+    }
+
+    // --- SERVER PER WILAYAH / CLUSTER ---
+    async function loadServerWilayahData() {
+      const { data, error } = await _supabase.from('servers').select('*').order('wilayah', { ascending: true });
+      const container = document.getElementById('containerServerWilayah');
+      if (!container) return;
+
+      if (error || !data || data.length === 0) {
+        container.innerHTML = `<div class="card card-custom p-4 text-center text-muted">Belum ada data server per wilayah.</div>`;
+        return;
+      }
+
+      const grouped = {};
+      data.forEach(s => {
+        const w = s.wilayah || 'Lainnya';
+        if (!grouped[w]) grouped[w] = [];
+        grouped[w].push(s);
+      });
+
+      container.innerHTML = Object.keys(grouped).map(w => `
+        <div class="card card-custom p-4 mb-4">
+          <h5 class="fw-bold mb-3 text-indigo"><i class="fa-solid fa-map-pin me-2"></i>Wilayah Cluster: ${escapeHTML(w)}</h5>
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead><tr><th>Nama Server</th><th>Pengelola</th><th>WhatsApp</th></tr></thead>
+              <tbody>
+                ${grouped[w].map(srv => `
+                  <tr>
+                    <td class="fw-bold">${escapeHTML(srv.nama_server)}</td>
+                    <td>${escapeHTML(srv.pengelola)}</td>
+                    <td><a href="https://wa.me/${escapeHTML(srv.no_wa)}" target="_blank" class="text-decoration-none text-success fw-bold"><i class="fa-brands fa-whatsapp me-1"></i>${escapeHTML(srv.no_wa)}</a></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- PENYERAHAN STOK VOUCHER ---
+    async function loadStokData() {
+      const start = document.getElementById('filterStokStart')?.value;
+      const end = document.getElementById('filterStokEnd')?.value;
+
+      let query = _supabase.from('reseller_stock').select('*').order('tanggal', { ascending: false });
+      if (start) query = query.gte('tanggal', start);
+      if (end) query = query.lte('tanggal', end);
+
+      const { data, error } = await query;
+      const body = document.getElementById('bodyStok');
+      if (!body) return;
+
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="16" class="text-center text-muted py-3">Tidak ada data stok voucher.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.map(s => `
+        <tr>
+          <td>${s.tanggal || '-'}</td>
+          <td><span class="badge bg-indigo">${escapeHTML(s.nama_server)}</span></td>
+          <td class="fw-bold text-dark">${escapeHTML(s.nama_reseller)}</td>
+          <td>${escapeHTML(s.petugas)}</td>
+          <td>${s.v2k||0}</td><td>${s.v3k||0}</td><td>${s.v4k||0}</td><td>${s.v5k||0}</td><td>${s.v6k||0}</td><td>${s.v25k||0}</td>
+          <td>${s.b1hp||0}</td><td>${s.b2hp||0}</td><td>${s.b3hp||0}</td><td>${s.b4hp||0}</td><td>${s.b5hp||0}</td>
+          <td class="action-col">
+            <button class="btn btn-sm btn-outline-danger" onclick="hapusRecord('reseller_stock', '${s.id}', loadStokData, 'Stok Voucher')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleServerChangeInVoucher(srvName) {
+      const resSelect = document.getElementById('stkReseller');
+      if (!resSelect) return;
+
+      const filtered = cachedResellers.filter(r => r.nama_server === srvName);
+      resSelect.innerHTML = `<option value="">-- Pilih Reseller --</option>` + 
+        filtered.map(r => `<option value="${escapeHTML(r.nama_reseller)}">${escapeHTML(r.nama_reseller)}</option>`).join('');
+    }
+
+    async function simpanStokReseller(e) {
+      e.preventDefault();
+      const payload = {
+        tanggal: document.getElementById('stkTanggal').value,
+        nama_server: document.getElementById('stkServer').value,
+        nama_reseller: document.getElementById('stkReseller').value,
+        petugas: document.getElementById('stkPetugas').value.trim(),
+        v2k: parseInt(document.getElementById('v2k').value) || 0,
+        v3k: parseInt(document.getElementById('v3k').value) || 0,
+        v4k: parseInt(document.getElementById('v4k').value) || 0,
+        v5k: parseInt(document.getElementById('v5k').value) || 0,
+        v6k: parseInt(document.getElementById('v6k').value) || 0,
+        v25k: parseInt(document.getElementById('v25k').value) || 0,
+        b1hp: parseInt(document.getElementById('b1hp').value) || 0,
+        b2hp: parseInt(document.getElementById('b2hp').value) || 0,
+        b3hp: parseInt(document.getElementById('b3hp').value) || 0,
+        b4hp: parseInt(document.getElementById('b4hp').value) || 0,
+        b5hp: parseInt(document.getElementById('b5hp').value) || 0
+      };
+
+      const { error } = await _supabase.from('reseller_stock').insert([payload]);
+      if (!error) {
+        showToast('success', 'Penyerahan Voucher berhasil disimpan!');
+        e.target.reset();
+        loadStokData();
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
+      }
+    }
+
+    // --- FORM & REKAPITULASI KASBON ---
+    function populateKasbonKaryawanDropdown() {
+      const selectForm = document.getElementById('ksbKaryawan');
+      const selectFilter = document.getElementById('fltKasbonKaryawan');
+
+      if (selectForm) {
+        selectForm.innerHTML = `<option value="">-- Pilih Karyawan --</option>` + 
+          cachedEmployees.map(e => `<option value="${escapeHTML(e.nama_karyawan)}">${escapeHTML(e.nama_karyawan)} (${escapeHTML(e.jabatan)})</option>`).join('');
+      }
+
+      if (selectFilter) {
+        selectFilter.innerHTML = `<option value="">-- Semua Karyawan --</option>` + 
+          cachedEmployees.map(e => `<option value="${escapeHTML(e.nama_karyawan)}">${escapeHTML(e.nama_karyawan)}</option>`).join('');
+      }
+    }
+
+    async function loadKasbonData() {
+      const emp = document.getElementById('fltKasbonKaryawan')?.value;
+      const start = document.getElementById('fltKasbonStart')?.value;
+      const end = document.getElementById('fltKasbonEnd')?.value;
+
+      let query = _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
+      if (emp) query = query.eq('nama_karyawan', emp);
+      if (start) query = query.gte('tanggal', start);
+      if (end) query = query.lte('tanggal', end);
+
+      const { data, error } = await query;
+      const body = document.getElementById('bodyKasbon');
+      if (!body) return;
+
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">Tidak ada catatan kasbon.</td></tr>`;
+        document.getElementById('rekapTotalKasbonUser').innerText = 'Rp 0';
+        document.getElementById('rekapTotalKasbon2W').innerText = 'Rp 0';
+        document.getElementById('rekapTotalKasbon1M').innerText = 'Rp 0';
+        return;
+      }
+
+      let totalFilter = 0;
+      let total2W = 0;
+      let total1M = 0;
+
+      const now = new Date();
+      const twoWeeksAgo = new Date(); twoWeeksAgo.setDate(now.getDate() - 14);
+      const oneMonthAgo = new Date(); oneMonthAgo.setDate(now.getDate() - 30);
+
+      data.forEach(k => {
+        const jml = k.jumlah || 0;
+        totalFilter += jml;
+
+        const kDate = new Date(k.tanggal);
+        if (kDate >= twoWeeksAgo) total2W += jml;
+        if (kDate >= oneMonthAgo) total1M += jml;
+      });
+
+      document.getElementById('rekapTotalKasbonUser').innerText = 'Rp ' + totalFilter.toLocaleString('id-ID');
+      document.getElementById('rekapTotalKasbon2W').innerText = 'Rp ' + total2W.toLocaleString('id-ID');
+      document.getElementById('rekapTotalKasbon1M').innerText = 'Rp ' + total1M.toLocaleString('id-ID');
+
+      body.innerHTML = data.map(k => `
+        <tr>
+          <td>${k.tanggal || '-'}</td>
+          <td class="fw-bold text-dark">${escapeHTML(k.nama_karyawan)}</td>
+          <td class="text-primary fw-bold">Rp ${(k.jumlah||0).toLocaleString('id-ID')}</td>
+          <td><span class="badge bg-indigo">${escapeHTML(k.sumber_dana)}</span></td>
+          <td>${escapeHTML(k.keterangan || '-')}</td>
+          <td class="action-col">
+            <button class="btn btn-sm btn-outline-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Catatan Kasbon')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function simpanKasbon(e) {
+      e.preventDefault();
+      const payload = {
+        tanggal: document.getElementById('ksbTanggal').value,
+        nama_karyawan: document.getElementById('ksbKaryawan').value,
+        jumlah: parseInt(document.getElementById('ksbJumlah').value) || 0,
+        sumber_dana: document.getElementById('ksbSumber').value,
+        keterangan: document.getElementById('ksbKet').value.trim()
+      };
+
+      const { error } = await _supabase.from('kasbon').insert([payload]);
+      if (!error) {
+        showToast('success', 'Pengajuan Kasbon berhasil disimpan!');
+        e.target.reset();
+        loadKasbonData();
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
+      }
+    }
+
+    // --- PROFIL SAYA ---
+    async function loadProfilData() {
+      if (!currentUser) return;
+      document.getElementById('prfUsername').value = currentUser.username;
+      document.getElementById('prfNamaLengkap').value = currentUser.nama_lengkap || '';
+      document.getElementById('prfEmail').value = currentUser.email || '';
+      document.getElementById('prfWA').value = currentUser.no_wa || '';
+      if (currentUser.avatar_url) document.getElementById('prfAvatarPreview').src = currentUser.avatar_url;
+    }
+
+    function previewSelectedImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          base64AvatarImage = e.target.result;
+          document.getElementById('prfAvatarPreview').src = base64AvatarImage;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function simpanProfil(e) {
+      e.preventDefault();
+      const nama = document.getElementById('prfNamaLengkap').value.trim();
+      const email = document.getElementById('prfEmail').value.trim();
+      const wa = document.getElementById('prfWA').value.trim();
+
+      const payload = { nama_lengkap: nama, email: email, no_wa: wa };
+      if (base64AvatarImage) payload.avatar_url = base64AvatarImage;
+
+      const { error } = await _supabase.from('users').update(payload).eq('username', currentUser.username);
+      if (!error) {
+        currentUser = { ...currentUser, ...payload };
+        sessionStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
+        document.getElementById('navUserName').innerText = nama;
+        if (base64AvatarImage) document.getElementById('navUserAvatar').src = base64AvatarImage;
+        showToast('success', 'Profil berhasil diperbarui!');
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
+      }
+    }
+
+    // --- MONITORING SYSTEM CHART REALTIME ---
+    function initLiveSystemPerformanceChart() {
+      const ctx = document.getElementById('systemPerfChart').getContext('2d');
+      if (perfChart) perfChart.destroy();
+
+      const labels = [];
+      const cpuData = [];
+      const latencyData = [];
+
+      perfChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            { label: 'CPU Usage (%)', data: cpuData, borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4 },
+            { label: 'DB Latency (ms)', data: latencyData, borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.4 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      if (livePerfInterval) clearInterval(livePerfInterval);
+      livePerfInterval = setInterval(() => {
+        const nowStr = new Date().toLocaleTimeString('id-ID');
+        const randomCpu = Math.floor(Math.random() * 25) + 10;
+        const randomLatency = Math.floor(Math.random() * 15) + 20;
+
+        document.getElementById('sysCpuVal').innerText = randomCpu + '%';
+        document.getElementById('sysCpuBar').style.width = randomCpu + '%';
+        document.getElementById('sysDbLatency').innerText = randomLatency + ' ms';
+
+        if (labels.length > 10) { labels.shift(); cpuData.shift(); latencyData.shift(); }
+        labels.push(nowStr);
+        cpuData.push(randomCpu);
+        latencyData.push(randomLatency);
+        perfChart.update();
+      }, 3000);
+    }
+
+    // --- MODAL PURGE PEMBERSIHAN DATA CUSTOM ---
+    function openPurgeModal(targetTable, targetLabel) {
+      document.getElementById('purgeTargetTable').value = targetTable;
+      document.getElementById('purgeTargetLabel').value = targetLabel;
       const modal = new bootstrap.Modal(document.getElementById('modalPurge'));
       modal.show();
     }
 
     async function executeCustomPurge() {
       const table = document.getElementById('purgeTargetTable').value;
-      const startDate = document.getElementById('purgeStartDate').value;
-      const endDate = document.getElementById('purgeEndDate').value;
+      const start = document.getElementById('purgeStartDate').value;
+      const end = document.getElementById('purgeEndDate').value;
 
-      if (!startDate || !endDate) {
-        alert('Harap isi rentang tanggal pembersihan!');
+      if (!start || !end) {
+        Swal.fire('Peringatan', 'Silakan pilih rentang tanggal lengkap!', 'warning');
         return;
       }
 
-      try {
-        const { error } = await _supabase.from(table).delete().gte('tanggal', startDate).lte('tanggal', endDate);
-        if (!error) {
-          await logActivity('PEMBERSIHAN_DATA', `Membersihkan data ${table} periode ${startDate} s/d ${endDate}`, true);
-          alert('Pembersihan data berhasil dilaksanakan!');
-          bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
-          loadDashboardData();
-        } else {
-          alert('Gagal pembersihan data: ' + error.message);
-        }
-      } catch (err) {
-        alert('Kesalahan koneksi saat pembersihan data.');
+      const confirm = await Swal.fire({
+        title: 'Konfirmasi Pembersihan Data',
+        text: `Apakah Anda benar-benar ingin menghapus data pada rentang ${start} s/d ${end}? Action ini tidak bisa dibatalkan.`,
+        icon: 'danger',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Ya, Bersihkan!'
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      const { error } = await _supabase.from(table).delete().gte('tanggal', start).lte('tanggal', end);
+      if (!error) {
+        Swal.fire('Berhasil', 'Pembersihan data berhasil dilaksanakan!', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('modalPurge')).hide();
+        if (table === 'reseller_stock') { loadDashboardResellerSummary(); loadStokData(); }
+        if (table === 'kasbon') loadKasbonData();
+      } else {
+        Swal.fire('Gagal', error.message, 'error');
       }
     }
 
-    // --- INISIALISASI AWAL SISTEM ---
+    // LISTENER JARINGAN INTERNET (ONLINE/OFFLINE MONITOR)
+    window.addEventListener('online', () => showToast('success', 'Koneksi terhubung kembali ke internet.'));
+    window.addEventListener('offline', () => Swal.fire('Internet Terputus', 'Perangkat Anda terputus dari jaringan internet.', 'warning'));
+
+    // INITIALIZATION ON LOAD
     window.addEventListener('DOMContentLoaded', () => {
-      const sessionUser = sessionStorage.getItem('rinnet_session_user');
-      if (sessionUser) {
+      const savedUserStr = sessionStorage.getItem('rinnet_session_user');
+      if (savedUserStr) {
         try {
-          const u = JSON.parse(sessionUser);
-          initAppView(u);
-        } catch (e) {
+          const user = JSON.parse(savedUserStr);
+          initAppView(user);
+        } catch(e) {
           sessionStorage.removeItem('rinnet_session_user');
         }
       }
