@@ -11,6 +11,7 @@ let heartbeatInterval = null;
 let failedLoginAttempts = 0;
 let idleTimer = null;
 let sessionsPollInterval = null;
+let realtimeChannel = null;
 
 // Global Cache untuk Performa Super Cepat
 window.SERVER_CACHE = [];
@@ -35,35 +36,13 @@ const QUOTES_DATABASE = [
   { text: "Jangan lupa tersenyum dan rehat sejenak, kesehatanmu adalah aset terbaik.", author: "Penghibur Diri" }
 ];
 
-// E2E Security Module
-const E2EEngine = {
-  async getKey() {
-    const secret = "RINNET_ENTERPRISE_E2E_KEY_2026_MASTER";
-    const enc = new TextEncoder();
-    const keyMaterial = await window.crypto.subtle.importKey(
-      "raw", enc.encode(secret), "PBKDF2", false, ["deriveKey"]
-    );
-    return window.crypto.subtle.deriveKey(
-      { name: "PBKDF2", salt: enc.encode("RINNET_SALT_SECURE"), iterations: 100000, hash: "SHA-256" },
-      keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
-    );
-  },
-  async encrypt(plainText) {
-    if (!plainText) return plainText;
-    try {
-      const key = await this.getKey();
-      const iv = window.crypto.getRandomValues(new Uint8Array(12));
-      const enc = new TextEncoder();
-      const ciphertext = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, enc.encode(plainText));
-      const combined = new Uint8Array(iv.length + ciphertext.byteLength);
-      combined.set(iv, 0);
-      combined.set(new Uint8Array(ciphertext), iv.length);
-      return btoa(String.fromCharCode(...combined));
-    } catch(e) {
-      return plainText;
-    }
-  }
-};
+// Helper Cryptographic Hash (SHA-256) untuk Validasi Keamanan Password
+async function hashSHA256(str) {
+  const utf8 = new TextEncoder().encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 // Anti-XSS Helper
 function escapeHTML(str) {
@@ -96,15 +75,6 @@ function triggerSuccessCelebration() {
   if (typeof confetti === 'function') {
     confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
   }
-}
-
-function getDeviceSessionId() {
-  let sid = sessionStorage.getItem('rinnet_device_session_id');
-  if (!sid) {
-    sid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('sess-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-    sessionStorage.setItem('rinnet_device_session_id', sid);
-  }
-  return sid;
 }
 
 function getDeviceDetailedInfo() {
@@ -156,12 +126,43 @@ async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
 
   try {
     await _supabase.from('activity_logs').insert([payload]);
+    appendTerminalLog(`[AUDITLOG] ${tipe}: ${fullDetail}`);
   } catch (err) {
     console.warn("Gagal simpan log ke Supabase.", err);
   }
 }
 
-// Memuat data master dengan error handling dan fallback untuk mencegah kegagalan silent
+function appendTerminalLog(msg) {
+  const terminal = document.getElementById('sysLogTerminal');
+  if (terminal) {
+    const timeStr = new Date().toLocaleTimeString('id-ID');
+    const div = document.createElement('div');
+    div.innerText = `[${timeStr}] ${msg}`;
+    terminal.appendChild(div);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+}
+
+// Supabase Realtime Engine Setup
+function initSupabaseRealtimeSubscriptions() {
+  if (realtimeChannel) return;
+
+  realtimeChannel = _supabase.channel('public:realtime_changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'servers' }, payload => {
+      loadAllMasterDropdowns();
+      appendTerminalLog(`[REALTIME] Update pada tabel 'servers' (${payload.eventType})`);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'stok_voucher' }, payload => {
+      appendTerminalLog(`[REALTIME] Penyerahan Voucher Baru terdeteksi!`);
+    })
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        appendTerminalLog('[REALTIME] Supabase WebSocket Live Connection ACTIVE');
+      }
+    });
+}
+
+// Memuat data master dengan error handling dan fallback
 async function loadAllMasterDropdowns() {
   try {
     const { data: srvs, error: errSrv } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
@@ -277,7 +278,7 @@ function exportFormattedExcel(elementId, filename = 'Export_Data') {
 async function handleAuthLogin(e) {
   e.preventDefault();
   if (failedLoginAttempts >= 5) {
-    Swal.fire('Akses Diblokir', 'Terlalu banyak percobaaan gagal.', 'error');
+    Swal.fire('Akses Diblokir', 'Terlalu banyak percobaan gagal.', 'error');
     return;
   }
 
@@ -290,7 +291,11 @@ async function handleAuthLogin(e) {
   try {
     const { data: users, error } = await _supabase.from('users').select('*').eq('username', userVal);
     
-    if (error || !users || users.length === 0 || users[0].password_hash !== passVal) {
+    // Mendukung pencocokan hash SHA-256 maupun string plain
+    const passHash = await hashSHA256(passVal);
+    const isPasswordValid = users && users.length > 0 && (users[0].password_hash === passVal || users[0].password_hash === passHash);
+
+    if (error || !users || users.length === 0 || !isPasswordValid) {
       failedLoginAttempts++;
       if (failedLoginAttempts >= 5) {
         document.getElementById('loginLockoutAlert').classList.remove('d-none');
@@ -319,6 +324,7 @@ async function handleAuthLogin(e) {
 
     triggerSuccessCelebration();
     await loadAllMasterDropdowns();
+    initSupabaseRealtimeSubscriptions();
     switchMenu('dashboard');
     logActivity('LOGIN', `Pengguna ${currentUser.username} berhasil masuk ke sistem.`);
 
@@ -335,6 +341,10 @@ function handleLogout() {
     logActivity('LOGOUT', `Pengguna ${currentUser.username} keluar dari sistem.`);
   }
   currentUser = null;
+  if (realtimeChannel) {
+    _supabase.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
   document.getElementById('pageApp').classList.add('d-none');
   document.getElementById('pageLogin').classList.remove('d-none');
 }

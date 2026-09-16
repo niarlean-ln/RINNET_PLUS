@@ -1,5 +1,5 @@
 /* ==========================================================================
-   RINNET+ ENTERPRISE INFRASTRUCTURE CUSTOM DESIGN & LUXURY STYLING
+   RINNET+ ENTERPRISE INFRASTRUCTURE CUSTOM DESIGN & LUXURY STYLING (UPDATED)
    ========================================================================== */
 
 :root {
@@ -214,6 +214,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 20px;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.3s ease;
 }
 
 .welcome-card-lux {
@@ -269,6 +270,10 @@ body {
   position: relative;
   overflow: hidden;
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
 }
 .stat-icon {
   position: absolute;
