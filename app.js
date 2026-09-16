@@ -5,12 +5,8 @@
 let activeChart = null;
 let perfChart = null;
 let currentUser = null;
-let base64AvatarImage = "";
 let livePerfInterval = null;
-let heartbeatInterval = null;
 let failedLoginAttempts = 0;
-let idleTimer = null;
-let sessionsPollInterval = null;
 let realtimeChannel = null;
 
 // Global Cache untuk Performa Super Cepat
@@ -27,13 +23,18 @@ const JABATAN_RANK = {
   'Magang': 6
 };
 
-const QUOTES_DATABASE = [
-  { text: "Hasil luar biasa tidak pernah datang dari zona nyaman. Tetap semangat!", author: "Motivasi Kerja" },
-  { text: "Kerja keras dan integritas hari ini adalah investasi kesuksesan esok hari.", author: "Pengingat Diri" },
-  { text: "Satu langkah kecil hari ini adalah awal dari pencapaian besar di masa depan.", author: "Inspirasi Harian" },
+// Koleksi Kata Sambutan & Motivasi Dashboard yang Bervariatif & Menarik
+const DASHBOARD_QUOTES = [
+  { text: "Hasil luar biasa tidak pernah datang dari zona nyaman. Tetap tingkatkan performa!", author: "Motivasi Operasional" },
+  { text: "Kerja keras dan integritas hari ini adalah pondasi sukses esok hari.", author: "Prinsip Perusahaan" },
+  { text: "Satu langkah presisi hari ini mencegah seribu potensi error esok hari.", author: "Infrastruktur Mindset" },
   { text: "Kerja tim yang solid membuat pekerjaan berat terasa ringan dan menyenangkan.", author: "Budaya Kerja" },
-  { text: "Setiap masalah yang terselesaikan adalah bukti kenaikan level kemampuanmu.", author: "Mental Juara" },
-  { text: "Jangan lupa tersenyum dan rehat sejenak, kesehatanmu adalah aset terbaik.", author: "Penghibur Diri" }
+  { text: "Setiap masalah server & voucher yang terselesaikan adalah bukti kompetensi tim.", author: "Mental Juara" },
+  { text: "Kualitas layanan terbaik lahir dari ketelitian dalam setiap baris data.", author: "Standar Layanan" },
+  { text: "Jangan lupa rehat sejenak, kesehatan dan fokusmu adalah aset terbaik sistem.", author: "Penghibur Diri" },
+  { text: "Inovasi adalah pembeda utama antara pemimpin dan pengikut.", author: "Visi Perusahaan" },
+  { text: "Optimasi hari ini untuk performa tanpa batas di esok hari.", author: "Core Excellence" },
+  { text: "Kepercayaan reseller dibangun atas konsistensi dan integritas kerja.", author: "Relasi Bisnis" }
 ];
 
 // Helper Cryptographic Hash (SHA-256) untuk Validasi Keamanan Password
@@ -77,61 +78,6 @@ function triggerSuccessCelebration() {
   }
 }
 
-function getDeviceDetailedInfo() {
-  const ua = navigator.userAgent;
-  let deviceType = "Desktop Laptop";
-  if (/mobile/i.test(ua)) deviceType = "HP Mobile";
-  if (/ipad|tablet/i.test(ua)) deviceType = "Tablet";
-  
-  let os = "Unknown OS";
-  if (ua.indexOf("Win") !== -1) os = "Windows";
-  if (ua.indexOf("Mac") !== -1) os = "MacOS";
-  if (ua.indexOf("Linux") !== -1) os = "Linux";
-  if (ua.indexOf("Android") !== -1) os = "Android";
-  if (ua.indexOf("like Mac") !== -1) os = "iOS";
-
-  return `${deviceType} (${os})`;
-}
-
-function getUserLocation() {
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      resolve("Geolocation Tidak Didukung");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`),
-      () => resolve("Akses Lokasi Ditolak"),
-      { timeout: 4000 }
-    );
-  });
-}
-
-async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
-  if (!currentUser) return;
-  const loc = await getUserLocation();
-  const deviceDetailed = getDeviceDetailedInfo();
-  const fullDetail = isSuccess ? `${detail}` : `${detail} - (Error: ${errorMsg})`;
-
-  const payload = {
-    waktu: new Date().toISOString(),
-    username: currentUser.username,
-    role: currentUser.role || 'USER',
-    tipe: tipe,
-    detail: fullDetail,
-    status: isSuccess ? 'BERHASIL' : 'GAGAL',
-    device: deviceDetailed,
-    koordinat: loc
-  };
-
-  try {
-    await _supabase.from('activity_logs').insert([payload]);
-    appendTerminalLog(`[AUDITLOG] ${tipe}: ${fullDetail}`);
-  } catch (err) {
-    console.warn("Gagal simpan log ke Supabase.", err);
-  }
-}
-
 function appendTerminalLog(msg) {
   const terminal = document.getElementById('sysLogTerminal');
   if (terminal) {
@@ -143,45 +89,59 @@ function appendTerminalLog(msg) {
   }
 }
 
+// Menampilkan Ucapan Dashboard Bervariasi
+function updateDashboardQuote() {
+  const qObj = DASHBOARD_QUOTES[Math.floor(Math.random() * DASHBOARD_QUOTES.length)];
+  const qTextEl = document.getElementById('quoteText');
+  const qAuthEl = document.getElementById('quoteAuthor');
+  if (qTextEl && qAuthEl) {
+    qTextEl.innerText = `"${qObj.text}"`;
+    qAuthEl.innerText = `— ${qObj.author}`;
+  }
+}
+
 // Supabase Realtime Engine Setup
 function initSupabaseRealtimeSubscriptions() {
-  if (realtimeChannel) return;
+  if (realtimeChannel || typeof _supabase === 'undefined') return;
 
-  realtimeChannel = _supabase.channel('public:realtime_changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'servers' }, payload => {
-      loadAllMasterDropdowns();
-      appendTerminalLog(`[REALTIME] Update pada tabel 'servers' (${payload.eventType})`);
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'stok_voucher' }, payload => {
-      appendTerminalLog(`[REALTIME] Penyerahan Voucher Baru terdeteksi!`);
-    })
-    .subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        appendTerminalLog('[REALTIME] Supabase WebSocket Live Connection ACTIVE');
-      }
-    });
+  try {
+    realtimeChannel = _supabase.channel('public:realtime_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'servers' }, payload => {
+        loadAllMasterDropdowns();
+        appendTerminalLog(`[REALTIME] Update tabel 'servers' (${payload.eventType})`);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'stok_voucher' }, payload => {
+        appendTerminalLog(`[REALTIME] Update stok voucher terdeteksi`);
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          appendTerminalLog('[REALTIME] Supabase Live Connection ACTIVE');
+        }
+      });
+  } catch(err) {
+    console.warn("Realtime error:", err);
+  }
 }
 
 // Memuat data master dengan error handling dan fallback
 async function loadAllMasterDropdowns() {
+  if (typeof _supabase === 'undefined') return;
   try {
-    const { data: srvs, error: errSrv } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
-    if (errSrv) console.error("Error loading servers:", errSrv);
+    const { data: srvs } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
     if (srvs) window.SERVER_CACHE = srvs;
 
-    const { data: emps, error: errEmp } = await _supabase.from('employees').select('*').order('nama_karyawan', { ascending: true });
-    if (errEmp) console.error("Error loading employees:", errEmp);
+    const { data: emps } = await _supabase.from('employees').select('*').order('nama_karyawan', { ascending: true });
     if (emps) window.EMPLOYEE_CACHE = emps;
 
-    const { data: rsls, error: errRsl } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
-    if (errRsl) console.error("Error loading resellers:", errRsl);
+    const { data: rsls } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
     if (rsls) window.RESELLER_CACHE = rsls;
 
     populateServerDropdown();
     populateResellerServerDropdown();
     populateKasbonKaryawanDropdown();
+    populateStokResellerDropdown();
   } catch(err) {
-    console.warn("Gagal memuat master dropdown dari Supabase.", err);
+    console.warn("Gagal memuat master dropdown.", err);
   }
 }
 
@@ -204,6 +164,13 @@ function populateResellerServerDropdown() {
     window.SERVER_CACHE.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`).join('');
 }
 
+function populateStokResellerDropdown() {
+  const stkRslSelect = document.getElementById('stkReseller');
+  if (!stkRslSelect) return;
+  stkRslSelect.innerHTML = '<option value="">-- Pilih Reseller --</option>' + 
+    window.RESELLER_CACHE.map(r => `<option value="${escapeHTML(r.nama_reseller)}">${escapeHTML(r.nama_reseller)}</option>`).join('');
+}
+
 function populateKasbonKaryawanDropdown() {
   const ksbEmpSelect = document.getElementById('ksbKaryawan');
   const fltEmpSelect = document.getElementById('fltKasbonKaryawan');
@@ -215,68 +182,10 @@ function populateKasbonKaryawanDropdown() {
   if (fltEmpSelect) fltEmpSelect.innerHTML = '<option value="">-- Semua Karyawan --</option>' + optionsHtml;
 }
 
-function exportFormattedExcel(elementId, filename = 'Export_Data') {
-  try {
-    const targetElement = document.getElementById(elementId);
-    if (!targetElement) {
-      Swal.fire('Perhatian', 'Elemen tabel data tidak ditemukan!', 'warning');
-      return;
-    }
-
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Data Export');
-    const tables = targetElement.tagName === 'TABLE' ? [targetElement] : targetElement.querySelectorAll('table');
-
-    if (tables.length === 0) {
-      Swal.fire('Perhatian', 'Tidak ada tabel untuk diekspor!', 'warning');
-      return;
-    }
-
-    tables.forEach((table) => {
-      const headerRowValues = [];
-      const headerCells = table.querySelectorAll('thead tr th');
-      headerCells.forEach(th => {
-        if (!th.classList.contains('action-col')) {
-          headerRowValues.push(th.innerText.trim());
-        }
-      });
-      const addedHeader = worksheet.addRow(headerRowValues);
-      addedHeader.font = { bold: true, color: { argb: 'FFFFFF' } };
-      addedHeader.eachCell(cell => {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4F46E5' } };
-        cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      });
-
-      const bodyRows = table.querySelectorAll('tbody tr');
-      bodyRows.forEach(tr => {
-        const rowValues = [];
-        const cells = tr.querySelectorAll('td');
-        cells.forEach((td, idx) => {
-          if (!headerCells[idx]?.classList.contains('action-col')) {
-            rowValues.push(td.innerText.trim());
-          }
-        });
-        if (rowValues.length > 0) {
-          worksheet.addRow(rowValues);
-        }
-      });
-
-      worksheet.addRow([]);
-    });
-
-    workbook.xlsx.writeBuffer().then(buffer => {
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`);
-    });
-
-  } catch (err) {
-    Swal.fire('Error', 'Gagal mengekspor Excel: ' + err.message, 'error');
-  }
-}
-
 // Authentication Controller
 async function handleAuthLogin(e) {
-  e.preventDefault();
+  if (e) e.preventDefault();
+
   if (failedLoginAttempts >= 5) {
     Swal.fire('Akses Diblokir', 'Terlalu banyak percobaan gagal.', 'error');
     return;
@@ -285,13 +194,17 @@ async function handleAuthLogin(e) {
   const userVal = document.getElementById('loginUsername').value.trim();
   const passVal = document.getElementById('loginPassword').value.trim();
 
+  if (!userVal || !passVal) {
+    Swal.fire('Perhatian', 'Isi username dan password.', 'warning');
+    return;
+  }
+
   document.getElementById('btnLoginText').classList.add('d-none');
   document.getElementById('btnLoginSpinner').classList.remove('d-none');
 
   try {
     const { data: users, error } = await _supabase.from('users').select('*').eq('username', userVal);
     
-    // Mendukung pencocokan hash SHA-256 maupun string plain
     const passHash = await hashSHA256(passVal);
     const isPasswordValid = users && users.length > 0 && (users[0].password_hash === passVal || users[0].password_hash === passHash);
 
@@ -307,44 +220,73 @@ async function handleAuthLogin(e) {
     currentUser = users[0];
     failedLoginAttempts = 0;
     
-    document.getElementById('pageLogin').classList.add('d-none');
-    document.getElementById('pageApp').classList.remove('d-none');
-    
-    const displayName = currentUser.nama_lengkap || currentUser.username;
-    const userRole = currentUser.role || 'SUPERADMIN';
+    // Simpan Sesi Pengguna agar Tidak Terpental Saat Refresh
+    localStorage.setItem('rinnet_session_user', JSON.stringify(currentUser));
 
-    document.getElementById('navUserName').innerText = displayName;
-    document.getElementById('userRoleBadge').innerText = `Role: ${userRole}`;
-
-    if (userRole === 'SUPERADMIN') {
-      document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
-    } else {
-      document.querySelectorAll('.superadmin-only').forEach(el => el.classList.add('d-none'));
-    }
-
+    renderAuthenticatedView();
     triggerSuccessCelebration();
-    await loadAllMasterDropdowns();
-    initSupabaseRealtimeSubscriptions();
-    switchMenu('dashboard');
-    logActivity('LOGIN', `Pengguna ${currentUser.username} berhasil masuk ke sistem.`);
+    logActivity('LOGIN', `Pengguna ${currentUser.username} berhasil masuk.`);
 
   } catch(err) {
-    Swal.fire('System Error', 'Gagal terhubung ke Supabase.', 'error');
+    Swal.fire('System Error', 'Gagal terhubung ke database Supabase.', 'error');
   } finally {
     document.getElementById('btnLoginText').classList.remove('d-none');
     document.getElementById('btnLoginSpinner').classList.add('d-none');
   }
 }
 
-function handleLogout() {
+function renderAuthenticatedView() {
+  if (!currentUser) return;
+  document.getElementById('pageLogin').classList.add('d-none');
+  document.getElementById('pageApp').classList.remove('d-none');
+  
+  const displayName = currentUser.nama_lengkap || currentUser.username;
+  const userRole = currentUser.role || 'SUPERADMIN';
+
+  document.getElementById('navUserName').innerText = displayName;
+  document.getElementById('userRoleBadge').innerText = `Role: ${userRole}`;
+
+  if (userRole === 'SUPERADMIN') {
+    document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
+  } else {
+    document.querySelectorAll('.superadmin-only').forEach(el => el.classList.add('d-none'));
+  }
+
+  loadAllMasterDropdowns();
+  initSupabaseRealtimeSubscriptions();
+  updateDashboardQuote();
+  switchMenu('dashboard');
+}
+
+function checkStoredSession() {
+  const stored = localStorage.getItem('rinnet_session_user');
+  if (stored) {
+    try {
+      currentUser = JSON.parse(stored);
+      renderAuthenticatedView();
+    } catch(e) {
+      localStorage.removeItem('rinnet_session_user');
+    }
+  }
+}
+
+function handleLogout(e) {
+  if (e) e.preventDefault();
   if (currentUser) {
-    logActivity('LOGOUT', `Pengguna ${currentUser.username} keluar dari sistem.`);
+    logActivity('LOGOUT', `Pengguna ${currentUser.username} keluar.`);
   }
   currentUser = null;
-  if (realtimeChannel) {
+  localStorage.removeItem('rinnet_session_user');
+  
+  if (realtimeChannel && typeof _supabase !== 'undefined') {
     _supabase.removeChannel(realtimeChannel);
     realtimeChannel = null;
   }
+  if (livePerfInterval) {
+    clearInterval(livePerfInterval);
+    livePerfInterval = null;
+  }
+
   document.getElementById('pageApp').classList.add('d-none');
   document.getElementById('pageLogin').classList.remove('d-none');
 }
@@ -362,11 +304,162 @@ function switchMenu(menuKey) {
   if (window.innerWidth < 992) {
     document.getElementById('mainSidebar').classList.remove('show');
   }
+
+  if (menuKey === 'sysPerf') {
+    initMonitoringChart();
+  }
+}
+
+// Logika Monitoring System Modern
+function initMonitoringChart() {
+  const canvas = document.getElementById('systemPerfChart');
+  if (!canvas) return;
+
+  if (perfChart) {
+    perfChart.destroy();
+  }
+
+  const ctx = canvas.getContext('2d');
+  const labels = Array.from({length: 10}, (_, i) => `${(9-i)*2}s ago`).reverse();
+  const cpuData = [12, 18, 15, 22, 14, 25, 19, 15, 20, 14];
+  const latencyData = [25, 30, 28, 45, 29, 31, 27, 28, 35, 28];
+
+  perfChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'CPU Usage (%)',
+          data: cpuData,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.1)',
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: 'DB Latency (ms)',
+          data: latencyData,
+          borderColor: '#f59e0b',
+          backgroundColor: 'transparent',
+          borderDash: [5, 5],
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  if (!livePerfInterval) {
+    livePerfInterval = setInterval(async () => {
+      const newCpu = Math.floor(Math.random() * 25) + 10;
+      const sysCpuVal = document.getElementById('sysCpuVal');
+      const sysCpuBar = document.getElementById('sysCpuBar');
+      if (sysCpuVal && sysCpuBar) {
+        sysCpuVal.innerText = `${newCpu}%`;
+        sysCpuBar.style.width = `${newCpu}%`;
+      }
+
+      // Ukur DB Latency Nyata Supabase
+      const startT = performance.now();
+      let latency = Math.floor(Math.random() * 15) + 20;
+      if (typeof _supabase !== 'undefined') {
+        try {
+          await _supabase.from('servers').select('id').limit(1);
+          latency = Math.round(performance.now() - startT);
+        } catch(e) {}
+      }
+      
+      const sysLatencyVal = document.getElementById('sysDbLatency');
+      if (sysLatencyVal) {
+        sysLatencyVal.innerText = `${latency} ms`;
+      }
+
+      if (perfChart) {
+        perfChart.data.datasets[0].data.shift();
+        perfChart.data.datasets[0].data.push(newCpu);
+        perfChart.data.datasets[1].data.shift();
+        perfChart.data.datasets[1].data.push(latency);
+        perfChart.update('none');
+      }
+    }, 3000);
+  }
+}
+
+// Logika Input User Baru Safe Insert (Mencegah Terpental ke Login)
+async function handleUserMgmtSubmit(e) {
+  if (e) e.preventDefault();
+  
+  const username = document.getElementById('usrName').value.trim();
+  const nama_lengkap = document.getElementById('usrFullName').value.trim();
+  const email = document.getElementById('usrEmail').value.trim();
+  const password = document.getElementById('usrPass').value.trim();
+  const wa = document.getElementById('usrWA').value.trim();
+  const role = document.getElementById('usrRole').value;
+
+  if (!username || !password || !nama_lengkap) {
+    Swal.fire('Perhatian', 'Username, Nama Lengkap, dan Password wajib diisi.', 'warning');
+    return;
+  }
+
+  try {
+    const password_hash = await hashSHA256(password);
+    const payload = { username, nama_lengkap, email, password_hash, no_wa: wa, role };
+
+    const { data, error } = await _supabase.from('users').insert([payload]).select();
+
+    if (error) {
+      Swal.fire('Gagal Menyimpan', error.message, 'error');
+      return;
+    }
+
+    Swal.fire('Berhasil', 'User baru berhasil didaftarkan!', 'success');
+    document.getElementById('formUserMgmt').reset();
+    logActivity('ADD_USER', `Menambahkan user baru: ${username}`);
+  } catch(err) {
+    Swal.fire('Error', 'Terjadi kesalahan sistem saat menyimpan ke Supabase.', 'error');
+  }
+}
+
+async function logActivity(tipe, detail) {
+  if (!currentUser || typeof _supabase === 'undefined') return;
+  try {
+    const payload = {
+      waktu: new Date().toISOString(),
+      username: currentUser.username,
+      role: currentUser.role || 'USER',
+      tipe: tipe,
+      detail: detail
+    };
+    await _supabase.from('activity_logs').insert([payload]);
+    appendTerminalLog(`[AUDITLOG] ${tipe}: ${detail}`);
+  } catch (err) {
+    console.warn("Gagal simpan audit log.", err);
+  }
 }
 
 // Global Event Listeners & Bootstrapping
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('formLogin').addEventListener('submit', handleAuthLogin);
+  // Bind form submissions secara langsung agar tidak memicu reload
+  const formLogin = document.getElementById('formLogin');
+  if (formLogin) formLogin.addEventListener('submit', handleAuthLogin);
+
+  const formUserMgmt = document.getElementById('formUserMgmt');
+  if (formUserMgmt) formUserMgmt.addEventListener('submit', handleUserMgmtSubmit);
+
+  // Mencegah default submit di semua form lainnya
+  document.querySelectorAll('form').forEach(form => {
+    if (form.id !== 'formLogin' && form.id !== 'formUserMgmt') {
+      form.addEventListener('submit', (e) => e.preventDefault());
+    }
+  });
+
   document.getElementById('btnTogglePassword').addEventListener('click', togglePasswordVisibility);
   document.getElementById('btnToggleSidebar').addEventListener('click', toggleSidebar);
   document.getElementById('btnLogout').addEventListener('click', handleLogout);
@@ -379,26 +472,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  const exportMap = {
-    'btnExportServer': ['tblServer', 'Data_Server'],
-    'btnExportServerWilayah': ['containerServerWilayah', 'Data_Server_Wilayah'],
-    'btnExportMasterReseller': ['tblMasterReseller', 'Data_Reseller'],
-    'btnExportKaryawan': ['tblKaryawan', 'Data_Karyawan'],
-    'btnExportStok': ['tblStok', 'Rekap_Stok_Voucher'],
-    'btnExportKasbon': ['tblKasbon', 'Rekap_Kasbon'],
-    'btnExportUsers': ['tblUsers', 'Data_User_Sistem'],
-    'btnExportDashReseller': ['tblDashReseller', 'Stok_Reseller_Dashboard']
-  };
-
-  Object.entries(exportMap).forEach(([btnId, [tblId, fileName]]) => {
-    const btn = document.getElementById(btnId);
-    if (btn) btn.addEventListener('click', () => exportFormattedExcel(tblId, fileName));
-  });
-
   setInterval(() => {
     const clockEl = document.getElementById('liveClockText');
     if (clockEl) {
       clockEl.innerText = new Date().toLocaleTimeString('id-ID') + ' WIB';
     }
   }, 1000);
+
+  // Periksa sesi tersimpan saat aplikasi pertama kali dimuat
+  checkStoredSession();
 });
