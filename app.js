@@ -146,7 +146,7 @@ async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
   const payload = {
     waktu: new Date().toISOString(),
     username: currentUser.username,
-    role: currentUser.role,
+    role: currentUser.role || 'USER',
     tipe: tipe,
     detail: fullDetail,
     status: isSuccess ? 'BERHASIL' : 'GAGAL',
@@ -269,7 +269,7 @@ function exportFormattedExcel(elementId, filename = 'Export_Data') {
   }
 }
 
-// Authentication Controller
+// Authentication Controller (Disesuaikan dengan Database Supabase)
 async function handleAuthLogin(e) {
   e.preventDefault();
   if (failedLoginAttempts >= 5) {
@@ -284,9 +284,11 @@ async function handleAuthLogin(e) {
   document.getElementById('btnLoginSpinner').classList.remove('d-none');
 
   try {
+    // Kueri berdasarkan kolom 'username'
     const { data: users, error } = await _supabase.from('users').select('*').eq('username', userVal);
     
-    if (error || !users || users.length === 0 || users[0].password !== passVal) {
+    // Pengecekan disesuaikan ke kolom 'password_hash'
+    if (error || !users || users.length === 0 || users[0].password_hash !== passVal) {
       failedLoginAttempts++;
       if (failedLoginAttempts >= 5) {
         document.getElementById('loginLockoutAlert').classList.remove('d-none');
@@ -301,11 +303,14 @@ async function handleAuthLogin(e) {
     document.getElementById('pageLogin').classList.add('d-none');
     document.getElementById('pageApp').classList.remove('d-none');
     
-    document.getElementById('navUserName').innerText = currentUser.nama_lengkap || currentUser.username;
-    document.getElementById('userRoleBadge').innerText = `Role: ${currentUser.role}`;
+    const displayName = currentUser.nama_lengkap || currentUser.username;
+    const userRole = currentUser.role || 'SUPERADMIN'; // Default ke SUPERADMIN jika role null di database
+
+    document.getElementById('navUserName').innerText = displayName;
+    document.getElementById('userRoleBadge').innerText = `Role: ${userRole}`;
 
     // Tampilkan menu khusus Superadmin jika role SUPERADMIN
-    if (currentUser.role === 'SUPERADMIN') {
+    if (userRole === 'SUPERADMIN') {
       document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
     } else {
       document.querySelectorAll('.superadmin-only').forEach(el => el.classList.add('d-none'));
