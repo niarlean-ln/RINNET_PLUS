@@ -161,15 +161,19 @@ async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
   }
 }
 
+// Memuat data master dengan error handling dan fallback untuk mencegah kegagalan silent
 async function loadAllMasterDropdowns() {
   try {
-    const { data: srvs } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
+    const { data: srvs, error: errSrv } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
+    if (errSrv) console.error("Error loading servers:", errSrv);
     if (srvs) window.SERVER_CACHE = srvs;
 
-    const { data: emps } = await _supabase.from('employees').select('*').order('nama_karyawan', { ascending: true });
+    const { data: emps, error: errEmp } = await _supabase.from('employees').select('*').order('nama_karyawan', { ascending: true });
+    if (errEmp) console.error("Error loading employees:", errEmp);
     if (emps) window.EMPLOYEE_CACHE = emps;
 
-    const { data: rsls } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
+    const { data: rsls, error: errRsl } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
+    if (errRsl) console.error("Error loading resellers:", errRsl);
     if (rsls) window.RESELLER_CACHE = rsls;
 
     populateServerDropdown();
@@ -269,7 +273,7 @@ function exportFormattedExcel(elementId, filename = 'Export_Data') {
   }
 }
 
-// Authentication Controller (Disesuaikan dengan Database Supabase)
+// Authentication Controller
 async function handleAuthLogin(e) {
   e.preventDefault();
   if (failedLoginAttempts >= 5) {
@@ -284,10 +288,8 @@ async function handleAuthLogin(e) {
   document.getElementById('btnLoginSpinner').classList.remove('d-none');
 
   try {
-    // Kueri berdasarkan kolom 'username'
     const { data: users, error } = await _supabase.from('users').select('*').eq('username', userVal);
     
-    // Pengecekan disesuaikan ke kolom 'password_hash'
     if (error || !users || users.length === 0 || users[0].password_hash !== passVal) {
       failedLoginAttempts++;
       if (failedLoginAttempts >= 5) {
@@ -304,12 +306,11 @@ async function handleAuthLogin(e) {
     document.getElementById('pageApp').classList.remove('d-none');
     
     const displayName = currentUser.nama_lengkap || currentUser.username;
-    const userRole = currentUser.role || 'SUPERADMIN'; // Default ke SUPERADMIN jika role null di database
+    const userRole = currentUser.role || 'SUPERADMIN';
 
     document.getElementById('navUserName').innerText = displayName;
     document.getElementById('userRoleBadge').innerText = `Role: ${userRole}`;
 
-    // Tampilkan menu khusus Superadmin jika role SUPERADMIN
     if (userRole === 'SUPERADMIN') {
       document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
     } else {
@@ -360,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnToggleSidebar').addEventListener('click', toggleSidebar);
   document.getElementById('btnLogout').addEventListener('click', handleLogout);
 
-  // Dynamic Navigation Listener
   document.querySelectorAll('[data-menu]').forEach(elem => {
     elem.addEventListener('click', (e) => {
       e.preventDefault();
@@ -369,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Export Button Dynamic Listeners
   const exportMap = {
     'btnExportServer': ['tblServer', 'Data_Server'],
     'btnExportServerWilayah': ['containerServerWilayah', 'Data_Server_Wilayah'],
@@ -386,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn) btn.addEventListener('click', () => exportFormattedExcel(tblId, fileName));
   });
 
-  // Live Clock Controller
   setInterval(() => {
     const clockEl = document.getElementById('liveClockText');
     if (clockEl) {
