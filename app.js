@@ -7,13 +7,12 @@ let perfChart = null;
 let currentUser = null;
 let base64AvatarImage = "";
 let livePerfInterval = null;
-let liveClockInterval = null;
 let heartbeatInterval = null;
 let failedLoginAttempts = 0;
 let idleTimer = null;
 let sessionsPollInterval = null;
 
-// Global Cache untuk performa super cepat
+// Global Cache untuk Performa Super Cepat
 window.SERVER_CACHE = [];
 window.EMPLOYEE_CACHE = [];
 window.RESELLER_CACHE = [];
@@ -33,8 +32,7 @@ const QUOTES_DATABASE = [
   { text: "Satu langkah kecil hari ini adalah awal dari pencapaian besar di masa depan.", author: "Inspirasi Harian" },
   { text: "Kerja tim yang solid membuat pekerjaan berat terasa ringan dan menyenangkan.", author: "Budaya Kerja" },
   { text: "Setiap masalah yang terselesaikan adalah bukti kenaikan level kemampuanmu.", author: "Mental Juara" },
-  { text: "Jangan lupa tersenyum dan rehat sejenak, kesehatanmu adalah aset terbaik.", author: "Penghibur Diri" },
-  { text: "Ketelitian dalam data adalah kunci keputusan bisnis yang tepat sasaran.", author: "Prinsip Profesional" }
+  { text: "Jangan lupa tersenyum dan rehat sejenak, kesehatanmu adalah aset terbaik.", author: "Penghibur Diri" }
 ];
 
 // E2E Security Module
@@ -94,20 +92,6 @@ function togglePasswordVisibility() {
   }
 }
 
-function setButtonLoading(btnElement, isLoading, defaultText = "Simpan Data") {
-  if (!btnElement) return;
-  if (isLoading) {
-    btnElement.disabled = true;
-    btnElement.setAttribute('data-original-text', btnElement.innerHTML);
-    btnElement.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Memproses Data...`;
-  } else {
-    btnElement.disabled = false;
-    const orig = btnElement.getAttribute('data-original-text');
-    if (orig) btnElement.innerHTML = orig;
-    else btnElement.innerHTML = defaultText;
-  }
-}
-
 function triggerSuccessCelebration() {
   if (typeof confetti === 'function') {
     confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
@@ -147,7 +131,7 @@ function getUserLocation() {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`),
-      () => resolve("Akses Lokasi Ditolak/Tidak Aktif"),
+      () => resolve("Akses Lokasi Ditolak"),
       { timeout: 4000 }
     );
   });
@@ -173,7 +157,7 @@ async function logActivity(tipe, detail, isSuccess = true, errorMsg = '') {
   try {
     await _supabase.from('activity_logs').insert([payload]);
   } catch (err) {
-    console.warn("Gagal simpan log ke Cloud Supabase.", err);
+    console.warn("Gagal simpan log ke Supabase.", err);
   }
 }
 
@@ -320,9 +304,17 @@ async function handleAuthLogin(e) {
     document.getElementById('navUserName').innerText = currentUser.nama_lengkap || currentUser.username;
     document.getElementById('userRoleBadge').innerText = `Role: ${currentUser.role}`;
 
+    // Tampilkan menu khusus Superadmin jika role SUPERADMIN
+    if (currentUser.role === 'SUPERADMIN') {
+      document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
+    } else {
+      document.querySelectorAll('.superadmin-only').forEach(el => el.classList.add('d-none'));
+    }
+
     triggerSuccessCelebration();
     await loadAllMasterDropdowns();
     switchMenu('dashboard');
+    logActivity('LOGIN', `Pengguna ${currentUser.username} berhasil masuk ke sistem.`);
 
   } catch(err) {
     Swal.fire('System Error', 'Gagal terhubung ke Supabase.', 'error');
@@ -333,6 +325,9 @@ async function handleAuthLogin(e) {
 }
 
 function handleLogout() {
+  if (currentUser) {
+    logActivity('LOGOUT', `Pengguna ${currentUser.username} keluar dari sistem.`);
+  }
   currentUser = null;
   document.getElementById('pageApp').classList.add('d-none');
   document.getElementById('pageLogin').classList.remove('d-none');

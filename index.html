@@ -1,18 +1,18 @@
-[source: 1]<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>RINNET+ - Enterprise Management System</title>
+  <title>RINNET+ - Enterprise Infrastructure & Management System</title>
   
-  <!-- Fonts & External CSS -->
+  <!-- Fonts & Stylesheets -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- External JavaScript Libraries -->
+  <!-- Core JavaScript Engines -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -23,7 +23,7 @@
 </head>
 <body>
 
-  <!-- PAGE LOGIN -->
+  <!-- PAGE LOGIN MODERN -->
   <div id="pageLogin" class="login-wrapper">
     <div class="login-grid">
       <div class="login-left">
@@ -34,20 +34,20 @@
               <span class="brand-subtitle text-white-50">Enterprise Infrastructure</span>
             </div>
           </div>
-          <h2 class="fw-800 text-white display-6 mb-3">Enterprise Core Infrastructure</h2>
-          <p class="text-secondary small leading-relaxed">Platform manajemen sistem terpadu untuk pengawasan server cloud, distribusi voucher, pengelolaan SDM, dan monitoring finansial interaktif.</p>
+          <h2 class="fw-800 text-white display-6 mb-3">Enterprise Core Infrastructure System</h2>
+          <p class="text-white-50 small leading-relaxed">Platform terpadu untuk pengawasan server cloud, otomatisasi alokasi voucher, pengelolaan SDM, monitoring finansial, serta sinkronisasi realtime terintegrasi Supabase & GitHub.</p>
         </div>
 
         <div class="row g-3 my-4">
           <div class="col-6"><div class="feature-pill"><i class="fa-solid fa-server text-indigo"></i> Multi-Server Cloud</div></div>
-          <div class="col-6"><div class="feature-pill"><i class="fa-solid fa-shield-halved text-emerald"></i> Enterprise E2E Security</div></div>
+          <div class="col-6"><div class="feature-pill"><i class="fa-solid fa-shield-halved text-emerald"></i> AES-256 E2E Security</div></div>
           <div class="col-6"><div class="feature-pill"><i class="fa-solid fa-chart-line text-amber"></i> Realtime Analytics</div></div>
-          <div class="col-6"><div class="feature-pill"><i class="fa-solid fa-mobile-screen-button text-cyan"></i> Cross-Device Monitoring</div></div>
+          <div class="col-6"><div class="feature-pill"><i class="fa-solid fa-mobile-screen-button text-cyan"></i> Cross-Device Tracker</div></div>
         </div>
 
-        <div class="text-secondary small pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+        <div class="text-white-50 small pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
           <span>© 2026 PT RINNET GLOBAL MANDIRI.</span>
-          <span class="badge-e2e"><i class="fa-solid fa-lock"></i> AES-256 E2E</span>
+          <span class="badge-e2e"><i class="fa-solid fa-lock me-1"></i> Cloud Synced</span>
         </div>
       </div>
 
@@ -68,7 +68,7 @@
             <label class="form-label small fw-bold text-secondary">USERNAME</label>
             <div class="input-group">
               <span class="input-group-text input-group-text-custom"><i class="fa-regular fa-user"></i></span>
-              <input type="text" id="loginUsername" class="form-control form-control-lg fs-6" placeholder="Masukkan username" required>
+              <input type="text" id="loginUsername" class="form-control form-control-lg fs-6" placeholder="Masukkan username" required autocomplete="username">
             </div>
           </div>
 
@@ -76,7 +76,7 @@
             <label class="form-label small fw-bold text-secondary">PASSWORD</label>
             <div class="input-group">
               <span class="input-group-text input-group-text-custom"><i class="fa-solid fa-lock"></i></span>
-              <input type="password" id="loginPassword" class="form-control form-control-lg fs-6" placeholder="••••••••" required>
+              <input type="password" id="loginPassword" class="form-control form-control-lg fs-6" placeholder="••••••••" required autocomplete="current-password">
               <button class="btn btn-outline-secondary" type="button" id="btnTogglePassword"><i class="fa-solid fa-eye" id="eyeIcon"></i></button>
             </div>
           </div>
@@ -98,7 +98,7 @@
   <div id="pageApp" class="d-none">
     <div class="mobile-header d-lg-none">
       <div class="brand-logo-container">
-        <span class="brand-logo-text fs-4">RINNET<span class="plus-tag">+</span></span>
+        <span class="brand-logo-text fs-4 text-white">RINNET<span class="plus-tag">+</span></span>
       </div>
       <button class="btn btn-sm btn-outline-light" id="btnToggleSidebar"><i class="fa-solid fa-bars fs-5"></i></button>
     </div>
@@ -111,7 +111,7 @@
         </div>
         <img id="navUserAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-avatar-nav mb-2" alt="Avatar">
         <h6 class="fw-800 text-white mb-0" id="navUserName">User</h6>
-        <span class="badge bg-indigo bg-opacity-25 text-indigo mt-1 px-3 py-1 rounded-pill" id="userRoleBadge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">Role: -</span>
+        <span class="badge mt-1 px-3 py-1 rounded-pill" id="userRoleBadge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">Role: -</span>
       </div>
 
       <div class="sidebar-menu">
@@ -155,7 +155,7 @@
               <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 text-uppercase small mb-2 fw-bold" style="letter-spacing: 1px;">
                 <i class="fa-solid fa-sparkles text-warning me-1"></i>Enterprise System Active
               </span>
-              <h2 class="fw-900 mb-1" id="dashWelcomeTitle">Selamat Datang di RINNET+</h2>
+              <h2 class="fw-900 mb-1 text-white" id="dashWelcomeTitle">Selamat Datang di RINNET+</h2>
               <p class="text-white-50 mb-0 small" id="dashWelcomeSubtitle">Sistem Pengelolaan Infrastruktur Server, Stok Voucher & Monitoring Karyawan.</p>
             </div>
             <div class="text-end d-none d-md-block">
@@ -265,40 +265,40 @@
           </div>
         </div>
 
-        <!-- STATISTIK DASAR & RINGKASAN DATA -->
+        <!-- STATISTIK DASAR -->
         <div class="row g-3 mb-4">
           <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #4f46e5, #6366f1);">
               <span class="text-white-50 small fw-bold">TOTAL SERVER</span>
-              <h2 id="dashTotalServer" class="fw-800 my-1">0</h2>
+              <h2 id="dashTotalServer" class="fw-800 my-1 text-white">0</h2>
               <i class="fa-solid fa-server stat-icon"></i>
             </div>
           </div>
           <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #0284c7, #06b6d4);">
               <span class="text-white-50 small fw-bold">TOTAL WILAYAH/CLUSTER</span>
-              <h2 id="dashTotalWilayah" class="fw-800 my-1">0</h2>
+              <h2 id="dashTotalWilayah" class="fw-800 my-1 text-white">0</h2>
               <i class="fa-solid fa-map-location-dot stat-icon"></i>
             </div>
           </div>
           <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #d97706, #f59e0b);">
               <span class="text-white-50 small fw-bold">TOTAL RESELLER</span>
-              <h2 id="dashTotalReseller" class="fw-800 my-1">0</h2>
+              <h2 id="dashTotalReseller" class="fw-800 my-1 text-white">0</h2>
               <i class="fa-solid fa-users-viewfinder stat-icon"></i>
             </div>
           </div>
           <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #0f172a, #1e293b);">
               <span class="text-white-50 small fw-bold">TOTAL KARYAWAN</span>
-              <h2 id="dashTotalKaryawan" class="fw-800 my-1">0</h2>
+              <h2 id="dashTotalKaryawan" class="fw-800 my-1 text-white">0</h2>
               <i class="fa-solid fa-users stat-icon"></i>
             </div>
           </div>
           <div class="col-12 col-sm-6 col-xl-2-4">
             <div class="stat-card" style="background: linear-gradient(135deg, #059669, #10b981);">
               <span class="text-white-50 small fw-bold">TOTAL VOUCHER TERSEDIA</span>
-              <h2 id="dashTotalStok" class="fw-800 my-1">0</h2>
+              <h2 id="dashTotalStok" class="fw-800 my-1 text-white">0</h2>
               <i class="fa-solid fa-ticket stat-icon"></i>
             </div>
           </div>
@@ -307,7 +307,7 @@
         <div class="card card-custom p-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-column me-2 text-primary"></i>Statistik Distribusi Server Cloud</h5>
-            <small class="text-muted">Mendukung Hingga 100+ Server</small>
+            <small class="text-muted">Mendukung Monitoring Realtime</small>
           </div>
           <div class="chart-container-scroll">
             <div id="chartWrapper" style="min-width: 100%; height: 320px;">
@@ -343,15 +343,15 @@
           </div>
 
           <div class="table-responsive">
-            <table class="table table-bordered table-sm text-center" id="tblDashReseller">
+            <table class="table table-bordered table-sm text-center align-middle" id="tblDashReseller">
               <thead>
                 <tr>
                   <th>Tanggal</th>
                   <th>Server</th>
                   <th>Reseller</th>
                   <th>Petugas</th>
-                  <th>Total Voucher Harian (2K-25K)</th>
-                  <th>Total Voucher Bulanan (1HP-5HP)</th>
+                  <th>Total Voucher Harian</th>
+                  <th>Total Voucher Bulanan</th>
                   <th>Total Keseluruhan</th>
                 </tr>
               </thead>
@@ -377,7 +377,7 @@
             <div class="mb-3"><label class="form-label small fw-bold">Nama Lengkap</label><input type="text" id="prfNamaLengkap" class="form-control" required></div>
             <div class="mb-3"><label class="form-label small fw-bold">Email Pribadi</label><input type="email" id="prfEmail" class="form-control" required></div>
             <div class="mb-3"><label class="form-label small fw-bold">Nomor WhatsApp</label><input type="text" id="prfWA" class="form-control" required></div>
-            <button type="submit" id="btnSimpanProfil" class="btn btn-primary fw-bold w-100" style="background: var(--primary-accent); border:none;">
+            <button type="submit" id="btnSimpanProfil" class="btn btn-primary fw-bold w-100 py-2" style="background: var(--primary-accent); border:none;">
               <span>Simpan Profil Saya</span>
             </button>
           </form>
@@ -421,7 +421,7 @@
             <div class="metric-card-modern">
               <span class="metric-title"><i class="fa-solid fa-bolt me-1 text-warning"></i> DB Latency</span>
               <div id="sysDbLatency" class="metric-val text-warning">28 ms</div>
-              <small class="text-muted" style="font-size: 11px;">Supabase PostgreSQL Engine</small>
+              <small class="text-muted" style="font-size: 11px;">Supabase Engine</small>
             </div>
           </div>
 
@@ -437,7 +437,7 @@
         <div class="card card-custom p-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <h5 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-users-rays me-2"></i>Pengguna & Perangkat Aktif Realtime (Superadmin Monitor)</h5>
+              <h5 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-users-rays me-2"></i>Pengguna & Perangkat Aktif Realtime</h5>
               <small class="text-muted">Memantau user dan jenis perangkat yang sedang mengakses aplikasi secara langsung.</small>
             </div>
             <button class="btn btn-sm btn-outline-primary rounded-pill px-3" id="btnRefreshSessions">
@@ -468,7 +468,7 @@
             <div class="card card-custom p-4 h-100">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-line me-2 text-indigo"></i>Grafik Realtime Latensi DB & CPU Usage</h5>
-                <small class="text-muted"><i class="fa-solid fa-arrows-rotate fa-spin me-1"></i>Update Tiap 3 Detik</small>
+                <small class="text-muted"><i class="fa-solid fa-arrows-rotate fa-spin me-1"></i>Update Realtime</small>
               </div>
               <div style="height: 280px; position: relative;">
                 <canvas id="systemPerfChart"></canvas>
@@ -480,7 +480,7 @@
             <div class="card card-custom p-4 h-100">
               <h5 class="fw-bold mb-3"><i class="fa-solid fa-terminal me-2 text-dark"></i>Live Security & Audit Terminal Log</h5>
               <div id="sysLogTerminal" class="terminal-console">
-                <div>[SYSTEM] Inisialisasi E2E Security Engine... DONE</div>
+                <div>[SYSTEM] Inisialisasi AES-256 E2E Security Engine... DONE</div>
                 <div>[SUPABASE] Connection pool initialized (OK)</div>
                 <div>[AUTH] Active session token verified</div>
               </div>
@@ -502,7 +502,7 @@
                 <div class="mb-2"><label class="form-label small fw-bold">Pengelola</label><input type="text" id="srvPengelola" class="form-control" required></div>
                 <div class="mb-2"><label class="form-label small fw-bold">WhatsApp</label><input type="text" id="srvWA" class="form-control" required></div>
                 <div class="mb-3"><label class="form-label small fw-bold">Wilayah / Cluster</label><input type="text" id="srvWilayah" class="form-control" placeholder="Contoh: Haurwangi/1, Cugenang/2" required></div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Server</button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: var(--primary-accent); border:none;">Simpan Server</button>
               </form>
             </div>
           </div>
@@ -513,8 +513,8 @@
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportServer"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
               </div>
               <div class="table-responsive">
-                <table class="table table-hover" id="tblServer">
-                  <thead><tr><th>Server</th><th>Pengelola</th><th>WhatsApp</th><th>Wilayah</th><th class="action-col">Aksi</th></tr></thead>
+                <table class="table table-hover align-middle" id="tblServer">
+                  <thead><tr><th>Server</th><th>Pengelola</th><th>WhatsApp</th><th>Wilayah</th><th class="action-col text-end">Aksi</th></tr></thead>
                   <tbody id="bodyServer"></tbody>
                 </table>
               </div>
@@ -560,7 +560,7 @@
                     <option value="">-- Pilih Server --</option>
                   </select>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Reseller</button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: var(--primary-accent); border:none;">Simpan Reseller</button>
               </form>
             </div>
           </div>
@@ -568,19 +568,19 @@
           <div class="col-12 col-lg-8 main-table-container">
             <div class="card card-custom p-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">Daftar Reseller Terdaftar (Dikelompokkan per Server)</h5>
+                <h5 class="fw-bold mb-0">Daftar Reseller Terdaftar</h5>
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportMasterReseller">
                   <i class="fa-solid fa-file-excel me-1"></i>Export Excel
                 </button>
               </div>
               <div class="table-responsive">
-                <table class="table table-hover" id="tblMasterReseller">
+                <table class="table table-hover align-middle" id="tblMasterReseller">
                   <thead>
                     <tr>
                       <th>Server Utama</th>
                       <th>Nama Reseller</th>
                       <th>Nomor WhatsApp</th>
-                      <th class="action-col">Aksi</th>
+                      <th class="action-col text-end">Aksi</th>
                     </tr>
                   </thead>
                   <tbody id="bodyMasterReseller"></tbody>
@@ -627,7 +627,7 @@
                   <label class="form-label small fw-bold">Nomor WhatsApp</label>
                   <input type="text" id="empWA" class="form-control" placeholder="08xxxxxxxxxx">
                 </div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Karyawan</button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: var(--primary-accent); border:none;">Simpan Karyawan</button>
               </form>
             </div>
           </div>
@@ -641,8 +641,8 @@
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportKaryawan"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
               </div>
               <div class="table-responsive">
-                <table class="table table-hover" id="tblKaryawan">
-                  <thead><tr><th>ID</th><th>Nama Karyawan</th><th>Jabatan</th><th>WhatsApp</th><th class="action-col">Aksi</th></tr></thead>
+                <table class="table table-hover align-middle" id="tblKaryawan">
+                  <thead><tr><th>ID</th><th>Nama Karyawan</th><th>Jabatan</th><th>WhatsApp</th><th class="action-col text-end">Aksi</th></tr></thead>
                   <tbody id="bodyKaryawan"></tbody>
                 </table>
               </div>
@@ -695,7 +695,7 @@
             <div class="col-4 col-md-2"><label class="small">4HP</label><input type="number" id="b4hp" class="form-control" value="0"></div>
             <div class="col-4 col-md-2"><label class="small">5HP</label><input type="number" id="b5hp" class="form-control" value="0"></div>
 
-            <div class="col-12 mt-3"><button type="submit" class="btn btn-primary px-4 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Penyerahan Voucher</button></div>
+            <div class="col-12 mt-3"><button type="submit" class="btn btn-primary px-4 fw-bold py-2" style="background: var(--primary-accent); border:none;">Simpan Penyerahan Voucher</button></div>
           </form>
         </div>
 
@@ -710,7 +710,7 @@
             </div>
           </div>
           <div class="table-responsive">
-            <table class="table table-bordered table-sm text-center" id="tblStok">
+            <table class="table table-bordered table-sm text-center align-middle" id="tblStok">
               <thead>
                 <tr>
                   <th>Tgl</th><th>Server</th><th>Reseller</th><th>Petugas</th>
@@ -790,7 +790,7 @@
                   <span id="ksbSisaPreview" class="text-danger">Rp 0</span>
                 </div>
                 <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Kasbon</button>
+                  <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: var(--primary-accent); border:none;">Simpan Kasbon</button>
                   <button type="button" id="btnBatalEditKasbon" class="btn btn-outline-secondary fw-bold d-none">Batal</button>
                 </div>
               </form>
@@ -804,7 +804,7 @@
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportKasbon"><i class="fa-solid fa-file-excel me-1"></i>Export Format Excel</button>
               </div>
 
-              <div class="row g-2 mb-3 bg-light p-3 rounded-3">
+              <div class="row g-2 mb-3 bg-light p-3 rounded-3 border">
                 <div class="col-12 col-sm-4">
                   <label class="small fw-bold">Filter Karyawan</label>
                   <select id="fltKasbonKaryawan" class="form-select form-select-sm"><option value="">-- Semua Karyawan --</option></select>
@@ -814,8 +814,8 @@
               </div>
 
               <div class="table-responsive">
-                <table class="table table-hover" id="tblKasbon">
-                  <thead><tr><th>Tanggal</th><th>Karyawan</th><th>Jumlah Kasbon</th><th>Sisa Saldo</th><th>Status</th><th>Sumber Dana</th><th>Keterangan</th><th class="action-col">Aksi</th></tr></thead>
+                <table class="table table-hover align-middle" id="tblKasbon">
+                  <thead><tr><th>Tanggal</th><th>Karyawan</th><th>Jumlah Kasbon</th><th>Sisa Saldo</th><th>Status</th><th>Sumber Dana</th><th>Keterangan</th><th class="action-col text-end">Aksi</th></tr></thead>
                   <tbody id="bodyKasbon"></tbody>
                 </table>
               </div>
@@ -824,7 +824,7 @@
             <div class="card card-custom p-4 mt-4">
               <h5 class="fw-bold mb-3"><i class="fa-solid fa-scale-balanced me-2 text-warning"></i>Saldo Kasbon Belum Lunas per Karyawan</h5>
               <div class="table-responsive">
-                <table class="table table-sm table-hover">
+                <table class="table table-sm table-hover align-middle">
                   <thead><tr><th>Karyawan</th><th>Total Kasbon</th><th>Sudah Dibayar</th><th>Sisa Saldo</th></tr></thead>
                   <tbody id="bodySaldoKasbon"><tr><td colspan="4" class="text-muted text-center py-2">Belum ada data.</td></tr></tbody>
                 </table>
@@ -885,11 +885,11 @@
                   </div>
                   <div class="form-check form-switch mb-1">
                     <input class="form-check-input perm-chk" type="checkbox" value="monitoring" id="permMon">
-                    <label class="form-check-label small" for="permMon">Akses Monitoring Pekerjaan</label>
+                    <label class="form-check-label small" for="permMon">Akses Monitoring System</label>
                   </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Akun</button>
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2" style="background: var(--primary-accent); border:none;">Simpan Akun</button>
               </form>
             </div>
           </div>
@@ -924,16 +924,16 @@
           <div class="brand-logo-container justify-content-center mb-3">
             <span class="brand-logo-text fs-1 text-white">RINNET<span class="plus-tag">+</span></span>
           </div>
-          <h2 class="fw-900 mb-2">Enterprise Infrastructure Management System</h2>
+          <h2 class="fw-900 mb-2 text-white">Enterprise Infrastructure Management System</h2>
           <p class="text-white-50 max-w-2xl mx-auto" style="max-width: 650px;">
-            Sistem terintegrasi modern untuk pengelolaan infrastruktur server cloud, alokasi jaringan reseller, manajemen SDM operasional, serta pemantauan finansial secara realtime.
+            Sistem terintegrasi modern untuk pengelolaan infrastruktur server cloud, alokasi jaringan reseller, manajemen SDM operasional, serta pemantauan finansial secara realtime terhubung Cloud & GitHub.
           </p>
           <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
-            <span class="tech-badge"><i class="fa-solid fa-layer-group text-primary"></i> Supabase Cloud DB</span>
-            <span class="tech-badge"><i class="fa-solid fa-bolt text-warning"></i> Realtime Sync</span>
-            <span class="tech-badge"><i class="fa-solid fa-shield-halved text-success"></i> Role-Based Access</span>
-            <span class="tech-badge"><i class="fa-solid fa-lock text-cyan"></i> WebCrypto E2E Security</span>
-            <span class="tech-badge"><i class="fa-solid fa-file-excel text-success"></i> Excel Engine Integration</span>
+            <span class="tech-badge"><i class="fa-solid fa-layer-group text-primary me-1"></i> Supabase Cloud DB</span>
+            <span class="tech-badge"><i class="fa-solid fa-bolt text-warning me-1"></i> Realtime Sync</span>
+            <span class="tech-badge"><i class="fa-solid fa-shield-halved text-success me-1"></i> Role-Based Access</span>
+            <span class="tech-badge"><i class="fa-solid fa-lock text-cyan me-1"></i> AES-256 E2E Security</span>
+            <span class="tech-badge"><i class="fa-solid fa-file-excel text-success me-1"></i> ExcelJS Engine</span>
           </div>
         </div>
 
