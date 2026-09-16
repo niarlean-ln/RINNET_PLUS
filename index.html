@@ -1180,13 +1180,34 @@
                   <label class="form-label small fw-bold">Nama Karyawan</label>
                   <select id="ksbKaryawan" class="form-select" required><option value="">-- Pilih Karyawan --</option></select>
                 </div>
-                <div class="mb-3"><label class="form-label small fw-bold">Jumlah Kasbon (Rp)</label><input type="number" id="ksbJumlah" class="form-control" placeholder="0" required></div>
+                <div class="mb-3"><label class="form-label small fw-bold">Jumlah Kasbon (Rp)</label><input type="number" id="ksbJumlah" class="form-control" placeholder="0" min="0" required oninput="updateSisaSaldoPreview()"></div>
                 <div class="mb-3">
                   <label class="form-label small fw-bold">Sumber Dana (Server)</label>
                   <select id="ksbSumber" class="form-select" required><option value="">-- Pilih Server --</option></select>
                 </div>
                 <div class="mb-3"><label class="form-label small fw-bold">Keterangan / Alasan</label><textarea id="ksbKet" class="form-control" rows="2"></textarea></div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Kasbon</button>
+                <div class="row g-2 mb-3">
+                  <div class="col-6">
+                    <label class="form-label small fw-bold">Status Pelunasan</label>
+                    <select id="ksbStatus" class="form-select" onchange="updateSisaSaldoPreview()">
+                      <option value="BELUM_LUNAS">Belum Lunas</option>
+                      <option value="SEBAGIAN">Lunas Sebagian</option>
+                      <option value="LUNAS">Lunas</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small fw-bold">Sudah Dibayar (Rp)</label>
+                    <input type="number" id="ksbDibayar" class="form-control" placeholder="0" min="0" value="0" oninput="updateSisaSaldoPreview()">
+                  </div>
+                </div>
+                <div class="alert alert-light border small fw-bold d-flex justify-content-between mb-3" id="ksbSisaPreviewBox">
+                  <span>Sisa Saldo Kasbon</span>
+                  <span id="ksbSisaPreview" class="text-danger">Rp 0</span>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--primary-accent); border:none;">Simpan Kasbon</button>
+                  <button type="button" id="btnBatalEditKasbon" class="btn btn-outline-secondary fw-bold d-none" onclick="batalEditKasbon()">Batal</button>
+                </div>
               </form>
             </div>
           </div>
@@ -1209,8 +1230,18 @@
 
               <div class="table-responsive">
                 <table class="table table-hover" id="tblKasbon">
-                  <thead><tr><th>Tanggal</th><th>Karyawan</th><th>Jumlah Kasbon</th><th>Sumber Dana</th><th>Keterangan</th><th class="action-col">Aksi</th></tr></thead>
+                  <thead><tr><th>Tanggal</th><th>Karyawan</th><th>Jumlah Kasbon</th><th>Sisa Saldo</th><th>Status</th><th>Sumber Dana</th><th>Keterangan</th><th class="action-col">Aksi</th></tr></thead>
                   <tbody id="bodyKasbon"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card card-custom p-4 mt-4">
+              <h5 class="fw-bold mb-3"><i class="fa-solid fa-scale-balanced me-2 text-warning"></i>Saldo Kasbon Belum Lunas per Karyawan</h5>
+              <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                  <thead><tr><th>Karyawan</th><th>Total Kasbon</th><th>Sudah Dibayar</th><th>Sisa Saldo</th></tr></thead>
+                  <tbody id="bodySaldoKasbon"><tr><td colspan="4" class="text-muted text-center py-2">Belum ada data.</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -1416,6 +1447,7 @@
     let heartbeatInterval = null;
     let failedLoginAttempts = 0;
     let idleTimer = null;
+    let sessionsPollInterval = null;
 
     // GLOBAL CACHE UNTUK AKSELERASI MEKANISME DROPDOWN SERVER & SDM
     window.SERVER_CACHE = [];
@@ -1516,6 +1548,17 @@
       if (typeof confetti === 'function') {
         confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
       }
+    }
+
+    // ID unik per perangkat/tab (bukan per-username) supaya satu akun yang login
+    // dari beberapa device tetap terlihat sebagai sesi terpisah di monitoring.
+    function getDeviceSessionId() {
+      let sid = sessionStorage.getItem('rinnet_device_session_id');
+      if (!sid) {
+        sid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('sess-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+        sessionStorage.setItem('rinnet_device_session_id', sid);
+      }
+      return sid;
     }
 
     function getDeviceDetailedInfo() {
@@ -1860,13 +1903,16 @@
       try {
         const device = getDeviceDetailedInfo();
         const payload = {
+          session_id: getDeviceSessionId(),
           username: currentUser.username,
           nama_lengkap: currentUser.nama_lengkap || currentUser.username,
           role: currentUser.role,
           device: device,
           last_active: new Date().toISOString()
         };
-        await _supabase.from('active_sessions').upsert([payload], { onConflict: 'username' });
+        // PENTING: onConflict sekarang berbasis session_id (unik per perangkat),
+        // bukan username, supaya login dari beberapa device/user tetap terdeteksi semua.
+        await _supabase.from('active_sessions').upsert([payload], { onConflict: 'session_id' });
       } catch(e) {
         // Fallback silent
       }
@@ -1934,10 +1980,17 @@
       }
     }
 
-    function handleLogout() {
+    async function handleLogout() {
       if (livePerfInterval) clearInterval(livePerfInterval);
       if (heartbeatInterval) clearInterval(heartbeatInterval);
+      if (sessionsPollInterval) clearInterval(sessionsPollInterval);
+      try {
+        const sid = sessionStorage.getItem('rinnet_device_session_id');
+        if (sid) await _supabase.from('active_sessions').delete().eq('session_id', sid);
+        if (currentUser) await logActivity('LOGOUT', `Keluar dari sistem aplikasi RINNET+`, true);
+      } catch(e) { /* fallback silent, sesi akan basi otomatis setelah 5 menit */ }
       sessionStorage.removeItem('rinnet_session_user');
+      sessionStorage.removeItem('rinnet_device_session_id');
       location.reload();
     }
 
@@ -1964,6 +2017,10 @@
 
       if (window.innerWidth < 992) document.getElementById('mainSidebar').classList.remove('show');
 
+      // Auto-refresh sesi aktif hanya jalan selagi admin berada di halaman Monitoring Sistem,
+      // supaya login/logout user lain langsung kelihatan tanpa perlu pindah-pindah menu.
+      if (sessionsPollInterval) { clearInterval(sessionsPollInterval); sessionsPollInterval = null; }
+
       if (menuName === 'dashboard') { loadDashboardData(); loadDashboardResellerSummary(); }
       if (menuName === 'karyawan') { generateNextEmployeeID(); loadKaryawanData(); }
       if (menuName === 'kasbon') { populateKasbonKaryawanDropdown(); loadKasbonData(); }
@@ -1972,7 +2029,11 @@
       if (menuName === 'inputReseller') { populateResellerServerDropdown(); loadResellerMasterData(); }
       if (menuName === 'reseller') { populateServerDropdown(); loadStokData(); }
       if (menuName === 'profil') loadProfilData();
-      if (menuName === 'sysPerf') { initLiveSystemPerformanceChart(); loadRealtimeActiveSessions(); }
+      if (menuName === 'sysPerf') {
+        initLiveSystemPerformanceChart();
+        loadRealtimeActiveSessions();
+        sessionsPollInterval = setInterval(loadRealtimeActiveSessions, 8000);
+      }
       if (menuName === 'userMgmt') loadUserData();
     }
 
@@ -2520,8 +2581,9 @@
 
         if (sysCount) sysCount.innerText = `${data.length} Online`;
 
+        const mySessionId = sessionStorage.getItem('rinnet_device_session_id');
         body.innerHTML = data.map(s => {
-          const isSelf = currentUser && s.username === currentUser.username;
+          const isSelf = mySessionId && s.session_id === mySessionId;
           const timeDiffSec = Math.floor((Date.now() - new Date(s.last_active).getTime()) / 1000);
           
           return `
@@ -2682,16 +2744,62 @@
       `).join('');
     }
 
+    // Preview sisa saldo kasbon secara live di form, dan auto-sinkronkan status
+    function updateSisaSaldoPreview() {
+      const jumlah = parseFloat(document.getElementById('ksbJumlah').value) || 0;
+      const dibayarEl = document.getElementById('ksbDibayar');
+      let dibayar = parseFloat(dibayarEl.value) || 0;
+      if (dibayar > jumlah) { dibayar = jumlah; dibayarEl.value = jumlah; }
+
+      const sisa = Math.max(jumlah - dibayar, 0);
+      const statusEl = document.getElementById('ksbStatus');
+
+      // Auto-sinkron status berdasarkan sisa saldo (boleh ditimpa manual oleh user)
+      if (sisa <= 0 && jumlah > 0) statusEl.value = 'LUNAS';
+      else if (dibayar > 0 && sisa > 0) statusEl.value = 'SEBAGIAN';
+      else if (dibayar === 0) statusEl.value = statusEl.value === 'LUNAS' ? 'BELUM_LUNAS' : statusEl.value;
+
+      document.getElementById('ksbSisaPreview').innerText = `Rp ${sisa.toLocaleString('id-ID')}`;
+    }
+
+    function batalEditKasbon() {
+      document.getElementById('ksbId').value = '';
+      document.querySelector('#menu-kasbon form').reset();
+      document.getElementById('ksbDibayar').value = 0;
+      document.getElementById('btnBatalEditKasbon').classList.add('d-none');
+      updateSisaSaldoPreview();
+    }
+
+    function editKasbon(id, tanggal, karyawan, jumlah, dibayar, status, sumber, ket) {
+      document.getElementById('ksbId').value = id;
+      document.getElementById('ksbTanggal').value = tanggal;
+      document.getElementById('ksbKaryawan').value = karyawan;
+      document.getElementById('ksbJumlah').value = jumlah;
+      document.getElementById('ksbDibayar').value = dibayar || 0;
+      document.getElementById('ksbStatus').value = status || 'BELUM_LUNAS';
+      document.getElementById('ksbSumber').value = sumber;
+      document.getElementById('ksbKet').value = ket || '';
+      document.getElementById('btnBatalEditKasbon').classList.remove('d-none');
+      updateSisaSaldoPreview();
+      window.scrollTo({ top: document.querySelector('#menu-kasbon').offsetTop - 80, behavior: 'smooth' });
+    }
+
     async function simpanKasbon(e) {
       e.preventDefault();
       const btn = e.target.querySelector('button[type="submit"]');
       setButtonLoading(btn, true);
 
       const id = document.getElementById('ksbId').value;
+      const jumlah = parseFloat(document.getElementById('ksbJumlah').value) || 0;
+      let dibayar = parseFloat(document.getElementById('ksbDibayar').value) || 0;
+      if (dibayar > jumlah) dibayar = jumlah;
+
       const payload = {
         tanggal: document.getElementById('ksbTanggal').value,
         nama_karyawan: document.getElementById('ksbKaryawan').value,
-        jumlah_kasbon: parseFloat(document.getElementById('ksbJumlah').value)||0,
+        jumlah_kasbon: jumlah,
+        jumlah_dibayar: dibayar,
+        status: document.getElementById('ksbStatus').value,
         sumber_dana: document.getElementById('ksbSumber').value,
         keterangan: document.getElementById('ksbKet').value
       };
@@ -2710,7 +2818,10 @@
           triggerSuccessCelebration();
           Swal.fire('Berhasil', 'Pengajuan kasbon berhasil disimpan!', 'success');
           document.getElementById('ksbId').value = '';
+          document.getElementById('btnBatalEditKasbon').classList.add('d-none');
           e.target.reset();
+          document.getElementById('ksbDibayar').value = 0;
+          updateSisaSaldoPreview();
           loadKasbonData();
         } else {
           Swal.fire('Gagal', res.error.message, 'error');
@@ -2719,6 +2830,12 @@
         setButtonLoading(btn, false);
         Swal.fire('Error', 'Kesalahan jaringan.', 'error');
       }
+    }
+
+    function statusKasbonBadge(status) {
+      if (status === 'LUNAS') return '<span class="badge bg-success bg-opacity-10 text-success">Lunas</span>';
+      if (status === 'SEBAGIAN') return '<span class="badge bg-warning bg-opacity-10 text-warning">Sebagian</span>';
+      return '<span class="badge bg-danger bg-opacity-10 text-danger">Belum Lunas</span>';
     }
 
     async function loadKasbonData() {
@@ -2736,30 +2853,106 @@
       const isManager = currentUser?.role === 'MANAJER';
 
       if (error || !data || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="6" class="text-muted text-center py-3">Belum ada riwayat kasbon.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="8" class="text-muted text-center py-3">Belum ada riwayat kasbon.</td></tr>`;
         document.getElementById('rekapTotalKasbonUser').innerText = 'Rp 0';
+      } else {
+        let totalFiltered = 0;
+        body.innerHTML = data.map(k => {
+          const jumlah = k.jumlah_kasbon || 0;
+          const dibayar = k.jumlah_dibayar || 0;
+          const sisa = Math.max(jumlah - dibayar, 0);
+          const status = k.status || 'BELUM_LUNAS';
+          totalFiltered += jumlah;
+          const argKet = escapeHTML(k.keterangan || '').replace(/'/g, "\\'");
+          return `
+            <tr>
+              <td>${escapeHTML(k.tanggal)}</td>
+              <td><b>${escapeHTML(k.nama_karyawan)}</b></td>
+              <td><strong class="text-danger">Rp ${jumlah.toLocaleString('id-ID')}</strong></td>
+              <td>${sisa > 0 ? `<span class="text-warning fw-bold">Rp ${sisa.toLocaleString('id-ID')}</span>` : `<span class="text-success fw-bold">Rp 0</span>`}</td>
+              <td>${statusKasbonBadge(status)}</td>
+              <td>${escapeHTML(k.sumber_dana)}</td>
+              <td>${escapeHTML(k.keterangan || '-')}</td>
+              ${!isManager ? `
+              <td class="action-col text-nowrap">
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editKasbon('${k.id}','${k.tanggal}','${escapeHTML(k.nama_karyawan).replace(/'/g,"\\'")}',${jumlah},${dibayar},'${status}','${escapeHTML(k.sumber_dana).replace(/'/g,"\\'")}','${argKet}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Kasbon ${escapeHTML(k.nama_karyawan)}')"><i class="fa-solid fa-trash"></i></button>
+              </td>` : ''}
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${totalFiltered.toLocaleString('id-ID')}`;
+      }
+
+      loadKasbonPeriodeSummary();
+      loadSaldoKasbonPerKaryawan();
+    }
+
+    // Kartu "Estimasi 2 Minggu" & "Total Bulanan": total kasbon yang DIINPUT
+    // dalam 14 hari & 30 hari terakhir (periode berjalan), independen dari filter tabel.
+    async function loadKasbonPeriodeSummary() {
+      const el2W = document.getElementById('rekapTotalKasbon2W');
+      const el1M = document.getElementById('rekapTotalKasbon1M');
+      if (!el2W || !el1M) return;
+
+      const now = new Date();
+      const d30 = new Date(now); d30.setDate(d30.getDate() - 30);
+      const d14 = new Date(now); d14.setDate(d14.getDate() - 14);
+      const iso30 = d30.toISOString().slice(0, 10);
+      const iso14 = d14.toISOString().slice(0, 10);
+
+      const { data, error } = await _supabase.from('kasbon').select('tanggal, jumlah_kasbon').gte('tanggal', iso30);
+      if (error || !data) { el2W.innerText = 'Rp 0'; el1M.innerText = 'Rp 0'; return; }
+
+      let total2W = 0, total1M = 0;
+      data.forEach(k => {
+        const jumlah = k.jumlah_kasbon || 0;
+        total1M += jumlah;
+        if (k.tanggal >= iso14) total2W += jumlah;
+      });
+
+      el2W.innerText = `Rp ${total2W.toLocaleString('id-ID')}`;
+      el1M.innerText = `Rp ${total1M.toLocaleString('id-ID')}`;
+    }
+
+    // Saldo kasbon berjalan (belum lunas / sebagian) diagregasi per karyawan
+    async function loadSaldoKasbonPerKaryawan() {
+      const body = document.getElementById('bodySaldoKasbon');
+      if (!body) return;
+
+      const { data, error } = await _supabase.from('kasbon').select('nama_karyawan, jumlah_kasbon, jumlah_dibayar, status').neq('status', 'LUNAS');
+      if (error || !data || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="4" class="text-muted text-center py-2">Semua kasbon sudah lunas.</td></tr>`;
         return;
       }
 
-      let totalFiltered = 0;
-      body.innerHTML = data.map(k => {
-        totalFiltered += (k.jumlah_kasbon || 0);
-        return `
-          <tr>
-            <td>${escapeHTML(k.tanggal)}</td>
-            <td><b>${escapeHTML(k.nama_karyawan)}</b></td>
-            <td><strong class="text-danger">Rp ${(k.jumlah_kasbon||0).toLocaleString('id-ID')}</strong></td>
-            <td>${escapeHTML(k.sumber_dana)}</td>
-            <td>${escapeHTML(k.keterangan || '-')}</td>
-            ${!isManager ? `
-            <td class="action-col">
-              <button class="btn btn-sm btn-danger" onclick="hapusRecord('kasbon', '${k.id}', loadKasbonData, 'Kasbon ${escapeHTML(k.nama_karyawan)}')"><i class="fa-solid fa-trash"></i></button>
-            </td>` : ''}
-          </tr>
-        `;
-      }).join('');
+      const agg = {};
+      data.forEach(k => {
+        const nama = k.nama_karyawan || '-';
+        if (!agg[nama]) agg[nama] = { total: 0, dibayar: 0 };
+        agg[nama].total += (k.jumlah_kasbon || 0);
+        agg[nama].dibayar += (k.jumlah_dibayar || 0);
+      });
 
-      document.getElementById('rekapTotalKasbonUser').innerText = `Rp ${totalFiltered.toLocaleString('id-ID')}`;
+      const rows = Object.entries(agg)
+        .map(([nama, v]) => ({ nama, total: v.total, dibayar: v.dibayar, sisa: Math.max(v.total - v.dibayar, 0) }))
+        .filter(r => r.sisa > 0)
+        .sort((a, b) => b.sisa - a.sisa);
+
+      if (rows.length === 0) {
+        body.innerHTML = `<tr><td colspan="4" class="text-muted text-center py-2">Semua kasbon sudah lunas.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = rows.map(r => `
+        <tr>
+          <td><b>${escapeHTML(r.nama)}</b></td>
+          <td>Rp ${r.total.toLocaleString('id-ID')}</td>
+          <td>Rp ${r.dibayar.toLocaleString('id-ID')}</td>
+          <td class="text-danger fw-bold">Rp ${r.sisa.toLocaleString('id-ID')}</td>
+        </tr>
+      `).join('');
     }
 
     // --- PEMBERSIHAN DATA CUSTOM ---
