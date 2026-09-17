@@ -136,12 +136,10 @@ async function loadAllMasterDropdowns() {
 
 function populateServerDropdown() {
   const stkSelect = document.getElementById('stkServer');
-  const ksbSumberSelect = document.getElementById('ksbSumber');
   const optionsHtml = '<option value="">-- Pilih Server --</option>' + 
     window.SERVER_CACHE.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)} (${escapeHTML(s.wilayah || 'Umum')})</option>`).join('');
 
   if (stkSelect) stkSelect.innerHTML = optionsHtml;
-  if (ksbSumberSelect) ksbSumberSelect.innerHTML = optionsHtml;
 }
 
 function populateResellerServerDropdown() {
@@ -169,10 +167,51 @@ function populateStokResellerDropdown() {
   }
 }
 
+// Apply Role Access Control & Read-Only for MANAJEMEN Role
+function applyRolePermissions() {
+  const role = currentUser?.role || 'ADMIN';
+  const isSuperadmin = role === 'SUPERADMIN';
+  const isManajemen = role === 'MANAJEMEN';
+
+  // Superadmin only elements
+  document.querySelectorAll('.superadmin-only').forEach(el => {
+    if (isSuperadmin) el.classList.remove('d-none');
+    else el.classList.add('d-none');
+  });
+
+  // Manajemen Read-Only styling
+  if (isManajemen) {
+    document.querySelectorAll('.action-col, .form-manage-container').forEach(el => el.classList.add('d-none'));
+    document.querySelectorAll('.main-table-container').forEach(el => {
+      el.classList.remove('col-lg-8');
+      el.classList.add('col-lg-12');
+    });
+  } else {
+    document.querySelectorAll('.action-col, .form-manage-container').forEach(el => el.classList.remove('d-none'));
+    document.querySelectorAll('.main-table-container').forEach(el => {
+      el.classList.remove('col-lg-12');
+      el.classList.add('col-lg-8');
+    });
+  }
+}
+
+// Restore User Avatar Picture from Local Storage
+function restoreUserAvatar() {
+  if (!currentUser) return;
+  const savedAvatar = localStorage.getItem('rinnet_user_avatar_' + currentUser.username);
+  const avatarImg = savedAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+  
+  const navAvatar = document.getElementById('navUserAvatar');
+  const prfAvatar = document.getElementById('prfAvatarPreview');
+  if (navAvatar) navAvatar.src = avatarImg;
+  if (prfAvatar) prfAvatar.src = avatarImg;
+}
+
 // Server Data & Cluster
 async function fetchAndRenderServers() {
   const { data, error } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
   if (error) return;
+  window.SERVER_CACHE = data || [];
   
   const tbody = document.getElementById('bodyServer');
   if (tbody) {
@@ -183,16 +222,42 @@ async function fetchAndRenderServers() {
         <td>${escapeHTML(s.no_wa)}</td>
         <td><span class="badge bg-info bg-opacity-10 text-info border border-info">${escapeHTML(s.wilayah)}</span></td>
         <td class="action-col text-end">
+          <button class="btn btn-sm btn-outline-primary me-1" onclick="editServer('${s.id}')"><i class="fa-solid fa-pen"></i></button>
           <button class="btn btn-sm btn-outline-danger" onclick="deleteServer('${s.id}')"><i class="fa-solid fa-trash"></i></button>
         </td>
       </tr>
-    `).join('');
+    `).join('') || '<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data server.</td></tr>';
   }
 
   const totalSrvEl = document.getElementById('dashTotalServer');
   if (totalSrvEl) totalSrvEl.innerText = (data || []).length;
   renderServerWilayahCluster(data || []);
   renderClusterMonitoringTable(data || []);
+  applyRolePermissions();
+}
+
+function editServer(id) {
+  const s = window.SERVER_CACHE.find(x => String(x.id) === String(id));
+  if (!s) return;
+  document.getElementById('srvId').value = s.id;
+  document.getElementById('srvNama').value = s.nama_server || '';
+  document.getElementById('srvPengelola').value = s.pengelola || '';
+  document.getElementById('srvWA').value = s.no_wa || '';
+  document.getElementById('srvWilayah').value = s.wilayah || '';
+  
+  const title = document.getElementById('titleFormServer');
+  if (title) title.innerText = 'Edit Server Cloud';
+  const btnBatal = document.getElementById('btnBatalEditServer');
+  if (btnBatal) btnBatal.classList.remove('d-none');
+}
+
+function cancelEditServer() {
+  document.getElementById('formServer').reset();
+  document.getElementById('srvId').value = '';
+  const title = document.getElementById('titleFormServer');
+  if (title) title.innerText = 'Input Server Baru';
+  const btnBatal = document.getElementById('btnBatalEditServer');
+  if (btnBatal) btnBatal.classList.add('d-none');
 }
 
 function renderServerWilayahCluster(servers) {
@@ -216,9 +281,19 @@ function renderServerWilayahCluster(servers) {
         <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-map-pin me-2"></i>Wilayah / Cluster: ${escapeHTML(wil)}</h5>
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
-            <thead><tr><th>Nama Server</th><th>Pengelola</th><th>WhatsApp</th></tr></thead>
+            <thead><tr><th>Nama Server</th><th>Pengelola</th><th>WhatsApp</th><th class="action-col text-end">Aksi</th></tr></thead>
             <tbody>
-              ${list.map(s => `<tr><td class="fw-bold">${escapeHTML(s.nama_server)}</td><td>${escapeHTML(s.pengelola)}</td><td>${escapeHTML(s.no_wa)}</td></tr>`).join('')}
+              ${list.map(s => `
+                <tr>
+                  <td class="fw-bold">${escapeHTML(s.nama_server)}</td>
+                  <td>${escapeHTML(s.pengelola)}</td>
+                  <td>${escapeHTML(s.no_wa)}</td>
+                  <td class="action-col text-end">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editServer('${s.id}'); switchMenu('server');"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteServer('${s.id}')"><i class="fa-solid fa-trash"></i></button>
+                  </td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
         </div>
@@ -226,6 +301,7 @@ function renderServerWilayahCluster(servers) {
     `;
   }
   container.innerHTML = html || '<div class="alert alert-light text-center">Belum ada data server wilayah.</div>';
+  applyRolePermissions();
 }
 
 function renderClusterMonitoringTable(servers) {
@@ -250,17 +326,23 @@ function renderClusterMonitoringTable(servers) {
 
 async function handleSaveServer(e) {
   e.preventDefault();
-  const nama = document.getElementById('srvNama').value.trim();
-  const pengelola = document.getElementById('srvPengelola').value.trim();
-  const no_wa = document.getElementById('srvWA').value.trim();
-  const wilayah = document.getElementById('srvWilayah').value.trim();
+  const id = document.getElementById('srvId').value;
+  const payload = {
+    nama_server: document.getElementById('srvNama').value.trim(),
+    pengelola: document.getElementById('srvPengelola').value.trim(),
+    no_wa: document.getElementById('srvWA').value.trim(),
+    wilayah: document.getElementById('srvWilayah').value.trim()
+  };
 
-  const { error } = await _supabase.from('servers').insert([{ nama_server: nama, pengelola, no_wa, wilayah }]);
+  const { error } = id
+    ? await _supabase.from('servers').update(payload).eq('id', id)
+    : await _supabase.from('servers').insert([payload]);
+
   if (error) {
     Swal.fire('Gagal Simpan', error.message, 'error');
   } else {
-    Swal.fire('Berhasil', 'Data Server tersimpan di Supabase!', 'success');
-    document.getElementById('formServer').reset();
+    Swal.fire('Berhasil', `Data Server ${id ? 'diperbarui' : 'tersimpan'}!`, 'success');
+    cancelEditServer();
     await fetchAndRenderServers();
     await loadAllMasterDropdowns();
   }
@@ -281,6 +363,8 @@ async function fetchAndRenderEmployees() {
   if (error) return;
 
   const sortedData = (data || []).sort((a, b) => (JABATAN_RANK[a.jabatan] || 99) - (JABATAN_RANK[b.jabatan] || 99));
+  window.EMPLOYEE_CACHE = sortedData;
+
   const tbody = document.getElementById('bodyKaryawan');
   if (tbody) {
     tbody.innerHTML = sortedData.map(e => `
@@ -290,29 +374,61 @@ async function fetchAndRenderEmployees() {
         <td><span class="badge bg-indigo bg-opacity-10 text-indigo border">${escapeHTML(e.jabatan)}</span></td>
         <td>${escapeHTML(e.no_wa || '-')}</td>
         <td class="action-col text-end">
+          <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee('${e.id}')"><i class="fa-solid fa-pen"></i></button>
           <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee('${e.id}')"><i class="fa-solid fa-trash"></i></button>
         </td>
       </tr>
-    `).join('');
+    `).join('') || '<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data karyawan.</td></tr>';
   }
 
   const dashEmpEl = document.getElementById('dashTotalKaryawan');
   if (dashEmpEl) dashEmpEl.innerText = sortedData.length;
+  applyRolePermissions();
+}
+
+function editEmployee(id) {
+  const e = window.EMPLOYEE_CACHE.find(x => String(x.id) === String(id));
+  if (!e) return;
+  document.getElementById('empDbId').value = e.id;
+  document.getElementById('empID').value = e.emp_id || '';
+  document.getElementById('empNama').value = e.nama_karyawan || '';
+  document.getElementById('empJabatan').value = e.jabatan || '';
+  document.getElementById('empWA').value = e.no_wa || '';
+
+  const title = document.getElementById('titleFormKaryawan');
+  if (title) title.innerText = 'Edit Data Karyawan';
+  const btnBatal = document.getElementById('btnBatalEditKaryawan');
+  if (btnBatal) btnBatal.classList.remove('d-none');
+}
+
+function cancelEditEmployee() {
+  document.getElementById('formKaryawan').reset();
+  document.getElementById('empDbId').value = '';
+  const title = document.getElementById('titleFormKaryawan');
+  if (title) title.innerText = 'Input Data Karyawan';
+  const btnBatal = document.getElementById('btnBatalEditKaryawan');
+  if (btnBatal) btnBatal.classList.add('d-none');
 }
 
 async function handleSaveEmployee(e) {
   e.preventDefault();
-  const emp_id = document.getElementById('empID').value.trim();
-  const nama_karyawan = document.getElementById('empNama').value.trim();
-  const jabatan = document.getElementById('empJabatan').value;
-  const no_wa = document.getElementById('empWA').value.trim();
+  const dbId = document.getElementById('empDbId').value;
+  const payload = {
+    emp_id: document.getElementById('empID').value.trim(),
+    nama_karyawan: document.getElementById('empNama').value.trim(),
+    jabatan: document.getElementById('empJabatan').value,
+    no_wa: document.getElementById('empWA').value.trim()
+  };
 
-  const { error } = await _supabase.from('employees').insert([{ emp_id, nama_karyawan, jabatan, no_wa }]);
+  const { error } = dbId
+    ? await _supabase.from('employees').update(payload).eq('id', dbId)
+    : await _supabase.from('employees').insert([payload]);
+
   if (error) {
     Swal.fire('Gagal Simpan', error.message, 'error');
   } else {
-    Swal.fire('Berhasil', 'Data Karyawan tersimpan di Supabase!', 'success');
-    document.getElementById('formKaryawan').reset();
+    Swal.fire('Berhasil', `Data Karyawan ${dbId ? 'diperbarui' : 'tersimpan'}!`, 'success');
+    cancelEditEmployee();
     fetchAndRenderEmployees();
     loadAllMasterDropdowns();
   }
@@ -331,6 +447,7 @@ async function deleteEmployee(id) {
 async function fetchAndRenderResellers() {
   const { data, error } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
   if (error) return;
+  window.RESELLER_CACHE = data || [];
 
   const tbody = document.getElementById('bodyMasterReseller');
   if (tbody) {
@@ -340,28 +457,59 @@ async function fetchAndRenderResellers() {
         <td class="fw-bold">${escapeHTML(r.nama_reseller)}</td>
         <td>${escapeHTML(r.no_wa)}</td>
         <td class="action-col text-end">
+          <button class="btn btn-sm btn-outline-primary me-1" onclick="editReseller('${r.id}')"><i class="fa-solid fa-pen"></i></button>
           <button class="btn btn-sm btn-outline-danger" onclick="deleteReseller('${r.id}')"><i class="fa-solid fa-trash"></i></button>
         </td>
       </tr>
-    `).join('');
+    `).join('') || '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada data reseller.</td></tr>';
   }
 
   const dashRslEl = document.getElementById('dashTotalReseller');
   if (dashRslEl) dashRslEl.innerText = (data || []).length;
+  applyRolePermissions();
+}
+
+function editReseller(id) {
+  const r = window.RESELLER_CACHE.find(x => String(x.id) === String(id));
+  if (!r) return;
+  document.getElementById('rslId').value = r.id;
+  document.getElementById('rslNama').value = r.nama_reseller || '';
+  document.getElementById('rslWA').value = r.no_wa || '';
+  document.getElementById('rslServer').value = r.nama_server || '';
+
+  const title = document.getElementById('titleFormReseller');
+  if (title) title.innerText = 'Edit Data Reseller';
+  const btnBatal = document.getElementById('btnBatalEditReseller');
+  if (btnBatal) btnBatal.classList.remove('d-none');
+}
+
+function cancelEditReseller() {
+  document.getElementById('formResellerMaster').reset();
+  document.getElementById('rslId').value = '';
+  const title = document.getElementById('titleFormReseller');
+  if (title) title.innerText = 'Input Data Reseller';
+  const btnBatal = document.getElementById('btnBatalEditReseller');
+  if (btnBatal) btnBatal.classList.add('d-none');
 }
 
 async function handleSaveReseller(e) {
   e.preventDefault();
-  const nama_reseller = document.getElementById('rslNama').value.trim();
-  const no_wa = document.getElementById('rslWA').value.trim();
-  const nama_server = document.getElementById('rslServer').value;
+  const id = document.getElementById('rslId').value;
+  const payload = {
+    nama_reseller: document.getElementById('rslNama').value.trim(),
+    no_wa: document.getElementById('rslWA').value.trim(),
+    nama_server: document.getElementById('rslServer').value
+  };
 
-  const { error } = await _supabase.from('reseller_master').insert([{ nama_reseller, no_wa, nama_server }]);
+  const { error } = id
+    ? await _supabase.from('reseller_master').update(payload).eq('id', id)
+    : await _supabase.from('reseller_master').insert([payload]);
+
   if (error) {
     Swal.fire('Gagal Simpan', error.message, 'error');
   } else {
-    Swal.fire('Berhasil', 'Data Reseller tersimpan di Supabase!', 'success');
-    document.getElementById('formResellerMaster').reset();
+    Swal.fire('Berhasil', `Data Reseller ${id ? 'diperbarui' : 'tersimpan'}!`, 'success');
+    cancelEditReseller();
     fetchAndRenderResellers();
     loadAllMasterDropdowns();
   }
@@ -388,16 +536,45 @@ async function fetchAndRenderUsers() {
         <td class="fw-bold text-dark">${escapeHTML(u.username)}</td>
         <td>${escapeHTML(u.email || '-')}</td>
         <td><span class="badge bg-primary rounded-pill px-3">${escapeHTML(u.role || 'ADMIN')}</span></td>
-        <td class="text-end">
+        <td class="action-col text-end">
+          <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser('${u.id}')"><i class="fa-solid fa-pen"></i></button>
           <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>
         </td>
       </tr>
-    `).join('');
+    `).join('') || '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada user registered.</td></tr>';
   }
+  applyRolePermissions();
+}
+
+function editUser(id) {
+  _supabase.from('users').select('*').eq('id', id).single().then(({ data }) => {
+    if (!data) return;
+    document.getElementById('usrId').value = data.id;
+    document.getElementById('usrName').value = data.username || '';
+    document.getElementById('usrFullName').value = data.nama_lengkap || '';
+    document.getElementById('usrEmail').value = data.email || '';
+    document.getElementById('usrWA').value = data.no_wa || '';
+    document.getElementById('usrRole').value = data.role || 'ADMIN';
+
+    const title = document.getElementById('titleFormUser');
+    if (title) title.innerText = 'Edit User System';
+    const btnBatal = document.getElementById('btnBatalEditUser');
+    if (btnBatal) btnBatal.classList.remove('d-none');
+  });
+}
+
+function cancelEditUser() {
+  document.getElementById('formUserMgmt').reset();
+  document.getElementById('usrId').value = '';
+  const title = document.getElementById('titleFormUser');
+  if (title) title.innerText = 'Registrasi User Baru';
+  const btnBatal = document.getElementById('btnBatalEditUser');
+  if (btnBatal) btnBatal.classList.add('d-none');
 }
 
 async function handleSaveUserMgmt(e) {
   e.preventDefault();
+  const id = document.getElementById('usrId').value;
   const username = document.getElementById('usrName').value.trim();
   const nama_lengkap = document.getElementById('usrFullName').value.trim();
   const email = document.getElementById('usrEmail').value.trim();
@@ -405,19 +582,23 @@ async function handleSaveUserMgmt(e) {
   const no_wa = document.getElementById('usrWA').value.trim();
   const role = document.getElementById('usrRole').value;
 
-  if (!rawPass || rawPass.length < 6) {
-    Swal.fire('Password Tidak Valid', 'Password wajib diisi minimal 6 karakter.', 'warning');
+  const payload = { username, nama_lengkap, email, no_wa, role };
+  if (rawPass && rawPass.length >= 6) {
+    payload.password_hash = await hashSHA256(rawPass);
+  } else if (!id && (!rawPass || rawPass.length < 6)) {
+    Swal.fire('Password Wajib', 'Password baru minimal 6 karakter.', 'warning');
     return;
   }
 
-  const password_hash = await hashSHA256(rawPass);
+  const { error } = id
+    ? await _supabase.from('users').update(payload).eq('id', id)
+    : await _supabase.from('users').insert([payload]);
 
-  const { error } = await _supabase.from('users').insert([{ username, nama_lengkap, email, password_hash, no_wa, role }]);
   if (error) {
     Swal.fire('Gagal Simpan User', error.message, 'error');
   } else {
-    Swal.fire('Berhasil', 'User baru berhasil didaftarkan!', 'success');
-    document.getElementById('formUserMgmt').reset();
+    Swal.fire('Berhasil', `User ${id ? 'diperbarui' : 'didaftarkan'}!`, 'success');
+    cancelEditUser();
     fetchAndRenderUsers();
   }
 }
@@ -476,6 +657,37 @@ function startLockoutCountdown() {
   tick();
 }
 
+async function initializeAuthenticatedUser(user) {
+  currentUser = user;
+  // Simpan sesi login ke localStorage agar bebas refresh
+  localStorage.setItem('rinnet_user_session', JSON.stringify(currentUser));
+
+  document.getElementById('pageLogin').classList.add('d-none');
+  document.getElementById('pageApp').classList.remove('d-none');
+
+  const displayName = currentUser.nama_lengkap || currentUser.username;
+  const userRole = currentUser.role || 'ADMIN';
+
+  document.getElementById('navUserName').innerText = escapeHTML(displayName);
+  document.getElementById('userRoleBadge').innerText = `Role: ${userRole}`;
+
+  restoreUserAvatar();
+  setRandomDashboardGreeting();
+  await loadAllMasterDropdowns();
+  await fetchAndRenderServers();
+  await fetchAndRenderEmployees();
+  await fetchAndRenderResellers();
+  await fetchAndRenderUsers();
+  await fetchAndRenderKasbon();
+  await fetchAndRenderStok();
+  populateProfilForm();
+  renderServerDistributionChart();
+  startSysPerfSimulation();
+
+  switchMenu('dashboard');
+  applyRolePermissions();
+}
+
 async function handleAuthLogin(e) {
   e.preventDefault();
 
@@ -504,38 +716,9 @@ async function handleAuthLogin(e) {
       return;
     }
 
-    currentUser = matchedUser;
     clearFailedAttempts();
-
-    document.getElementById('pageLogin').classList.add('d-none');
-    document.getElementById('pageApp').classList.remove('d-none');
-
-    const displayName = currentUser.nama_lengkap || currentUser.username;
-    const userRole = currentUser.role || 'ADMIN';
-
-    document.getElementById('navUserName').innerText = escapeHTML(displayName);
-    document.getElementById('userRoleBadge').innerText = `Role: ${userRole}`;
-
-    if (userRole === 'SUPERADMIN') {
-      document.querySelectorAll('.superadmin-only').forEach(el => el.classList.remove('d-none'));
-    } else {
-      document.querySelectorAll('.superadmin-only').forEach(el => el.classList.add('d-none'));
-    }
-
     triggerSuccessCelebration();
-    setRandomDashboardGreeting();
-    await loadAllMasterDropdowns();
-    await fetchAndRenderServers();
-    await fetchAndRenderEmployees();
-    await fetchAndRenderResellers();
-    await fetchAndRenderUsers();
-    await fetchAndRenderKasbon();
-    await fetchAndRenderStok();
-    populateProfilForm();
-    renderServerDistributionChart();
-    startSysPerfSimulation();
-
-    switchMenu('dashboard');
+    await initializeAuthenticatedUser(matchedUser);
 
   } catch(err) {
     console.error(err);
@@ -548,9 +731,25 @@ async function handleAuthLogin(e) {
 
 function handleLogout() {
   currentUser = null;
+  localStorage.removeItem('rinnet_user_session');
   document.getElementById('pageApp').classList.add('d-none');
   document.getElementById('pageLogin').classList.remove('d-none');
   document.getElementById('formLogin').reset();
+}
+
+// Restore Session dari LocalStorage saat Page Load
+function tryRestoreSession() {
+  const saved = localStorage.getItem('rinnet_user_session');
+  if (saved) {
+    try {
+      const user = JSON.parse(saved);
+      if (user && user.username) {
+        initializeAuthenticatedUser(user);
+      }
+    } catch(err) {
+      localStorage.removeItem('rinnet_user_session');
+    }
+  }
 }
 
 function switchMenu(menuKey) {
@@ -572,6 +771,7 @@ function switchMenu(menuKey) {
     const sidebar = document.getElementById('mainSidebar');
     if (sidebar) sidebar.classList.remove('show');
   }
+  applyRolePermissions();
 }
 
 // Export Excel Functionality
@@ -647,7 +847,7 @@ function bindExportButtons() {
     { header: 'Sudah Dibayar', key: 'dibayar', width: 16 },
     { header: 'Sisa Saldo', key: 'sisa', width: 16 },
     { header: 'Status', key: 'status', width: 14 },
-    { header: 'Sumber Dana', key: 'sumber_dana', width: 18 },
+    { header: 'Sumber Dana', key: 'sumber_dana', width: 22 },
     { header: 'Keterangan', key: 'keterangan', width: 25 },
   ], (window.KASBON_VIEW_CACHE || []).map(k => ({ ...k, sisa: Math.max((Number(k.jumlah_kasbon) || 0) - (Number(k.dibayar) || 0), 0) }))));
 
@@ -695,6 +895,7 @@ async function fetchAndRenderKasbon() {
   window.KASBON_CACHE = data || [];
   applyKasbonFilterAndRender();
   renderSaldoKasbonPerKaryawan(window.KASBON_CACHE);
+  applyRolePermissions();
 }
 
 function applyKasbonFilterAndRender() {
@@ -722,7 +923,7 @@ function applyKasbonFilterAndRender() {
           <td>${formatRupiah(k.jumlah_kasbon)}</td>
           <td>${formatRupiah(sisa)}</td>
           <td><span class="badge bg-${statusColor} bg-opacity-10 text-${statusColor} border border-${statusColor}">${statusLabel}</span></td>
-          <td>${escapeHTML(k.sumber_dana || '-')}</td>
+          <td><span class="badge bg-light text-dark border">${escapeHTML(k.sumber_dana || 'Uang Pribadi')}</span></td>
           <td>${escapeHTML(k.keterangan || '-')}</td>
           <td class="action-col text-end">
             <button class="btn btn-sm btn-outline-primary me-1" onclick="editKasbon('${k.id}')"><i class="fa-solid fa-pen"></i></button>
@@ -762,7 +963,7 @@ async function handleSaveKasbon(e) {
     tanggal: document.getElementById('ksbTanggal').value,
     nama_karyawan: document.getElementById('ksbKaryawan').value,
     jumlah_kasbon: Number(document.getElementById('ksbJumlah').value) || 0,
-    sumber_dana: document.getElementById('ksbSumber').value,
+    sumber_dana: document.getElementById('ksbSumber').value || 'Bayar Sendiri (Uang Pribadi)',
     keterangan: document.getElementById('ksbKet').value.trim(),
     status: document.getElementById('ksbStatus').value,
     dibayar: Number(document.getElementById('ksbDibayar').value) || 0,
@@ -788,7 +989,7 @@ function editKasbon(id) {
   document.getElementById('ksbTanggal').value = row.tanggal || '';
   document.getElementById('ksbKaryawan').value = row.nama_karyawan || '';
   document.getElementById('ksbJumlah').value = row.jumlah_kasbon || 0;
-  document.getElementById('ksbSumber').value = row.sumber_dana || '';
+  document.getElementById('ksbSumber').value = row.sumber_dana || 'Potongan Gaji';
   document.getElementById('ksbKet').value = row.keterangan || '';
   document.getElementById('ksbStatus').value = row.status || 'BELUM_LUNAS';
   document.getElementById('ksbDibayar').value = row.dibayar || 0;
@@ -821,11 +1022,13 @@ async function fetchAndRenderStok() {
   if (error) return;
   window.STOK_CACHE = data || [];
 
+  const totalStok = window.STOK_CACHE.reduce((sum, r) => sum + totalVoucherRow(r), 0);
   const totalStokEl = document.getElementById('dashTotalStok');
-  if (totalStokEl) totalStokEl.innerText = window.STOK_CACHE.reduce((sum, r) => sum + totalVoucherRow(r), 0);
+  if (totalStokEl) totalStokEl.innerText = totalStok.toLocaleString('id-ID');
 
   applyStokFilterAndRender();
   renderDashboardResellerRecap();
+  applyRolePermissions();
 }
 
 function applyStokFilterAndRender() {
@@ -845,10 +1048,42 @@ function applyStokFilterAndRender() {
       <td>${escapeHTML(r.nama_server)}</td>
       <td>${escapeHTML(r.nama_reseller)}</td>
       <td>${escapeHTML(r.petugas)}</td>
-      ${VOUCHER_FIELDS.map(f => `<td>${Number(r[f]) || 0}</td>`).join('')}
-      <td class="action-col"><button class="btn btn-sm btn-outline-danger" onclick="deleteStok('${r.id}')"><i class="fa-solid fa-trash"></i></button></td>
+      ${VOUCHER_FIELDS.map(f => `<td>${(Number(r[f]) || 0).toLocaleString('id-ID')}</td>`).join('')}
+      <td class="action-col text-center">
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="editStok('${r.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteStok('${r.id}')"><i class="fa-solid fa-trash"></i></button>
+      </td>
     </tr>
   `).join('') || `<tr><td colspan="16" class="text-center text-muted py-3">Belum ada data stok voucher.</td></tr>`;
+}
+
+function editStok(id) {
+  const row = window.STOK_CACHE.find(r => String(r.id) === String(id));
+  if (!row) return;
+  document.getElementById('stkId').value = row.id;
+  document.getElementById('stkTanggal').value = row.tanggal || '';
+  document.getElementById('stkServer').value = row.nama_server || '';
+  document.getElementById('stkReseller').value = row.nama_reseller || '';
+  document.getElementById('stkPetugas').value = row.petugas || '';
+
+  VOUCHER_FIELDS.forEach(f => {
+    const el = document.getElementById(f);
+    if (el) el.value = row[f] || 0;
+  });
+
+  const title = document.getElementById('titleFormStok');
+  if (title) title.innerText = 'Edit Penyerahan Voucher';
+  const btnBatal = document.getElementById('btnBatalEditStok');
+  if (btnBatal) btnBatal.classList.remove('d-none');
+}
+
+function cancelEditStok() {
+  document.getElementById('formStokReseller').reset();
+  document.getElementById('stkId').value = '';
+  const title = document.getElementById('titleFormStok');
+  if (title) title.innerText = 'Form Input Penyerahan Voucher';
+  const btnBatal = document.getElementById('btnBatalEditStok');
+  if (btnBatal) btnBatal.classList.add('d-none');
 }
 
 function renderDashboardResellerRecap() {
@@ -881,15 +1116,16 @@ function renderDashboardResellerRecap() {
       <td>${escapeHTML(v.nama_server)}</td>
       <td>${escapeHTML(v.nama_reseller)}</td>
       <td>${escapeHTML(v.petugas)}</td>
-      <td>${v.totalHarian}</td>
-      <td>${v.totalBulanan}</td>
-      <td>${v.totalKeseluruhan}</td>
+      <td class="fw-bold">${v.totalHarian.toLocaleString('id-ID')}</td>
+      <td class="fw-bold text-primary">${v.totalBulanan.toLocaleString('id-ID')}</td>
+      <td class="fw-bold text-success">${v.totalKeseluruhan.toLocaleString('id-ID')}</td>
     </tr>
   `).join('') || `<tr><td colspan="7" class="text-center text-muted py-3">Belum ada data.</td></tr>`;
 }
 
 async function handleSaveStok(e) {
   e.preventDefault();
+  const id = document.getElementById('stkId').value;
   const payload = {
     tanggal: document.getElementById('stkTanggal').value,
     nama_server: document.getElementById('stkServer').value,
@@ -898,12 +1134,15 @@ async function handleSaveStok(e) {
   };
   VOUCHER_FIELDS.forEach(f => { payload[f] = Number(document.getElementById(f).value) || 0; });
 
-  const { error } = await _supabase.from('stok_voucher').insert([payload]);
+  const { error } = id
+    ? await _supabase.from('stok_voucher').update(payload).eq('id', id)
+    : await _supabase.from('stok_voucher').insert([payload]);
+
   if (error) {
     Swal.fire('Gagal Simpan', error.message, 'error');
   } else {
-    Swal.fire('Berhasil', 'Data penyerahan voucher tersimpan!', 'success');
-    document.getElementById('formStokReseller').reset();
+    Swal.fire('Berhasil', `Data penyerahan voucher ${id ? 'diperbarui' : 'tersimpan'}!`, 'success');
+    cancelEditStok();
     fetchAndRenderStok();
   }
 }
@@ -924,6 +1163,7 @@ function populateProfilForm() {
   set('prfNamaLengkap', currentUser.nama_lengkap);
   set('prfEmail', currentUser.email);
   set('prfWA', currentUser.no_wa);
+  restoreUserAvatar();
 }
 
 async function handleSaveProfil(e) {
@@ -941,6 +1181,7 @@ async function handleSaveProfil(e) {
     Swal.fire('Gagal Simpan Profil', error.message, 'error');
   } else {
     currentUser = { ...currentUser, ...payload };
+    localStorage.setItem('rinnet_user_session', JSON.stringify(currentUser));
     document.getElementById('navUserName').innerText = escapeHTML(currentUser.nama_lengkap || currentUser.username);
     Swal.fire('Berhasil', 'Profil berhasil diperbarui!', 'success');
   }
@@ -948,20 +1189,26 @@ async function handleSaveProfil(e) {
 
 function handleAvatarPreview(e) {
   const file = e.target.files[0];
-  if (!file) return;
+  if (!file || !currentUser) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
+    const base64Avatar = ev.target.result;
     const preview = document.getElementById('prfAvatarPreview');
     const navAvatar = document.getElementById('navUserAvatar');
-    if (preview) preview.src = ev.target.result;
-    if (navAvatar) navAvatar.src = ev.target.result;
+    if (preview) preview.src = base64Avatar;
+    if (navAvatar) navAvatar.src = base64Avatar;
+
+    // Simpan foto profil secara permanen ke localStorage
+    localStorage.setItem('rinnet_user_avatar_' + currentUser.username, base64Avatar);
+    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Foto profil diperbarui secara permanen!', showConfirmButton: false, timer: 1800 });
   };
   reader.readAsDataURL(file);
 }
 
-// Visualizations & Charts
+// Visualizations & Scalable Charts (100+ Servers Support)
 function renderServerDistributionChart() {
   const canvas = document.getElementById('serverChart');
+  const wrapper = document.getElementById('chartWrapper');
   if (!canvas || typeof Chart === 'undefined') return;
 
   const grouped = {};
@@ -970,16 +1217,23 @@ function renderServerDistributionChart() {
     grouped[wil] = (grouped[wil] || 0) + 1;
   });
 
+  const keys = Object.keys(grouped);
+  if (wrapper) {
+    // Penyesuaian otomatis lebar grafik jika server/wilayah > 15 agar bisa di-scroll rapi
+    const dynamicWidth = Math.max(100, keys.length * 45);
+    wrapper.style.minWidth = dynamicWidth + '%';
+  }
+
   if (activeChart) activeChart.destroy();
   activeChart = new Chart(canvas.getContext('2d'), {
     type: 'bar',
     data: {
-      labels: Object.keys(grouped),
+      labels: keys,
       datasets: [{
-        label: 'Jumlah Server',
+        label: 'Jumlah Server Active',
         data: Object.values(grouped),
-        backgroundColor: 'rgba(99, 102, 241, 0.7)',
-        borderRadius: 6,
+        backgroundColor: 'rgba(99, 102, 241, 0.85)',
+        borderRadius: 8,
       }],
     },
     options: {
@@ -1019,9 +1273,9 @@ function startSysPerfSimulation() {
 
   if (livePerfInterval) clearInterval(livePerfInterval);
   livePerfInterval = setInterval(() => {
-    const cpu = Math.floor(10 + Math.random() * 40);
-    const ram = Math.floor(30 + Math.random() * 35);
-    const latency = Math.floor(15 + Math.random() * 60);
+    const cpu = Math.floor(10 + Math.random() * 35);
+    const ram = Math.floor(30 + Math.random() * 30);
+    const latency = Math.floor(15 + Math.random() * 45);
 
     const cpuVal = document.getElementById('sysCpuVal');
     const cpuBar = document.getElementById('sysCpuBar');
@@ -1055,6 +1309,8 @@ function startSysPerfSimulation() {
 
 // Global Event Registration
 document.addEventListener('DOMContentLoaded', () => {
+  tryRestoreSession();
+
   const formLogin = document.getElementById('formLogin');
   if (formLogin) formLogin.addEventListener('submit', handleAuthLogin);
 
@@ -1070,24 +1326,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAutoID = document.getElementById('btnAutoID');
   if (btnAutoID) btnAutoID.addEventListener('click', generateAutoEmployeeID);
 
-  // Form Submissions
+  // Form Submissions & Cancel Listeners
   const formServer = document.getElementById('formServer');
   if (formServer) formServer.addEventListener('submit', handleSaveServer);
+
+  const btnBatalEditServer = document.getElementById('btnBatalEditServer');
+  if (btnBatalEditServer) btnBatalEditServer.addEventListener('click', cancelEditServer);
 
   const formKaryawan = document.getElementById('formKaryawan');
   if (formKaryawan) formKaryawan.addEventListener('submit', handleSaveEmployee);
 
+  const btnBatalEditKaryawan = document.getElementById('btnBatalEditKaryawan');
+  if (btnBatalEditKaryawan) btnBatalEditKaryawan.addEventListener('click', cancelEditKaryawan);
+
   const formResellerMaster = document.getElementById('formResellerMaster');
   if (formResellerMaster) formResellerMaster.addEventListener('submit', handleSaveReseller);
 
+  const btnBatalEditReseller = document.getElementById('btnBatalEditReseller');
+  if (btnBatalEditReseller) btnBatalEditReseller.addEventListener('click', cancelEditReseller);
+
   const formUserMgmt = document.getElementById('formUserMgmt');
   if (formUserMgmt) formUserMgmt.addEventListener('submit', handleSaveUserMgmt);
+
+  const btnBatalEditUser = document.getElementById('btnBatalEditUser');
+  if (btnBatalEditUser) btnBatalEditUser.addEventListener('click', cancelEditUser);
 
   const formKasbon = document.getElementById('formKasbon');
   if (formKasbon) formKasbon.addEventListener('submit', handleSaveKasbon);
 
   const btnBatalEditKasbon = document.getElementById('btnBatalEditKasbon');
   if (btnBatalEditKasbon) btnBatalEditKasbon.addEventListener('click', cancelEditKasbon);
+
+  const formStokReseller = document.getElementById('formStokReseller');
+  if (formStokReseller) formStokReseller.addEventListener('submit', handleSaveStok);
+
+  const btnBatalEditStok = document.getElementById('btnBatalEditStok');
+  if (btnBatalEditStok) btnBatalEditStok.addEventListener('click', cancelEditStok);
 
   ['ksbJumlah', 'ksbDibayar'].forEach(id => {
     const el = document.getElementById(id);
@@ -1098,9 +1372,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', applyKasbonFilterAndRender);
   });
-
-  const formStokReseller = document.getElementById('formStokReseller');
-  if (formStokReseller) formStokReseller.addEventListener('submit', handleSaveStok);
 
   ['filterStokStart', 'filterStokEnd'].forEach(id => {
     const el = document.getElementById(id);
