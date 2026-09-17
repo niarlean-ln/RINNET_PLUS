@@ -130,6 +130,7 @@ async function loadAllMasterDropdowns() {
     populateKasbonKaryawanDropdown();
     populateKasbonSumberDanaDropdown();
     populateStokResellerDropdown();
+    populateDashResellerServerFilter();
   } catch(err) {
     console.warn("Gagal memuat master dropdown dari Supabase.", err);
   }
@@ -508,7 +509,8 @@ async function deleteEmployee(id) {
 // ==========================================
 async function fetchAndRenderResellers() {
   try {
-    const { data, error } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
+    // Diurutkan berdasarkan nama_server, lalu nama_reseller
+    const { data, error } = await _supabase.from('reseller_master').select('*').order('nama_server', { ascending: true }).order('nama_reseller', { ascending: true });
     if (error) throw error;
     
     window.RESELLER_CACHE = data || [];
@@ -613,17 +615,18 @@ async function fetchAndRenderUsers() {
 
     const tbody = document.getElementById('bodyUsers');
     if (tbody) {
-      tbody.innerHTML = (data || []).map(u => `
+     tbody.innerHTML = (data || []).map(u => `
         <tr>
           <td class="fw-bold text-dark">${escapeHTML(u.username)}</td>
           <td>${escapeHTML(u.email || '-')}</td>
           <td><span class="badge bg-primary rounded-pill px-3">${escapeHTML(u.role || 'ADMIN')}</span></td>
           <td class="action-col text-end">
+            <button class="btn btn-sm btn-outline-info me-1" onclick="sendEmailToUser('${escapeHTML(u.email)}')" title="Kirim Email"><i class="fa-solid fa-envelope"></i></button>
             <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser('${u.id}')"><i class="fa-solid fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada user registered.</td></tr>';
+      `).join(''); || '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada user registered.</td></tr>';
     }
     applyRolePermissions();
   } catch(err) {
@@ -705,11 +708,19 @@ async function deleteUser(id) {
   }
 }
 
+function sendEmailToUser(email) {
+  if (!email || email === '-') {
+    Swal.fire('Info', 'User ini tidak memiliki alamat email yang terdaftar.', 'info');
+    return;
+  }
+  window.location.href = `mailto:${email}?subject=Notifikasi Sistem RINNET+&body=Halo, ini pesan administratif dari Superadmin RINNET+.`;
+}
+
 // ==========================================
 // AUTHENTICATION & LOGIN LOGIC
 // ==========================================
 const LOCKOUT_DURATION_MS = 60000;
-const MAX_FAILED_ATTEMPTS = 5;
+const MAX_FAILED_ATTEMPTS = 3;
 
 function getLockoutRemainingMs() {
   const until = parseInt(localStorage.getItem('rinnet_lockout_until') || '0', 10);
@@ -1251,20 +1262,30 @@ function cancelEditStok() {
 function renderDashboardResellerRecap() {
   const fStart = document.getElementById('dashResellerStart')?.value || '';
   const fEnd = document.getElementById('dashResellerEnd')?.value || '';
+  const fServer = document.getElementById('dashResellerServerFilter')?.value || '';
 
   let rows = [...window.STOK_CACHE];
+  
+  // Filter berdasarkan Date Custom
   if (fStart) rows = rows.filter(r => r.tanggal >= fStart);
   if (fEnd) rows = rows.filter(r => r.tanggal <= fEnd);
+  
+  // Filter berdasarkan Server
+  if (fServer) rows = rows.filter(r => r.nama_server === fServer);
 
   const viewRows = rows.map(r => {
     const totalHarian = totalVoucherRow(r);
     const rDate = new Date(r.tanggal);
+    
+    // Perbaikan bug total bulanan: dihitung spesifik per reseller & bulan/tahun transaksi tersebut
     const totalBulanan = window.STOK_CACHE
       .filter(x => x.nama_reseller === r.nama_reseller && new Date(x.tanggal).getMonth() === rDate.getMonth() && new Date(x.tanggal).getFullYear() === rDate.getFullYear())
       .reduce((sum, x) => sum + totalVoucherRow(x), 0);
+      
     const totalKeseluruhan = window.STOK_CACHE
       .filter(x => x.nama_reseller === r.nama_reseller)
       .reduce((sum, x) => sum + totalVoucherRow(x), 0);
+      
     return { tanggal: r.tanggal, nama_server: r.nama_server, nama_reseller: r.nama_reseller, petugas: r.petugas, totalHarian, totalBulanan, totalKeseluruhan };
   });
 
@@ -1282,7 +1303,7 @@ function renderDashboardResellerRecap() {
       <td class="fw-bold text-primary">${v.totalBulanan.toLocaleString('id-ID')}</td>
       <td class="fw-bold text-success">${v.totalKeseluruhan.toLocaleString('id-ID')}</td>
     </tr>
-  `).join('') || `<tr><td colspan="7" class="text-center text-muted py-3">Belum ada data.</td></tr>`;
+  `).join('') || `<tr><td colspan="7" class="text-center text-muted py-3">Belum ada data rekapan.</td></tr>`;
 }
 
 async function handleSaveStok(e) {
@@ -1503,6 +1524,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnAutoID = document.getElementById('btnAutoID');
   if (btnAutoID) btnAutoID.addEventListener('click', generateAutoEmployeeID);
+
+  const dashResellerServerFilter = document.getElementById('dashResellerServerFilter');
+  if (dashResellerServerFilter) {
+    dashResellerServerFilter.addEventListener('change', renderDashboardResellerRecap);
+  }
 
   // Form Submissions & Cancel Listeners
   const formServer = document.getElementById('formServer');
