@@ -3,16 +3,20 @@
    ========================================================================== */
 
 let activeChart = null;
-let perfChart = null;
+let sysPerfChart = null;
 let currentUser = null;
 let livePerfInterval = null;
 let failedLoginAttempts = 0;
-let realtimeChannel = null;
 
 // Global Cache untuk Performa Super Cepat
 window.SERVER_CACHE = [];
 window.EMPLOYEE_CACHE = [];
 window.RESELLER_CACHE = [];
+window.KASBON_CACHE = [];
+window.KASBON_VIEW_CACHE = [];
+window.STOK_CACHE = [];
+window.STOK_VIEW_CACHE = [];
+window.DASH_RESELLER_VIEW_CACHE = [];
 
 const JABATAN_RANK = {
   'Owner': 1,
@@ -22,6 +26,8 @@ const JABATAN_RANK = {
   'OB': 5,
   'Magang': 6
 };
+
+const VOUCHER_FIELDS = ['v2k', 'v3k', 'v4k', 'v5k', 'v6k', 'v25k', 'b1hp', 'b2hp', 'b3hp', 'b4hp', 'b5hp'];
 
 const DYNAMIC_GREETINGS = [
   "Selamat bertugas! Mari ciptakan efisiensi dan performa terbaik hari ini.",
@@ -57,6 +63,11 @@ function escapeHTML(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+function formatRupiah(num) {
+  const n = Number(num) || 0;
+  return 'Rp ' + n.toLocaleString('id-ID');
 }
 
 function toggleSidebar() {
@@ -95,18 +106,23 @@ function setRandomDashboardGreeting() {
   if (qAuth) qAuth.innerText = `— ${randomQuote.author}`;
 }
 
+function generateAutoEmployeeID() {
+  const existingCount = window.EMPLOYEE_CACHE.length + 1;
+  const nextID = 'IDR-' + String(existingCount).padStart(3, '0');
+  const inputEl = document.getElementById('empID');
+  if (inputEl) inputEl.value = nextID;
+}
+
+// Master Dropdown Hydration
 async function loadAllMasterDropdowns() {
   try {
-    const { data: srvs, error: errSrv } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
-    if (errSrv) console.error("Error loading servers:", errSrv);
+    const { data: srvs } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
     if (srvs) window.SERVER_CACHE = srvs;
 
-    const { data: emps, error: errEmp } = await _supabase.from('employees').select('*').order('nama_karyawan', { ascending: true });
-    if (errEmp) console.error("Error loading employees:", errEmp);
+    const { data: emps } = await _supabase.from('employees').select('*').order('nama_karyawan', { ascending: true });
     if (emps) window.EMPLOYEE_CACHE = emps;
 
-    const { data: rsls, error: errRsl } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
-    if (errRsl) console.error("Error loading resellers:", errRsl);
+    const { data: rsls } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
     if (rsls) window.RESELLER_CACHE = rsls;
 
     populateServerDropdown();
@@ -121,8 +137,6 @@ async function loadAllMasterDropdowns() {
 function populateServerDropdown() {
   const stkSelect = document.getElementById('stkServer');
   const ksbSumberSelect = document.getElementById('ksbSumber');
-  if (!stkSelect && !ksbSumberSelect) return;
-
   const optionsHtml = '<option value="">-- Pilih Server --</option>' + 
     window.SERVER_CACHE.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)} (${escapeHTML(s.wilayah || 'Umum')})</option>`).join('');
 
@@ -132,48 +146,48 @@ function populateServerDropdown() {
 
 function populateResellerServerDropdown() {
   const rslSelect = document.getElementById('rslServer');
-  if (!rslSelect) return;
-  rslSelect.innerHTML = '<option value="">-- Pilih Server --</option>' + 
-    window.SERVER_CACHE.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`).join('');
+  if (rslSelect) {
+    rslSelect.innerHTML = '<option value="">-- Pilih Server --</option>' + 
+      window.SERVER_CACHE.map(s => `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`).join('');
+  }
 }
 
 function populateKasbonKaryawanDropdown() {
   const ksbEmpSelect = document.getElementById('ksbKaryawan');
   const fltEmpSelect = document.getElementById('fltKasbonKaryawan');
-  if (!ksbEmpSelect) return;
-
   const optionsHtml = window.EMPLOYEE_CACHE.map(e => `<option value="${escapeHTML(e.nama_karyawan)}">${escapeHTML(e.nama_karyawan)} (${escapeHTML(e.jabatan || '-')})</option>`).join('');
 
-  ksbEmpSelect.innerHTML = '<option value="">-- Pilih Karyawan --</option>' + optionsHtml;
+  if (ksbEmpSelect) ksbEmpSelect.innerHTML = '<option value="">-- Pilih Karyawan --</option>' + optionsHtml;
   if (fltEmpSelect) fltEmpSelect.innerHTML = '<option value="">-- Semua Karyawan --</option>' + optionsHtml;
 }
 
 function populateStokResellerDropdown() {
   const stkResellerSelect = document.getElementById('stkReseller');
-  if (!stkResellerSelect) return;
-  stkResellerSelect.innerHTML = '<option value="">-- Pilih Reseller --</option>' +
-    window.RESELLER_CACHE.map(r => `<option value="${escapeHTML(r.nama_reseller)}">${escapeHTML(r.nama_reseller)} (${escapeHTML(r.nama_server || 'Umum')})</option>`).join('');
+  if (stkResellerSelect) {
+    stkResellerSelect.innerHTML = '<option value="">-- Pilih Reseller --</option>' +
+      window.RESELLER_CACHE.map(r => `<option value="${escapeHTML(r.nama_reseller)}">${escapeHTML(r.nama_reseller)} (${escapeHTML(r.nama_server || 'Umum')})</option>`).join('');
+  }
 }
 
-// Global CRUD Data Operations with Fix for Auto-Redirects
+// Server Data & Cluster
 async function fetchAndRenderServers() {
   const { data, error } = await _supabase.from('servers').select('*').order('nama_server', { ascending: true });
-  if (error) { console.error(error); return; }
+  if (error) return;
   
   const tbody = document.getElementById('bodyServer');
-  if (!tbody) return;
-
-  tbody.innerHTML = (data || []).map(s => `
-    <tr>
-      <td class="fw-bold">${escapeHTML(s.nama_server)}</td>
-      <td>${escapeHTML(s.pengelola)}</td>
-      <td>${escapeHTML(s.no_wa)}</td>
-      <td><span class="badge bg-info bg-opacity-10 text-info border border-info">${escapeHTML(s.wilayah)}</span></td>
-      <td class="action-col text-end">
-        <button class="btn btn-sm btn-outline-danger" onclick="deleteServer('${s.id}')"><i class="fa-solid fa-trash"></i></button>
-      </td>
-    </tr>
-  `).join('');
+  if (tbody) {
+    tbody.innerHTML = (data || []).map(s => `
+      <tr>
+        <td class="fw-bold">${escapeHTML(s.nama_server)}</td>
+        <td>${escapeHTML(s.pengelola)}</td>
+        <td>${escapeHTML(s.no_wa)}</td>
+        <td><span class="badge bg-info bg-opacity-10 text-info border border-info">${escapeHTML(s.wilayah)}</span></td>
+        <td class="action-col text-end">
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteServer('${s.id}')"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
 
   const totalSrvEl = document.getElementById('dashTotalServer');
   if (totalSrvEl) totalSrvEl.innerText = (data || []).length;
@@ -192,9 +206,8 @@ function renderServerWilayahCluster(servers) {
     grouped[wil].push(s);
   });
 
-  const uniqueWilayahCount = Object.keys(grouped).length;
   const dashWilEl = document.getElementById('dashTotalWilayah');
-  if (dashWilEl) dashWilEl.innerText = uniqueWilayahCount;
+  if (dashWilEl) dashWilEl.innerText = Object.keys(grouped).length;
 
   let html = '';
   for (const [wil, list] of Object.entries(grouped)) {
@@ -236,7 +249,7 @@ function renderClusterMonitoringTable(servers) {
 }
 
 async function handleSaveServer(e) {
-  e.preventDefault(); // Prevents page reload/redirect to login
+  e.preventDefault();
   const nama = document.getElementById('srvNama').value.trim();
   const pengelola = document.getElementById('srvPengelola').value.trim();
   const no_wa = document.getElementById('srvWA').value.trim();
@@ -254,7 +267,7 @@ async function handleSaveServer(e) {
 }
 
 async function deleteServer(id) {
-  const confirm = await Swal.fire({ title: 'Hapus Server?', text: "Data di Supabase akan terhapus permanent", icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus' });
+  const confirm = await Swal.fire({ title: 'Hapus Server?', text: "Data di Supabase akan terhapus permanen", icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus' });
   if (confirm.isConfirmed) {
     await _supabase.from('servers').delete().eq('id', id);
     fetchAndRenderServers();
@@ -262,6 +275,7 @@ async function deleteServer(id) {
   }
 }
 
+// Employee Management
 async function fetchAndRenderEmployees() {
   const { data, error } = await _supabase.from('employees').select('*');
   if (error) return;
@@ -287,7 +301,7 @@ async function fetchAndRenderEmployees() {
 }
 
 async function handleSaveEmployee(e) {
-  e.preventDefault(); // Prevents page reload/redirect
+  e.preventDefault();
   const emp_id = document.getElementById('empID').value.trim();
   const nama_karyawan = document.getElementById('empNama').value.trim();
   const jabatan = document.getElementById('empJabatan').value;
@@ -313,6 +327,7 @@ async function deleteEmployee(id) {
   }
 }
 
+// Reseller Management
 async function fetchAndRenderResellers() {
   const { data, error } = await _supabase.from('reseller_master').select('*').order('nama_reseller', { ascending: true });
   if (error) return;
@@ -361,7 +376,7 @@ async function deleteReseller(id) {
   }
 }
 
-// User Management Actions
+// User Management
 async function fetchAndRenderUsers() {
   const { data, error } = await _supabase.from('users').select('*');
   if (error) return;
@@ -390,14 +405,8 @@ async function handleSaveUserMgmt(e) {
   const no_wa = document.getElementById('usrWA').value.trim();
   const role = document.getElementById('usrRole').value;
 
-  // PERBAIKAN KEAMANAN: tidak ada lagi default password 'default123'.
-  // Password wajib diisi saat membuat user baru, dan selalu di-hash SHA-256.
-  if (!rawPass) {
-    Swal.fire('Password Wajib Diisi', 'Silakan isi password untuk akun baru ini.', 'warning');
-    return;
-  }
-  if (rawPass.length < 6) {
-    Swal.fire('Password Terlalu Pendek', 'Gunakan minimal 6 karakter.', 'warning');
+  if (!rawPass || rawPass.length < 6) {
+    Swal.fire('Password Tidak Valid', 'Password wajib diisi minimal 6 karakter.', 'warning');
     return;
   }
 
@@ -421,19 +430,8 @@ async function deleteUser(id) {
   }
 }
 
-// Authentication Controller Fixed
-// CATATAN KEAMANAN:
-// - Validasi password kini WAJIB memakai hash SHA-256 (tidak menerima plaintext lagi).
-// - Akun lama yang password_hash-nya masih plaintext akan otomatis di-rehash
-//   (self-heal) saat berhasil login satu kali, supaya tidak ada yang ke-lockout
-//   mendadak, sekaligus menutup celah lama.
-// - PERINGATAN PENTING: pengecekan ini tetap berjalan di sisi client dengan anon key.
-//   Ini TIDAK aman untuk produksi selama tabel `users` masih bisa di-SELECT oleh role
-//   anon di Supabase (RLS). Siapa pun yang punya anon key (yang memang publik/terlihat
-//   di supabase-client.js) bisa langsung query tabel users dari luar aplikasi ini.
-//   Solusi yang benar: pindahkan pengecekan login ke Supabase Edge Function / RPC
-//   (SECURITY DEFINER) dan kunci RLS tabel users agar anon tidak bisa SELECT langsung.
-const LOCKOUT_DURATION_MS = 60000; // 1 menit
+// Auth Controller
+const LOCKOUT_DURATION_MS = 60000;
 const MAX_FAILED_ATTEMPTS = 5;
 
 function getLockoutRemainingMs() {
@@ -481,8 +479,7 @@ function startLockoutCountdown() {
 async function handleAuthLogin(e) {
   e.preventDefault();
 
-  const remainingMs = getLockoutRemainingMs();
-  if (remainingMs > 0) {
+  if (getLockoutRemainingMs() > 0) {
     startLockoutCountdown();
     return;
   }
@@ -499,21 +496,12 @@ async function handleAuthLogin(e) {
 
     const matchedUser = users && users.length > 0 ? users[0] : null;
     const isHashValid = matchedUser && matchedUser.password_hash === passHash;
-    // Kompatibilitas mundur untuk akun lama yang sempat tersimpan sebagai plaintext.
-    const isLegacyPlaintextValid = matchedUser && !isHashValid && matchedUser.password_hash === passVal;
 
-    if (error || !matchedUser || (!isHashValid && !isLegacyPlaintextValid)) {
+    if (error || !matchedUser || !isHashValid) {
       registerFailedAttempt();
       const remaining = MAX_FAILED_ATTEMPTS - failedLoginAttempts;
-      Swal.fire('Gagal Masuk', remaining > 0 ? `Username atau password salah! Percobaan tersisa: ${remaining}.` : 'Username atau password salah!', 'error');
+      Swal.fire('Gagal Masuk', remaining > 0 ? `Username atau password salah! Sisa percobaan: ${remaining}.` : 'Akun dikunci sementara!', 'error');
       return;
-    }
-
-    // Self-heal: kalau login masih lolos lewat password plaintext lama, segera hash & simpan ulang.
-    if (isLegacyPlaintextValid) {
-      console.warn('Akun ini masih memakai password plaintext lama, sedang di-upgrade ke hash SHA-256...');
-      await _supabase.from('users').update({ password_hash: passHash }).eq('id', matchedUser.id);
-      matchedUser.password_hash = passHash;
     }
 
     currentUser = matchedUser;
@@ -523,8 +511,6 @@ async function handleAuthLogin(e) {
     document.getElementById('pageApp').classList.remove('d-none');
 
     const displayName = currentUser.nama_lengkap || currentUser.username;
-    // PERBAIKAN: default role diturunkan ke ADMIN (bukan SUPERADMIN) kalau kolom role kosong,
-    // supaya akun tanpa role eksplisit tidak otomatis dapat akses tertinggi.
     const userRole = currentUser.role || 'ADMIN';
 
     document.getElementById('navUserName').innerText = escapeHTML(displayName);
@@ -577,7 +563,6 @@ function switchMenu(menuKey) {
   const activeLink = document.querySelector(`.sidebar .nav-link[data-menu="${menuKey}"]`);
   if (activeLink) activeLink.classList.add('active');
 
-  // Refresh data setiap kali halaman terkait dibuka, biar selalu up-to-date.
   if (menuKey === 'kasbon') fetchAndRenderKasbon();
   if (menuKey === 'reseller') fetchAndRenderStok();
   if (menuKey === 'profil') populateProfilForm();
@@ -589,18 +574,7 @@ function switchMenu(menuKey) {
   }
 }
 
-// ==========================================================================
-// UTIL: Format Rupiah
-// ==========================================================================
-function formatRupiah(num) {
-  const n = Number(num) || 0;
-  return 'Rp ' + n.toLocaleString('id-ID');
-}
-
-// ==========================================================================
-// EXPORT EXCEL (ExcelJS + FileSaver) — sebelumnya semua tombol Export Excel
-// tidak berfungsi sama sekali walau library-nya sudah dimuat.
-// ==========================================================================
+// Export Excel Functionality
 async function exportToExcel(filename, sheetName, columns, rows) {
   try {
     if (!rows || rows.length === 0) {
@@ -635,7 +609,7 @@ function bindExportButtons() {
     { header: 'Wilayah', key: 'wilayah', width: 20 },
   ], window.SERVER_CACHE));
 
-  bind('btnExportServerWilayah', () => exportToExcel('data-server-per-wilayah.xlsx', 'Server per Wilayah', [
+  bind('btnExportServerWilayah', () => exportToExcel('data-server-wilayah.xlsx', 'Server Wilayah', [
     { header: 'Wilayah', key: 'wilayah', width: 20 },
     { header: 'Nama Server', key: 'nama_server', width: 25 },
     { header: 'Pengelola', key: 'pengelola', width: 20 },
@@ -657,7 +631,6 @@ function bindExportButtons() {
 
   bind('btnExportUsers', async () => {
     const { data } = await _supabase.from('users').select('username, nama_lengkap, email, no_wa, role');
-    // Catatan: kolom password_hash SENGAJA tidak diikutsertakan dalam export.
     exportToExcel('data-user.xlsx', 'User', [
       { header: 'Username', key: 'username', width: 20 },
       { header: 'Nama Lengkap', key: 'nama_lengkap', width: 25 },
@@ -702,16 +675,7 @@ function bindExportButtons() {
   ], window.DASH_RESELLER_VIEW_CACHE || []));
 }
 
-// ==========================================================================
-// MODUL KASBON KARYAWAN
-// Catatan skema: fungsi ini mengasumsikan tabel Supabase bernama `kasbon`
-// dengan kolom: id, tanggal, nama_karyawan, jumlah_kasbon, sumber_dana,
-// keterangan, status, dibayar. Sesuaikan nama tabel/kolom di bawah ini jika
-// skema Supabase Anda berbeda.
-// ==========================================================================
-window.KASBON_CACHE = [];
-window.KASBON_VIEW_CACHE = [];
-
+// Kasbon Module
 function hitungSisaKasbon(jumlah, dibayar) {
   return Math.max((Number(jumlah) || 0) - (Number(dibayar) || 0), 0);
 }
@@ -720,20 +684,17 @@ function updateKasbonPreview() {
   const jumlah = document.getElementById('ksbJumlah');
   const dibayar = document.getElementById('ksbDibayar');
   const preview = document.getElementById('ksbSisaPreview');
-  if (!jumlah || !dibayar || !preview) return;
-  preview.innerText = formatRupiah(hitungSisaKasbon(jumlah.value, dibayar.value));
+  if (jumlah && dibayar && preview) {
+    preview.innerText = formatRupiah(hitungSisaKasbon(jumlah.value, dibayar.value));
+  }
 }
 
 async function fetchAndRenderKasbon() {
   const { data, error } = await _supabase.from('kasbon').select('*').order('tanggal', { ascending: false });
-  if (error) {
-    console.error('Gagal memuat data kasbon (cek apakah tabel `kasbon` sudah dibuat di Supabase):', error);
-    return;
-  }
+  if (error) return;
   window.KASBON_CACHE = data || [];
   applyKasbonFilterAndRender();
   renderSaldoKasbonPerKaryawan(window.KASBON_CACHE);
-  renderKasbonRecapCards(window.KASBON_CACHE);
 }
 
 function applyKasbonFilterAndRender() {
@@ -770,33 +731,6 @@ function applyKasbonFilterAndRender() {
         </tr>`;
     }).join('') || '<tr><td colspan="8" class="text-center text-muted py-3">Belum ada data kasbon.</td></tr>';
   }
-
-  renderKasbonRecapCards(rows);
-}
-
-function renderKasbonRecapCards(filteredRows) {
-  const totalFilterEl = document.getElementById('rekapTotalKasbonUser');
-  if (totalFilterEl) {
-    const totalFiltered = filteredRows.reduce((sum, k) => sum + (Number(k.jumlah_kasbon) || 0), 0);
-    totalFilterEl.innerText = formatRupiah(totalFiltered);
-  }
-
-  const now = new Date();
-  const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-  const total2W = window.KASBON_CACHE
-    .filter(k => new Date(k.tanggal) >= twoWeeksAgo)
-    .reduce((sum, k) => sum + (Number(k.jumlah_kasbon) || 0), 0);
-  const el2W = document.getElementById('rekapTotalKasbon2W');
-  if (el2W) el2W.innerText = formatRupiah(total2W);
-
-  const totalMonth = window.KASBON_CACHE
-    .filter(k => {
-      const d = new Date(k.tanggal);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    })
-    .reduce((sum, k) => sum + (Number(k.jumlah_kasbon) || 0), 0);
-  const elMonth = document.getElementById('rekapTotalKasbon1M');
-  if (elMonth) elMonth.innerText = formatRupiah(totalMonth);
 }
 
 function renderSaldoKasbonPerKaryawan(rows) {
@@ -811,11 +745,6 @@ function renderSaldoKasbonPerKaryawan(rows) {
   });
 
   const entries = Object.entries(grouped);
-  if (entries.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" class="text-muted text-center py-2">Belum ada data.</td></tr>';
-    return;
-  }
-
   tbody.innerHTML = entries.map(([nama, v]) => `
     <tr>
       <td class="fw-bold">${escapeHTML(nama)}</td>
@@ -823,7 +752,7 @@ function renderSaldoKasbonPerKaryawan(rows) {
       <td>${formatRupiah(v.dibayar)}</td>
       <td class="fw-bold text-danger">${formatRupiah(Math.max(v.total - v.dibayar, 0))}</td>
     </tr>
-  `).join('');
+  `).join('') || '<tr><td colspan="4" class="text-muted text-center py-2">Belum ada data.</td></tr>';
 }
 
 async function handleSaveKasbon(e) {
@@ -865,7 +794,6 @@ function editKasbon(id) {
   document.getElementById('ksbDibayar').value = row.dibayar || 0;
   document.getElementById('btnBatalEditKasbon').classList.remove('d-none');
   updateKasbonPreview();
-  document.getElementById('formKasbon').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function cancelEditKasbon() {
@@ -876,33 +804,21 @@ function cancelEditKasbon() {
 }
 
 async function deleteKasbon(id) {
-  const confirm = await Swal.fire({ title: 'Hapus Data Kasbon?', icon: 'warning', showCancelButton: true });
+  const confirm = await Swal.fire({ title: 'Hapus Kasbon?', icon: 'warning', showCancelButton: true });
   if (confirm.isConfirmed) {
     await _supabase.from('kasbon').delete().eq('id', id);
     fetchAndRenderKasbon();
   }
 }
 
-// ==========================================================================
-// MODUL STOK / PENYERAHAN VOUCHER RESELLER
-// Catatan skema: mengasumsikan tabel Supabase bernama `stok_voucher` dengan
-// kolom: id, tanggal, nama_server, nama_reseller, petugas, v2k, v3k, v4k, v5k,
-// v6k, v25k, b1hp, b2hp, b3hp, b4hp, b5hp. Sesuaikan jika berbeda.
-// ==========================================================================
-const VOUCHER_FIELDS = ['v2k', 'v3k', 'v4k', 'v5k', 'v6k', 'v25k', 'b1hp', 'b2hp', 'b3hp', 'b4hp', 'b5hp'];
-window.STOK_CACHE = [];
-window.STOK_VIEW_CACHE = [];
-
+// Stok Voucher Module
 function totalVoucherRow(row) {
   return VOUCHER_FIELDS.reduce((sum, f) => sum + (Number(row[f]) || 0), 0);
 }
 
 async function fetchAndRenderStok() {
   const { data, error } = await _supabase.from('stok_voucher').select('*').order('tanggal', { ascending: false });
-  if (error) {
-    console.error('Gagal memuat data stok voucher (cek apakah tabel `stok_voucher` sudah dibuat di Supabase):', error);
-    return;
-  }
+  if (error) return;
   window.STOK_CACHE = data || [];
 
   const totalStokEl = document.getElementById('dashTotalStok');
@@ -943,7 +859,6 @@ function renderDashboardResellerRecap() {
   if (fStart) rows = rows.filter(r => r.tanggal >= fStart);
   if (fEnd) rows = rows.filter(r => r.tanggal <= fEnd);
 
-  const now = new Date();
   const viewRows = rows.map(r => {
     const totalHarian = totalVoucherRow(r);
     const rDate = new Date(r.tanggal);
@@ -1001,9 +916,7 @@ async function deleteStok(id) {
   }
 }
 
-// ==========================================================================
-// MODUL PROFIL SAYA
-// ==========================================================================
+// User Profile Module
 function populateProfilForm() {
   if (!currentUser) return;
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
@@ -1034,24 +947,19 @@ async function handleSaveProfil(e) {
 }
 
 function handleAvatarPreview(e) {
-  // Catatan: ini hanya preview lokal di browser. Supaya foto benar-benar
-  // tersimpan permanen, perlu Supabase Storage bucket (mis. "avatars") dan
-  // kolom avatar_url di tabel users — belum dipasang di versi ini karena
-  // konfigurasi bucket-nya belum diketahui.
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
     const preview = document.getElementById('prfAvatarPreview');
+    const navAvatar = document.getElementById('navUserAvatar');
     if (preview) preview.src = ev.target.result;
+    if (navAvatar) navAvatar.src = ev.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-// ==========================================================================
-// DASHBOARD CHART: distribusi server per wilayah (sebelumnya canvas kosong
-// karena tidak pernah di-render sama sekali)
-// ==========================================================================
+// Visualizations & Charts
 function renderServerDistributionChart() {
   const canvas = document.getElementById('serverChart');
   if (!canvas || typeof Chart === 'undefined') return;
@@ -1083,16 +991,32 @@ function renderServerDistributionChart() {
   });
 }
 
-// ==========================================================================
-// MONITORING SYSTEM (menu Monitoring System)
-// PENTING: angka CPU/RAM/Latency di halaman ini SEBELUMNYA statis (hardcoded
-// di HTML, tidak pernah berubah) dan log terminal-nya juga teks tetap — ini
-// murni tampilan dekoratif, BUKAN monitoring hardware/server sungguhan.
-// Fungsi di bawah membuat angkanya setidaknya "hidup" (simulasi), tapi untuk
-// data performa server yang valid, perlu backend/agent monitoring asli
-// (mis. Supabase Edge Function yang membaca metrik server sebenarnya).
-// ==========================================================================
 function startSysPerfSimulation() {
+  const canvas = document.getElementById('systemPerfChart');
+  if (canvas && typeof Chart !== 'undefined') {
+    if (sysPerfChart) sysPerfChart.destroy();
+    sysPerfChart = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['10s lalu', '8s lalu', '6s lalu', '4s lalu', '2s lalu', 'Sekarang'],
+        datasets: [{
+          label: 'Latency DB (ms)',
+          data: [20, 25, 22, 28, 24, 21],
+          borderColor: '#f59e0b',
+          tension: 0.3,
+          fill: false
+        }, {
+          label: 'CPU Load (%)',
+          data: [12, 15, 18, 14, 16, 14],
+          borderColor: '#6366f1',
+          tension: 0.3,
+          fill: false
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+
   if (livePerfInterval) clearInterval(livePerfInterval);
   livePerfInterval = setInterval(() => {
     const cpu = Math.floor(10 + Math.random() * 40);
@@ -1111,6 +1035,14 @@ function startSysPerfSimulation() {
     if (ramBar) ramBar.style.width = ram + '%';
     if (latEl) latEl.innerText = latency + ' ms';
 
+    if (sysPerfChart) {
+      sysPerfChart.data.datasets[0].data.shift();
+      sysPerfChart.data.datasets[0].data.push(latency);
+      sysPerfChart.data.datasets[1].data.shift();
+      sysPerfChart.data.datasets[1].data.push(cpu);
+      sysPerfChart.update();
+    }
+
     const term = document.getElementById('sysLogTerminal');
     if (term) {
       const time = new Date().toLocaleTimeString('id-ID');
@@ -1118,10 +1050,10 @@ function startSysPerfSimulation() {
       term.scrollTop = term.scrollHeight;
       while (term.children.length > 40) term.removeChild(term.firstChild);
     }
-  }, 4000);
+  }, 3000);
 }
 
-// Global Event Listeners Registration
+// Global Event Registration
 document.addEventListener('DOMContentLoaded', () => {
   const formLogin = document.getElementById('formLogin');
   if (formLogin) formLogin.addEventListener('submit', handleAuthLogin);
@@ -1135,7 +1067,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLogout = document.getElementById('btnLogout');
   if (btnLogout) btnLogout.addEventListener('click', handleLogout);
 
-  // Forms submit bindings with event prevention
+  const btnAutoID = document.getElementById('btnAutoID');
+  if (btnAutoID) btnAutoID.addEventListener('click', generateAutoEmployeeID);
+
+  // Form Submissions
   const formServer = document.getElementById('formServer');
   if (formServer) formServer.addEventListener('submit', handleSaveServer);
 
