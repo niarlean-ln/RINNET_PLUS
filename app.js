@@ -626,7 +626,7 @@ async function fetchAndRenderUsers() {
             <button class="btn btn-sm btn-outline-danger" onclick="deleteUser('${u.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
-      `).join(''); || '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada user registered.</td></tr>';
+      `).join('') || '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada user registered.</td></tr>';
     }
     applyRolePermissions();
   } catch(err) {
