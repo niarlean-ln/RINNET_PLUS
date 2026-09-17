@@ -173,8 +173,10 @@ function applyRolePermissions() {
   const isSuperadmin = role === 'SUPERADMIN';
   const isManajemen = role === 'MANAJEMEN';
 
-  // Superadmin only elements
+  // Toggle elemen UI khusus superadmin (abaikan elemen .page-section agar halaman modul tidak bocor)
   document.querySelectorAll('.superadmin-only').forEach(el => {
+    if (el.classList.contains('page-section')) return;
+    
     if (isSuperadmin) el.classList.remove('d-none');
     else el.classList.add('d-none');
   });
@@ -753,15 +755,28 @@ function tryRestoreSession() {
 }
 
 function switchMenu(menuKey) {
+  const role = currentUser?.role || 'ADMIN';
+
+  // Validasi akses modul khusus superadmin
+  if ((menuKey === 'sysPerf' || menuKey === 'userMgmt') && role !== 'SUPERADMIN') {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire('Akses Ditolak', 'Halaman ini hanya dapat diakses oleh Superadmin.', 'warning');
+    }
+    return;
+  }
+
+  // Sembunyikan seluruh section modul
   document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('d-none'));
   document.querySelectorAll('.sidebar .nav-link').forEach(lnk => lnk.classList.remove('active'));
 
+  // Tampilkan hanya section modul yang dipilih
   const activeSec = document.getElementById(`menu-${menuKey}`);
   if (activeSec) activeSec.classList.remove('d-none');
 
   const activeLink = document.querySelector(`.sidebar .nav-link[data-menu="${menuKey}"]`);
   if (activeLink) activeLink.classList.add('active');
 
+  // Load data sesuai modul yang dibuka
   if (menuKey === 'kasbon') fetchAndRenderKasbon();
   if (menuKey === 'reseller') fetchAndRenderStok();
   if (menuKey === 'profil') populateProfilForm();
@@ -771,6 +786,7 @@ function switchMenu(menuKey) {
     const sidebar = document.getElementById('mainSidebar');
     if (sidebar) sidebar.classList.remove('show');
   }
+
   applyRolePermissions();
 }
 
