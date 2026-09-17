@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <!-- Mencegah zooming yang tidak diinginkan di mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>RINNET+ — Enterprise Infrastructure & Voucher Management System</title>
   
@@ -11,7 +10,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css"> <!-- Path relatif untuk GitHub Pages -->
+  <link rel="stylesheet" href="./styles.css">
 
   <!-- JavaScript Libraries CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,7 +21,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
-  <!-- App Scripts (Defer agar DOM load dulu) -->
+  <!-- App Scripts -->
   <script src="./supabase-client.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
@@ -33,7 +32,6 @@
     <div class="login-card-container">
       <div class="login-grid">
         
-        <!-- Left Banner (Branding) -->
         <div class="login-left">
           <div>
             <div class="brand-logo-container mb-4">
@@ -56,7 +54,6 @@
           </div>
         </div>
 
-        <!-- Right Form Panel -->
         <div class="login-right">
           <div class="text-center mb-4">
             <div class="brand-logo-container justify-content-center mb-1">
@@ -189,7 +186,6 @@
             <i class="fa-solid fa-bolt text-warning me-1"></i>Akses Cepat Modul Navigasi
           </h6>
           <div class="row g-3">
-            <!-- (Sama seperti sebelumnya, list akses cepat) -->
             <div class="col-6 col-md-4 col-xl-2">
               <div class="quick-access-card" data-menu="server">
                 <div class="quick-icon-box" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;"><i class="fa-solid fa-server"></i></div>
@@ -319,8 +315,7 @@
         </div>
       </section>
 
-      <!-- BAGIAN SECTION LAIN (Profil, SysPerf, Server, dsb) -->
-      <!-- Sengaja dirangkum agar menjaga konsistensi tanpa merubah ID logic JavaScript -->
+      <!-- PROFIL -->
       <section id="menu-profil" class="page-section d-none">
         <h3 class="fw-800 mb-4 text-center text-lg-start">Profil Saya</h3>
         <div class="card card-custom p-4 mx-auto" style="max-width: 600px;">
@@ -341,6 +336,7 @@
         </div>
       </section>
 
+      <!-- SYSTEM MONITORING -->
       <section id="menu-sysPerf" class="page-section d-none">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
           <div>
@@ -394,7 +390,7 @@
         </div>
       </section>
 
-      <!-- SISANYA (Server, Reseller, Karyawan, Kasbon, UserMgmt, About) -->
+      <!-- SERVER CLOUD -->
       <section id="menu-server" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen Server Cloud</h3>
         <div class="row g-4">
@@ -439,6 +435,7 @@
         <div id="containerServerWilayah"></div>
       </section>
 
+      <!-- RESELLER MASTER -->
       <section id="menu-inputReseller" class="page-section d-none">
         <h3 class="fw-800 mb-4">Pengelolaan & Data Master Reseller</h3>
         <div class="row g-4">
@@ -477,6 +474,7 @@
         </div>
       </section>
 
+      <!-- KARYAWAN -->
       <section id="menu-karyawan" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen Data Karyawan</h3>
         <div class="row g-4">
@@ -492,7 +490,7 @@
                 <div class="mb-3"><label class="form-label small fw-bold">Nama Karyawan</label><input type="text" id="empNama" class="form-control" required></div>
                 <div class="mb-3">
                   <label class="form-label small fw-bold">Jabatan</label>
-                  <select id="empJabatan" class="form-select" required>
+                  <select id="empJabatan" class="form-select fw-semibold" required>
                     <option value="">-- Pilih --</option>
                     <option value="Owner">Owner</option><option value="Manajer">Manajer</option>
                     <option value="Officer">Officer</option><option value="Teknisi">Teknisi</option>
@@ -524,6 +522,7 @@
         </div>
       </section>
 
+      <!-- STOK VOUCHER -->
       <section id="menu-reseller" class="page-section d-none">
         <h3 class="fw-800 mb-4">Pendaftaran & Penyerahan Stok Voucher</h3>
         <div class="card card-custom p-4 mb-4">
@@ -534,18 +533,19 @@
           <form id="formStokReseller" class="row g-3">
             <input type="hidden" id="stkId">
             <div class="col-12 col-md-3"><label class="form-label small fw-bold">Tanggal</label><input type="date" id="stkTanggal" class="form-control" required></div>
-            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Server</label><select id="stkServer" class="form-select" required><option value="">Pilih</option></select></div>
-            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Reseller</label><select id="stkReseller" class="form-select" required><option value="">Pilih</option></select></div>
+            <!-- PERBAIKAN 2: Server memicu pemfilteran Reseller -->
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Server</label><select id="stkServer" class="form-select" required><option value="">Pilih Server</option></select></div>
+            <div class="col-12 col-md-3"><label class="form-label small fw-bold">Reseller</label><select id="stkReseller" class="form-select" required><option value="">Pilih Server Dulu</option></select></div>
             <div class="col-12 col-md-3"><label class="form-label small fw-bold">Petugas</label><input type="text" id="stkPetugas" class="form-control" required></div>
             <div class="col-12"><hr class="my-2 text-muted"></div>
-            <!-- Input Voucher (2K-25K) -->
+            
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">2K</label><input type="number" id="v2k" class="form-control" value="0" min="0"></div>
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">3K</label><input type="number" id="v3k" class="form-control" value="0" min="0"></div>
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">4K</label><input type="number" id="v4k" class="form-control" value="0" min="0"></div>
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">5K</label><input type="number" id="v5k" class="form-control" value="0" min="0"></div>
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">6K</label><input type="number" id="v6k" class="form-control" value="0" min="0"></div>
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">25K</label><input type="number" id="v25k" class="form-control" value="0" min="0"></div>
-            <!-- Input Device (1HP-5HP) -->
+            
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">1HP</label><input type="number" id="b1hp" class="form-control" value="0" min="0"></div>
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">2HP</label><input type="number" id="b2hp" class="form-control" value="0" min="0"></div>
             <div class="col-4 col-sm-2"><label class="form-label small fw-bold">3HP</label><input type="number" id="b3hp" class="form-control" value="0" min="0"></div>
@@ -571,6 +571,7 @@
         </div>
       </section>
 
+      <!-- KASBON -->
       <section id="menu-kasbon" class="page-section d-none">
         <h3 class="fw-800 mb-4">Pengelolaan Kasbon Karyawan</h3>
         <div class="row g-4">
@@ -587,9 +588,19 @@
                   <label class="form-label small fw-bold">Status Pelunasan</label>
                   <select id="ksbStatus" class="form-select"><option value="BELUM_LUNAS">Belum Lunas</option><option value="SEBAGIAN">Lunas Sebagian</option><option value="LUNAS">Lunas</option></select>
                 </div>
+                <!-- PERBAIKAN 3A: Sumber Dana Mengambil dari Server Cloud -->
                 <div class="mb-2">
-                  <label class="form-label small fw-bold">Sumber Dana</label>
-                  <select id="ksbSumber" class="form-select"><option value="">-- Pilih --</option><option value="Potongan Gaji">Potongan Gaji</option><option value="Uang Makan">Uang Makan</option><option value="Bayar Sendiri (Uang Pribadi)">Bayar Sendiri</option></select>
+                  <label class="form-label small fw-bold">Sumber Dana (Server Cloud)</label>
+                  <select id="ksbSumber" class="form-select" required><option value="">-- Pilih Server Cloud --</option></select>
+                </div>
+                <!-- PERBAIKAN 3B: Menu Sumber Dana Pelunasan -->
+                <div class="mb-2">
+                  <label class="form-label small fw-bold">Sumber Dana Pelunasan</label>
+                  <select id="ksbPelunasan" class="form-select" required>
+                    <option value="Potong Gaji">Potong Gaji</option>
+                    <option value="Potong Uang Makan">Potong Uang Makan</option>
+                    <option value="Bayar Mandiri">Bayar Mandiri</option>
+                  </select>
                 </div>
                 <div class="mb-3"><label class="form-label small fw-bold">Keterangan</label><textarea id="ksbKet" class="form-control" rows="2"></textarea></div>
                 <div class="p-3 bg-light rounded mb-3 text-center border">
@@ -616,7 +627,9 @@
               </div>
               <div class="table-responsive table-scroll">
                 <table class="table table-hover align-middle" id="tblKasbon">
-                  <thead class="table-light"><tr><th>Tanggal</th><th>Karyawan</th><th>Kasbon</th><th>Saldo</th><th>Status</th><th>Sumber</th><th>Ket</th><th class="text-end">Aksi</th></tr></thead>
+                  <thead class="table-light">
+                    <tr><th>Tanggal</th><th>Karyawan</th><th>Kasbon</th><th>Saldo</th><th>Status</th><th>Sumber Server</th><th>Pelunasan Via</th><th>Ket</th><th class="text-end">Aksi</th></tr>
+                  </thead>
                   <tbody id="bodyKasbon"></tbody>
                 </table>
               </div>
@@ -625,7 +638,9 @@
               <h5 class="fw-bold mb-3"><i class="fa-solid fa-wallet me-2 text-warning"></i>Ringkasan Saldo per Karyawan</h5>
               <div class="table-responsive">
                 <table class="table table-sm table-bordered align-middle mb-0">
-                  <thead class="table-light"><tr><th>Nama Karyawan</th><th>Total Kasbon</th><th>Total Dibayar</th><th>Sisa Piutang</th></tr></thead>
+                  <thead class="table-light">
+                    <tr><th>Nama Karyawan</th><th>Total Kasbon</th><th>Total Dibayar</th><th>Sisa Piutang</th><th>Metode Pelunasan</th></tr>
+                  </thead>
                   <tbody id="bodySaldoKasbon"></tbody>
                 </table>
               </div>
@@ -634,6 +649,7 @@
         </div>
       </section>
 
+      <!-- USER MANAGEMENT -->
       <section id="menu-userMgmt" class="page-section d-none">
         <h3 class="fw-800 mb-4">Manajemen Akun System</h3>
         <div class="row g-4">
@@ -676,33 +692,202 @@
         </div>
       </section>
 
+      <!-- PERBAIKAN 4: REDESAIN TENTANG RINNET+ DARI 3 FOTO REFERENSI -->
       <section id="menu-about" class="page-section d-none">
-        <div class="welcome-card-lux mb-4">
-          <div class="d-flex align-items-center gap-3">
-            <div class="brand-logo-container">
-              <span class="brand-logo-text fs-1">RINNET<span class="plus-tag">+</span></span>
+        <!-- Hero Branding -->
+        <div class="text-center py-4 mb-4">
+          <div class="about-icon-wrapper mb-3 mx-auto">
+            <i class="fa-solid fa-wifi text-primary fs-1"></i>
+          </div>
+          <h1 class="fw-900 display-5 mb-1 text-dark tracking-tight">RINNETCORE</h1>
+          <p class="text-muted fw-600 fs-6 mb-2">ISP Core System Platform</p>
+          <div class="fw-bold text-primary mb-3">PT RINET GLOBAL MANDIRI</div>
+          <div class="d-flex justify-content-center align-items-center gap-2">
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">v1.0.0</span>
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">Update: 07 April 2026</span>
+          </div>
+        </div>
+
+        <!-- Card Tentang Aplikasi -->
+        <div class="card card-custom p-4 p-md-5 mb-5 shadow-sm">
+          <h4 class="fw-800 text-dark mb-4">Tentang Aplikasi</h4>
+          <p class="text-secondary leading-relaxed mb-3 fs-6">
+            Sebagian besar ISP dan jaringan WiFi masih berjalan dengan sistem yang terpisah, manual, dan tidak terukur. Akibatnya: data tercecer, operasional lambat, dan potensi revenue tidak maksimal.
+          </p>
+          <p class="text-secondary leading-relaxed mb-4 fs-6">
+            <strong class="text-dark">RINNETCORE</strong> hadir sebagai solusi untuk membangun bisnis yang terukur, otomatis, dan scalable. Platform ini adalah sistem inti (core system) yang mengintegrasikan seluruh operasional ISP—mulai dari pelanggan, jaringan, voucher, hingga keuangan—dalam satu dashboard terpusat dan real-time.
+          </p>
+          <div class="p-3 bg-light rounded-3 border-start border-4 border-primary">
+            <span class="fw-bold text-dark">Hasilnya:</span> operasional lebih efisien, kontrol lebih kuat, dan bisnis siap untuk scale.
+          </div>
+        </div>
+
+        <!-- Section Fitur Utama (6 Grid Cards) -->
+        <div class="mb-5">
+          <h4 class="fw-800 text-dark mb-4">Fitur Utama</h4>
+          <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="quick-icon-box bg-primary bg-opacity-10 text-primary rounded-3"><i class="fa-solid fa-users"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1 text-dark">Customer Management</h6>
+                    <p class="text-muted small mb-0">Semua data pelanggan dalam satu sistem terpusat</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 class="fw-900 text-white mb-1">Tentang Web Aplikasi RINNET+</h3>
-              <p class="text-white-50 mb-0 small">Enterprise Infrastructure & Multi-Server Voucher Management Platform</p>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="quick-icon-box bg-info bg-opacity-10 text-info rounded-3"><i class="fa-solid fa-wifi"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1 text-dark">Network Control</h6>
+                    <p class="text-muted small mb-0">Monitoring perangkat & jaringan secara real-time</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="quick-icon-box bg-success bg-opacity-10 text-success rounded-3"><i class="fa-solid fa-chart-line"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1 text-dark">Financial Dashboard</h6>
+                    <p class="text-muted small mb-0">Pantau pemasukan dan laporan bisnis secara otomatis</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="quick-icon-box bg-warning bg-opacity-10 text-warning rounded-3"><i class="fa-solid fa-bolt"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1 text-dark">Automation System</h6>
+                    <p class="text-muted small mb-0">Notifikasi, reminder, dan laporan berjalan tanpa manual</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="quick-icon-box bg-primary bg-opacity-10 text-indigo rounded-3"><i class="fa-solid fa-globe"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1 text-dark">Multi Access Platform</h6>
+                    <p class="text-muted small mb-0">Akses dari mana saja, kapan saja</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="quick-icon-box bg-secondary bg-opacity-10 text-dark rounded-3"><i class="fa-solid fa-shield-halved"></i></div>
+                  <div>
+                    <h6 class="fw-bold mb-1 text-dark">Security System</h6>
+                    <p class="text-muted small mb-0">Data aman dengan sistem proteksi berlapis</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="row g-4 mb-4">
-          <div class="col-12 col-lg-6">
-            <div class="card card-custom p-4 h-100">
-              <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-circle-info me-2"></i>Fungsi Utama</h5>
-              <p class="text-secondary leading-relaxed small"><strong>RINNET+</strong> adalah platform sistem informasi enterprise berbasis cloud yang dirancang khusus untuk memusatkan pengelolaan infrastruktur server, alokasi stok voucher reseller, dan manajemen kasbon secara terpadu.</p>
+
+        <!-- Section Kenapa RINNETCORE? -->
+        <div class="card p-4 p-md-5 mb-5 rounded-4 border-0" style="background: #eef2ff;">
+          <h4 class="fw-800 text-dark mb-4">Kenapa RINNETCORE?</h4>
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <i class="fa-circle-check fa-solid text-primary fs-5"></i>
+              <span class="fw-600 text-dark fs-6">Mengurangi pekerjaan manual secara signifikan</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <i class="fa-circle-check fa-solid text-primary fs-5"></i>
+              <span class="fw-600 text-dark fs-6">Meningkatkan kontrol operasional</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <i class="fa-circle-check fa-solid text-primary fs-5"></i>
+              <span class="fw-600 text-dark fs-6">Memaksimalkan potensi revenue</span>
             </div>
           </div>
-          <div class="col-12 col-lg-6">
-            <div class="card card-custom p-4 h-100">
-              <h5 class="fw-bold text-success mb-3"><i class="fa-solid fa-shield-check me-2"></i>Kelebihan Sistem</h5>
-              <ul class="small text-secondary ps-3 mb-2">
-                <li><strong>Realtime Cloud Sync:</strong> Data tersinkronisasi otomatis dengan database Supabase Cloud.</li>
-                <li><strong>Scalable Engine:</strong> Mampu menangani banyak data.</li>
-                <li><strong>Export Excel:</strong> Fitur rekap data cepat format XLSX.</li>
-              </ul>
+        </div>
+
+        <!-- Section Teknologi (6 Kategori Kiri-Kanan) -->
+        <div class="mb-5">
+          <h4 class="fw-800 text-dark mb-4">Teknologi</h4>
+          <div class="row g-4">
+            <!-- Frontend -->
+            <div class="col-12 col-md-6">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Frontend</h6>
+                <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
+                  <li>• React 18.3</li>
+                  <li>• TypeScript 5.x</li>
+                  <li>• Tailwind CSS 3.x</li>
+                  <li>• Shadcn UI Latest</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Backend -->
+            <div class="col-12 col-md-6">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Backend</h6>
+                <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
+                  <li>• Node.js (High-performance runtime)</li>
+                  <li>• Express.js / Fastify (API Framework)</li>
+                  <li>• REST API & WebSocket (Real-time communication)</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Database -->
+            <div class="col-12 col-md-6">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Database</h6>
+                <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
+                  <li>• PostgreSQL (Relational Database)</li>
+                  <li>• MongoDB (NoSQL Database)</li>
+                  <li>• Redis (Caching & Performance Optimization)</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Infrastructure -->
+            <div class="col-12 col-md-6">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Infrastructure</h6>
+                <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
+                  <li>• Docker (Containerization)</li>
+                  <li>• NGINX (Web Server & Load Balancer)</li>
+                  <li>• Cloud Deployment (Lovable Cloud / VPS / Dedicated Server)</li>
+                  <li>• CI/CD Pipeline (Automated Deployment)</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Security -->
+            <div class="col-12 col-md-6">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Security</h6>
+                <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
+                  <li>• JWT Authentication</li>
+                  <li>• Role-Based Access Control (RBAC)</li>
+                  <li>• SSL Encryption (HTTPS)</li>
+                  <li>• Data Backup & Recovery System</li>
+                </ul>
+              </div>
+            </div>
+            <!-- Integrasi -->
+            <div class="col-12 col-md-6">
+              <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Integrasi</h6>
+                <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
+                  <li>• WhatsApp API (Notifikasi & Marketing Automation)</li>
+                  <li>• Payment Gateway (QRIS, e-Wallet, Virtual Account)</li>
+                  <li>• MikroTik API (Hotspot & User Manager)</li>
+                  <li>• Mikhmon Integration</li>
+                  <li>• SNMP Monitoring (Network visibility)</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

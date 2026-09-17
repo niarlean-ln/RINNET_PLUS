@@ -1,6 +1,5 @@
 /* ==========================================================================
    RINNET+ ENTERPRISE INFRASTRUCTURE core business logic & app engine
-   (REFINED & BUG-FREE VERSION)
    ========================================================================== */
 
 let activeChart = null;
@@ -129,6 +128,7 @@ async function loadAllMasterDropdowns() {
     populateServerDropdown();
     populateResellerServerDropdown();
     populateKasbonKaryawanDropdown();
+    populateKasbonSumberDanaDropdown();
     populateStokResellerDropdown();
   } catch(err) {
     console.warn("Gagal memuat master dropdown dari Supabase.", err);
@@ -160,12 +160,36 @@ function populateKasbonKaryawanDropdown() {
   if (fltEmpSelect) fltEmpSelect.innerHTML = '<option value="">-- Semua Karyawan --</option>' + optionsHtml;
 }
 
-function populateStokResellerDropdown() {
-  const stkResellerSelect = document.getElementById('stkReseller');
-  if (stkResellerSelect) {
-    stkResellerSelect.innerHTML = '<option value="">-- Pilih Reseller --</option>' +
-      window.RESELLER_CACHE.map(r => `<option value="${escapeHTML(r.nama_reseller)}">${escapeHTML(r.nama_reseller)} (${escapeHTML(r.nama_server || 'Umum')})</option>`).join('');
+// PERBAIKAN 3A: Populate Sumber Dana Kasbon dari Server Cloud
+function populateKasbonSumberDanaDropdown() {
+  const ksbSumberSelect = document.getElementById('ksbSumber');
+  if (ksbSumberSelect) {
+    const serverOptions = window.SERVER_CACHE.map(s => `<option value="${escapeHTML(s.nama_server)}">Server: ${escapeHTML(s.nama_server)}</option>`).join('');
+    ksbSumberSelect.innerHTML = '<option value="">-- Pilih Sumber Dana --</option>' + serverOptions + '<option value="Kas Kantor/Lainnya">Kas Kantor/Lainnya</option>';
   }
+}
+
+// PERBAIKAN 2: Reseller Difilter Berdasarkan Server yang Dipilih
+function populateStokResellerDropdown(selectedServer = '') {
+  const stkResellerSelect = document.getElementById('stkReseller');
+  if (!stkResellerSelect) return;
+
+  let filteredReseller = window.RESELLER_CACHE;
+  if (selectedServer) {
+    filteredReseller = window.RESELLER_CACHE.filter(r => r.nama_server === selectedServer);
+  }
+
+  if (filteredReseller.length === 0) {
+    stkResellerSelect.innerHTML = '<option value="">-- Tidak ada Reseller di Server ini --</option>';
+  } else {
+    stkResellerSelect.innerHTML = '<option value="">-- Pilih Reseller --</option>' +
+      filteredReseller.map(r => `<option value="${escapeHTML(r.nama_reseller)}">${escapeHTML(r.nama_reseller)}</option>`).join('');
+  }
+}
+
+function handleStokServerChange(e) {
+  const serverName = e.target.value;
+  populateStokResellerDropdown(serverName);
 }
 
 // Apply Role Access Control & Read-Only for MANAJEMEN Role
@@ -195,7 +219,6 @@ function applyRolePermissions() {
   }
 }
 
-// Restore User Avatar Picture from Local Storage
 function restoreUserAvatar() {
   if (!currentUser) return;
   const savedAvatar = localStorage.getItem('rinnet_user_avatar_' + currentUser.username);
@@ -238,6 +261,7 @@ async function fetchAndRenderServers() {
     
     renderServerWilayahCluster(data || []);
     renderClusterMonitoringTable(data || []);
+    populateKasbonSumberDanaDropdown();
     applyRolePermissions();
   } catch (err) {
     console.error(err);
@@ -377,6 +401,7 @@ async function deleteServer(id) {
 // ==========================================
 // EMPLOYEE MANAGEMENT
 // ==========================================
+// PERBAIKAN 1: Memastikan Teks Jabatan Terlihat Jelas
 async function fetchAndRenderEmployees() {
   try {
     const { data, error } = await _supabase.from('employees').select('*');
@@ -387,18 +412,21 @@ async function fetchAndRenderEmployees() {
 
     const tbody = document.getElementById('bodyKaryawan');
     if (tbody) {
-      tbody.innerHTML = sortedData.map(e => `
+      tbody.innerHTML = sortedData.map(e => {
+        const jabatanText = e.jabatan ? escapeHTML(e.jabatan) : '-';
+        return `
         <tr>
           <td class="fw-bold text-primary">${escapeHTML(e.emp_id)}</td>
           <td class="fw-bold">${escapeHTML(e.nama_karyawan)}</td>
-          <td><span class="badge bg-indigo bg-opacity-10 text-indigo border">${escapeHTML(e.jabatan)}</span></td>
+          <td><span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-2 py-1 fw-semibold">${jabatanText}</span></td>
           <td>${escapeHTML(e.no_wa || '-')}</td>
           <td class="action-col text-end">
             <button class="btn btn-sm btn-outline-primary me-1" onclick="editEmployee('${e.id}')"><i class="fa-solid fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger" onclick="deleteEmployee('${e.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data karyawan.</td></tr>';
+      `;
+      }).join('') || '<tr><td colspan="5" class="text-center text-muted py-3">Belum ada data karyawan.</td></tr>';
     }
 
     const dashEmpEl = document.getElementById('dashTotalKaryawan');
@@ -424,7 +452,6 @@ function editEmployee(id) {
   if (btnBatal) btnBatal.classList.remove('d-none');
 }
 
-// BUG FIXED: Nama fungsi diselaraskan dengan Event Listener btnBatalEditKaryawan
 function cancelEditKaryawan() {
   const form = document.getElementById('formKaryawan');
   if (form) form.reset();
@@ -503,6 +530,9 @@ async function fetchAndRenderResellers() {
 
     const dashRslEl = document.getElementById('dashTotalReseller');
     if (dashRslEl) dashRslEl.innerText = (data || []).length;
+    
+    const stkServerValue = document.getElementById('stkServer')?.value || '';
+    populateStokResellerDropdown(stkServerValue);
     applyRolePermissions();
   } catch(err) {
     console.error(err);
@@ -927,6 +957,7 @@ function bindExportButtons() {
     { header: 'Sisa Saldo', key: 'sisa', width: 16 },
     { header: 'Status', key: 'status', width: 14 },
     { header: 'Sumber Dana', key: 'sumber_dana', width: 22 },
+    { header: 'Pelunasan Via', key: 'sumber_dana_pelunasan', width: 22 },
     { header: 'Keterangan', key: 'keterangan', width: 25 },
   ], (window.KASBON_VIEW_CACHE || []).map(k => ({ ...k, sisa: Math.max((Number(k.jumlah_kasbon) || 0) - (Number(k.dibayar) || 0), 0) }))));
 
@@ -1002,6 +1033,9 @@ function applyKasbonFilterAndRender() {
       const sisa = hitungSisaKasbon(k.jumlah_kasbon, k.dibayar);
       const statusMap = { BELUM_LUNAS: ['Belum Lunas', 'danger'], SEBAGIAN: ['Lunas Sebagian', 'warning'], LUNAS: ['Lunas', 'success'] };
       const [statusLabel, statusColor] = statusMap[k.status] || [k.status || '-', 'secondary'];
+      const sumberDanaDisplay = k.sumber_dana ? `Server: ${escapeHTML(k.sumber_dana)}` : '-';
+      const pelunasanDisplay = k.sumber_dana_pelunasan ? escapeHTML(k.sumber_dana_pelunasan) : '-';
+
       return `
         <tr>
           <td>${escapeHTML(k.tanggal)}</td>
@@ -1009,14 +1043,15 @@ function applyKasbonFilterAndRender() {
           <td>${formatRupiah(k.jumlah_kasbon)}</td>
           <td>${formatRupiah(sisa)}</td>
           <td><span class="badge bg-${statusColor} bg-opacity-10 text-${statusColor} border border-${statusColor}">${statusLabel}</span></td>
-          <td><span class="badge bg-light text-dark border">${escapeHTML(k.sumber_dana || 'Uang Pribadi')}</span></td>
+          <td><span class="badge bg-light text-dark border">${sumberDanaDisplay}</span></td>
+          <td><span class="badge bg-info bg-opacity-10 text-info border border-info">${pelunasanDisplay}</span></td>
           <td>${escapeHTML(k.keterangan || '-')}</td>
           <td class="action-col text-end">
             <button class="btn btn-sm btn-outline-primary me-1" onclick="editKasbon('${k.id}')"><i class="fa-solid fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger" onclick="deleteKasbon('${k.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`;
-    }).join('') || '<tr><td colspan="8" class="text-center text-muted py-3">Belum ada data kasbon.</td></tr>';
+    }).join('') || '<tr><td colspan="9" class="text-center text-muted py-3">Belum ada data kasbon.</td></tr>';
   }
 }
 
@@ -1026,20 +1061,29 @@ function renderSaldoKasbonPerKaryawan(rows) {
 
   const grouped = {};
   rows.forEach(k => {
-    if (!grouped[k.nama_karyawan]) grouped[k.nama_karyawan] = { total: 0, dibayar: 0 };
+    if (!grouped[k.nama_karyawan]) {
+      grouped[k.nama_karyawan] = { total: 0, dibayar: 0, pelunasanSet: new Set() };
+    }
     grouped[k.nama_karyawan].total += Number(k.jumlah_kasbon) || 0;
     grouped[k.nama_karyawan].dibayar += Number(k.dibayar) || 0;
+    if (k.sumber_dana_pelunasan) {
+      grouped[k.nama_karyawan].pelunasanSet.add(k.sumber_dana_pelunasan);
+    }
   });
 
   const entries = Object.entries(grouped);
-  tbody.innerHTML = entries.map(([nama, v]) => `
+  tbody.innerHTML = entries.map(([nama, v]) => {
+    const pelunasanStr = Array.from(v.pelunasanSet).join(', ') || '-';
+    return `
     <tr>
       <td class="fw-bold">${escapeHTML(nama)}</td>
       <td>${formatRupiah(v.total)}</td>
       <td>${formatRupiah(v.dibayar)}</td>
       <td class="fw-bold text-danger">${formatRupiah(Math.max(v.total - v.dibayar, 0))}</td>
+      <td><span class="badge bg-secondary bg-opacity-10 text-dark border">${escapeHTML(pelunasanStr)}</span></td>
     </tr>
-  `).join('') || '<tr><td colspan="4" class="text-muted text-center py-2">Belum ada data.</td></tr>';
+  `;
+  }).join('') || '<tr><td colspan="5" class="text-muted text-center py-2">Belum ada data.</td></tr>';
 }
 
 async function handleSaveKasbon(e) {
@@ -1049,7 +1093,8 @@ async function handleSaveKasbon(e) {
     tanggal: document.getElementById('ksbTanggal')?.value,
     nama_karyawan: document.getElementById('ksbKaryawan')?.value,
     jumlah_kasbon: Number(document.getElementById('ksbJumlah')?.value) || 0,
-    sumber_dana: document.getElementById('ksbSumber')?.value || 'Bayar Sendiri (Uang Pribadi)',
+    sumber_dana: document.getElementById('ksbSumber')?.value || '',
+    sumber_dana_pelunasan: document.getElementById('ksbPelunasan')?.value || 'Bayar Mandiri',
     keterangan: document.getElementById('ksbKet')?.value.trim(),
     status: document.getElementById('ksbStatus')?.value,
     dibayar: Number(document.getElementById('ksbDibayar')?.value) || 0,
@@ -1075,7 +1120,10 @@ function editKasbon(id) {
   document.getElementById('ksbTanggal').value = row.tanggal || '';
   document.getElementById('ksbKaryawan').value = row.nama_karyawan || '';
   document.getElementById('ksbJumlah').value = row.jumlah_kasbon || 0;
-  document.getElementById('ksbSumber').value = row.sumber_dana || 'Potongan Gaji';
+  document.getElementById('ksbSumber').value = row.sumber_dana || '';
+  if (document.getElementById('ksbPelunasan')) {
+    document.getElementById('ksbPelunasan').value = row.sumber_dana_pelunasan || 'Bayar Mandiri';
+  }
   document.getElementById('ksbKet').value = row.keterangan || '';
   document.getElementById('ksbStatus').value = row.status || 'BELUM_LUNAS';
   document.getElementById('ksbDibayar').value = row.dibayar || 0;
@@ -1165,7 +1213,13 @@ function editStok(id) {
   if (!row) return;
   document.getElementById('stkId').value = row.id;
   document.getElementById('stkTanggal').value = row.tanggal || '';
-  document.getElementById('stkServer').value = row.nama_server || '';
+  
+  const serverSelect = document.getElementById('stkServer');
+  if (serverSelect) {
+    serverSelect.value = row.nama_server || '';
+    populateStokResellerDropdown(row.nama_server || '');
+  }
+
   document.getElementById('stkReseller').value = row.nama_reseller || '';
   document.getElementById('stkPetugas').value = row.petugas || '';
 
@@ -1185,6 +1239,8 @@ function cancelEditStok() {
   if (form) form.reset();
   const idEl = document.getElementById('stkId');
   if (idEl) idEl.value = '';
+  
+  populateStokResellerDropdown('');
   
   const title = document.getElementById('titleFormStok');
   if (title) title.innerText = 'Form Input Penyerahan Voucher';
@@ -1456,7 +1512,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const formKaryawan = document.getElementById('formKaryawan');
   if (formKaryawan) formKaryawan.addEventListener('submit', handleSaveEmployee);
-  // BUG FIXED: cancelEditKaryawan sekarang terhubung sempurna!
   const btnBatalEditKaryawan = document.getElementById('btnBatalEditKaryawan');
   if (btnBatalEditKaryawan) btnBatalEditKaryawan.addEventListener('click', cancelEditKaryawan);
 
@@ -1479,6 +1534,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (formStokReseller) formStokReseller.addEventListener('submit', handleSaveStok);
   const btnBatalEditStok = document.getElementById('btnBatalEditStok');
   if (btnBatalEditStok) btnBatalEditStok.addEventListener('click', cancelEditStok);
+
+  // Event Listener dinamik untuk Server -> Reseller pada Form Penyerahan Stock Voucher
+  const stkServerSelect = document.getElementById('stkServer');
+  if (stkServerSelect) stkServerSelect.addEventListener('change', handleStokServerChange);
 
   ['ksbJumlah', 'ksbDibayar'].forEach(id => {
     const el = document.getElementById(id);
