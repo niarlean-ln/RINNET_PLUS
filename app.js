@@ -170,6 +170,19 @@ function populateKasbonSumberDanaDropdown() {
   }
 }
 
+// FUNGSI BARU: Untuk Filter Server di Dashboard & Halaman Stok
+function populateDashResellerServerFilter() {
+  const optionsHtml = window.SERVER_CACHE.map(s => 
+    `<option value="${escapeHTML(s.nama_server)}">${escapeHTML(s.nama_server)}</option>`
+  ).join('');
+  
+  const dashFilterSelect = document.getElementById('dashResellerServerFilter');
+  if (dashFilterSelect) dashFilterSelect.innerHTML = '<option value="">-- Semua Server --</option>' + optionsHtml;
+
+  const stokFilterSelect = document.getElementById('fltStokServer');
+  if (stokFilterSelect) stokFilterSelect.innerHTML = '<option value="">-- Semua Server --</option>' + optionsHtml;
+}
+
 // PERBAIKAN 2: Reseller Difilter Berdasarkan Server yang Dipilih
 function populateStokResellerDropdown(selectedServer = '') {
   const stkResellerSelect = document.getElementById('stkReseller');
@@ -199,25 +212,40 @@ function applyRolePermissions() {
   const isSuperadmin = role === 'SUPERADMIN';
   const isManajemen = role === 'MANAJEMEN';
 
+  // 1. Tampilkan/Sembunyikan Akses Khusus Superadmin (Monitoring & User Mgmt)
   document.querySelectorAll('.superadmin-only').forEach(el => {
     if (el.classList.contains('page-section')) return;
     if (isSuperadmin) el.classList.remove('d-none');
     else el.classList.add('d-none');
   });
 
-  if (isManajemen) {
-    document.querySelectorAll('.action-col, .form-manage-container').forEach(el => el.classList.add('d-none'));
-    document.querySelectorAll('.main-table-container').forEach(el => {
-      el.classList.remove('col-lg-8');
-      el.classList.add('col-lg-12');
-    });
-  } else {
-    document.querySelectorAll('.action-col, .form-manage-container').forEach(el => el.classList.remove('d-none'));
-    document.querySelectorAll('.main-table-container').forEach(el => {
-      el.classList.remove('col-lg-12');
-      el.classList.add('col-lg-8');
-    });
-  }
+  // 2. Terapkan aturan Read-Only untuk MANAJEMEN (Sembunyikan Form, Lebarkan Tabel)
+  ['formServer', 'formResellerMaster', 'formKaryawan', 'formKasbon', 'formStokReseller'].forEach(id => {
+    const formEl = document.getElementById(id);
+    if (!formEl) return;
+    
+    // Penyesuaian pembungkus: formStokReseller dibungkus oleh .card langsung, yang lain oleh .col-lg-4
+    const formColumn = id === 'formStokReseller' ? formEl.closest('.card') : formEl.closest('.col-lg-4'); 
+    const tableColumn = id === 'formStokReseller' ? null : formColumn?.nextElementSibling; 
+    
+    if (isManajemen) {
+      if (formColumn) formColumn.classList.add('d-none'); // Hilangkan form
+      if (tableColumn && tableColumn.classList.contains('col-lg-8')) {
+        tableColumn.classList.replace('col-lg-8', 'col-lg-12'); // Lebarkan tabel
+      }
+    } else {
+      if (formColumn) formColumn.classList.remove('d-none'); // Kembalikan form
+      if (tableColumn && tableColumn.classList.contains('col-lg-12')) {
+        tableColumn.classList.replace('col-lg-12', 'col-lg-8'); // Kembalikan ukuran tabel
+      }
+    }
+  });
+
+  // 3. Sembunyikan Tombol Aksi (Edit/Hapus) di dalam Tabel
+  document.querySelectorAll('.action-col').forEach(el => {
+    if (isManajemen) el.classList.add('d-none');
+    else el.classList.remove('d-none');
+  });
 }
 
 function restoreUserAvatar() {
@@ -310,8 +338,17 @@ function renderServerWilayahCluster(servers) {
   const dashWilEl = document.getElementById('dashTotalWilayah');
   if (dashWilEl) dashWilEl.innerText = Object.keys(grouped).length;
 
+  // Fitur Sorting Berdasarkan Angka Terkecil
+  const sortedKeys = Object.keys(grouped).sort((a, b) => {
+    const numA = parseInt((a.match(/\d+/) || [9999])[0], 10);
+    const numB = parseInt((b.match(/\d+/) || [9999])[0], 10);
+    if (numA === numB) return a.localeCompare(b);
+    return numA - numB;
+  });
+
   let html = '';
-  for (const [wil, list] of Object.entries(grouped)) {
+  for (const wil of sortedKeys) {
+    const list = grouped[wil];
     html += `
       <div class="card card-custom p-4 mb-4">
         <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-map-pin me-2"></i>Wilayah / Cluster: ${escapeHTML(wil)}</h5>
@@ -1196,8 +1233,10 @@ async function fetchAndRenderStok() {
 function applyStokFilterAndRender() {
   const fStart = document.getElementById('filterStokStart')?.value || '';
   const fEnd = document.getElementById('filterStokEnd')?.value || '';
+  const fServer = document.getElementById('fltStokServer')?.value || '';
 
   let rows = [...window.STOK_CACHE];
+  if (fServer) rows = rows.filter(r => r.nama_server === fServer);
   if (fStart) rows = rows.filter(r => r.tanggal >= fStart);
   if (fEnd) rows = rows.filter(r => r.tanggal <= fEnd);
   window.STOK_VIEW_CACHE = rows;
@@ -1259,6 +1298,9 @@ function cancelEditStok() {
   if (btnBatal) btnBatal.classList.add('d-none');
 }
 
+const HARIAN_FIELDS = ['v2k', 'v3k', 'v4k', 'v5k', 'v6k'];
+const BULANAN_FIELDS = ['v25k', 'b1hp', 'b2hp', 'b3hp', 'b4hp', 'b5hp'];
+
 function renderDashboardResellerRecap() {
   const fStart = document.getElementById('dashResellerStart')?.value || '';
   const fEnd = document.getElementById('dashResellerEnd')?.value || '';
@@ -1274,17 +1316,10 @@ function renderDashboardResellerRecap() {
   if (fServer) rows = rows.filter(r => r.nama_server === fServer);
 
   const viewRows = rows.map(r => {
-    const totalHarian = totalVoucherRow(r);
-    const rDate = new Date(r.tanggal);
-    
-    // Perbaikan bug total bulanan: dihitung spesifik per reseller & bulan/tahun transaksi tersebut
-    const totalBulanan = window.STOK_CACHE
-      .filter(x => x.nama_reseller === r.nama_reseller && new Date(x.tanggal).getMonth() === rDate.getMonth() && new Date(x.tanggal).getFullYear() === rDate.getFullYear())
-      .reduce((sum, x) => sum + totalVoucherRow(x), 0);
-      
-    const totalKeseluruhan = window.STOK_CACHE
-      .filter(x => x.nama_reseller === r.nama_reseller)
-      .reduce((sum, x) => sum + totalVoucherRow(x), 0);
+    // Memisahkan kategori penjumlahan Harian dan Bulanan
+    const totalHarian = HARIAN_FIELDS.reduce((sum, f) => sum + (Number(r[f]) || 0), 0);
+    const totalBulanan = BULANAN_FIELDS.reduce((sum, f) => sum + (Number(r[f]) || 0), 0);
+    const totalKeseluruhan = totalHarian + totalBulanan;
       
     return { tanggal: r.tanggal, nama_server: r.nama_server, nama_reseller: r.nama_reseller, petugas: r.petugas, totalHarian, totalBulanan, totalKeseluruhan };
   });
@@ -1415,9 +1450,18 @@ function renderServerDistributionChart() {
     grouped[wil] = (grouped[wil] || 0) + 1;
   });
 
-  const keys = Object.keys(grouped);
+  // Fitur Sorting Berdasarkan Angka Terkecil untuk Chart
+  const sortedKeys = Object.keys(grouped).sort((a, b) => {
+    const numA = parseInt((a.match(/\d+/) || [9999])[0], 10);
+    const numB = parseInt((b.match(/\d+/) || [9999])[0], 10);
+    if (numA === numB) return a.localeCompare(b);
+    return numA - numB;
+  });
+
+  const sortedValues = sortedKeys.map(k => grouped[k]);
+
   if (wrapper) {
-    const dynamicWidth = Math.max(100, keys.length * 45);
+    const dynamicWidth = Math.max(100, sortedKeys.length * 45);
     wrapper.style.minWidth = dynamicWidth + '%';
   }
 
@@ -1425,10 +1469,10 @@ function renderServerDistributionChart() {
   activeChart = new Chart(canvas.getContext('2d'), {
     type: 'bar',
     data: {
-      labels: keys,
+      labels: sortedKeys,
       datasets: [{
         label: 'Jumlah Server Active',
-        data: Object.values(grouped),
+        data: sortedValues,
         backgroundColor: 'rgba(99, 102, 241, 0.85)',
         borderRadius: 8,
       }],
@@ -1575,10 +1619,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.addEventListener('change', applyKasbonFilterAndRender);
   });
 
-  ['filterStokStart', 'filterStokEnd'].forEach(id => {
+  ['filterStokStart', 'filterStokEnd', 'fltStokServer'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', applyStokFilterAndRender);
   });
+
+  const btnResetStokFilter = document.getElementById('btnResetStokFilter');
+  if (btnResetStokFilter) {
+    btnResetStokFilter.addEventListener('click', () => {
+      ['filterStokStart', 'filterStokEnd', 'fltStokServer'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      applyStokFilterAndRender();
+    });
+  }
 
   ['dashResellerStart', 'dashResellerEnd'].forEach(id => {
     const el = document.getElementById(id);

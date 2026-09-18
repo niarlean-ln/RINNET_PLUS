@@ -287,28 +287,38 @@
         </div>
 
         <!-- REKAPAN VOUCHER -->
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-  <select id="dashResellerServerFilter" class="form-select form-select-sm" style="width: auto;">
-    <option value="">-- Semua Server --</option>
-    <!-- Opsi server akan terisi otomatis dari cache server -->
-  </select>
-  <div class="d-flex align-items-center gap-1">
-    <label class="small fw-bold mb-0 text-secondary">Dari:</label>
-    <input type="date" id="dashResellerStart" class="form-control form-control-sm" style="width: auto;">
-  </div>
-  <div class="d-flex align-items-center gap-1">
-    <label class="small fw-bold mb-0 text-secondary">s/d:</label>
-    <input type="date" id="dashResellerEnd" class="form-control form-control-sm" style="width: auto;">
-  </div>
-  <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 small" id="btnResetDashReseller" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
-  <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportDashReseller"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
-</div>
+        <div class="card card-custom p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-file-invoice me-2 text-primary"></i>Rekapitulasi Voucher Reseller</h5>
+          </div>
+          
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+            <select id="dashResellerServerFilter" class="form-select form-select-sm" style="width: auto;">
+              <option value="">-- Semua Server --</option>
+            </select>
+            <div class="d-flex align-items-center gap-1">
+              <label class="small fw-bold mb-0 text-secondary">Dari:</label>
+              <input type="date" id="dashResellerStart" class="form-control form-control-sm" style="width: auto;">
+            </div>
+            <div class="d-flex align-items-center gap-1">
+              <label class="small fw-bold mb-0 text-secondary">s/d:</label>
+              <input type="date" id="dashResellerEnd" class="form-control form-control-sm" style="width: auto;">
+            </div>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 small" id="btnResetDashReseller" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
+            <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportDashReseller"><i class="fa-solid fa-file-excel me-1"></i>Export Excel</button>
+          </div>
 
           <div class="table-responsive table-scroll">
-            <table class="table table-bordered table-sm text-center align-middle" id="tblDashReseller">
+            <table class="table table-bordered table-hover table-sm text-center align-middle" id="tblDashReseller">
               <thead class="table-light">
                 <tr>
-                  <th>Tanggal</th><th>Server</th><th>Reseller</th><th>Petugas</th><th>Total Voucher Harian</th><th>Total Voucher Bulanan</th><th>Total Keseluruhan</th>
+                  <th>Tanggal</th>
+                  <th>Server</th>
+                  <th>Reseller</th>
+                  <th>Petugas</th>
+                  <th>Total Harian</th>
+                  <th>Total Bulanan</th>
+                  <th>Total Keseluruhan</th>
                 </tr>
               </thead>
               <tbody id="bodyDashReseller"></tbody>
@@ -562,10 +572,35 @@
             <h5 class="fw-bold mb-0">Riwayat Penyerahan Voucher</h5>
             <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportStok"><i class="fa-solid fa-file-excel me-1"></i>Export</button>
           </div>
+          
+          <!-- UI FILTER SERVER & TANGGAL -->
+          <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+            <select id="fltStokServer" class="form-select form-select-sm" style="width: auto;">
+              <option value="">-- Semua Server --</option>
+            </select>
+            <div class="d-flex align-items-center gap-1">
+              <label class="small fw-bold mb-0 text-secondary">Dari:</label>
+              <input type="date" id="filterStokStart" class="form-control form-control-sm" style="width: auto;">
+            </div>
+            <div class="d-flex align-items-center gap-1">
+              <label class="small fw-bold mb-0 text-secondary">s/d:</label>
+              <input type="date" id="filterStokEnd" class="form-control form-control-sm" style="width: auto;">
+            </div>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1 small" id="btnResetStokFilter" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
+          </div>
+
           <div class="table-responsive table-scroll">
             <table class="table table-bordered table-hover text-center align-middle" id="tblStok">
               <thead class="table-light">
-                <tr><th>Tanggal</th><th>Server</th><th>Reseller</th><th>Petugas</th><th>2K</th><th>3K</th><th>4K</th><th>5K</th><th>6K</th><th>25K</th><th>1HP</th><th>2HP</th><th>3HP</th><th>4HP</th><th>5HP</th><th>Aksi</th></tr>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Server</th>
+                  <th>Reseller</th>
+                  <th>Petugas</th>
+                  <th>2K</th><th>3K</th><th>4K</th><th>5K</th><th>6K</th><th>25K</th>
+                  <th>1HP</th><th>2HP</th><th>3HP</th><th>4HP</th><th>5HP</th>
+                  <th>Aksi</th>
+                </tr>
               </thead>
               <tbody id="bodyStok"></tbody>
             </table>
