@@ -571,6 +571,9 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0">Riwayat Penyerahan Voucher</h5>
             <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportStok"><i class="fa-solid fa-file-excel me-1"></i>Export</button>
+            <button class="btn btn-sm btn-outline-danger me-2" onclick="showDeleteByDateRange('Stok Voucher', 'stok_voucher', fetchAndRenderStok)">
+            <i class="fa-solid fa-calendar-xmark me-1"></i> Hapus Custom
+            </button>
           </div>
           
           <!-- UI FILTER SERVER & TANGGAL -->
@@ -656,6 +659,9 @@
               <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                 <h5 class="fw-bold mb-0">Riwayat Kasbon & Pelunasan</h5>
                 <button class="btn btn-sm btn-outline-success rounded-pill px-3" id="btnExportKasbon"><i class="fa-solid fa-file-excel me-1"></i>Export</button>
+                <button class="btn btn-sm btn-outline-danger me-2" onclick="showDeleteByDateRange('Kasbon', 'kasbon', fetchAndRenderKasbon)">
+                <i class="fa-solid fa-calendar-xmark me-1"></i> Hapus Custom
+                </button>
               </div>
               <div class="row g-2 mb-3 bg-light p-2 rounded border">
                 <div class="col-12 col-md-4"><select id="fltKasbonKaryawan" class="form-select form-select-sm"><option value="">-- Semua Karyawan --</option></select></div>

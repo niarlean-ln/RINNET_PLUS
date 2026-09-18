@@ -1017,15 +1017,103 @@ async function exportToExcel(filename, sheetName, columns, rows) {
       Swal.fire({ toast: true, position: 'top-end', icon: 'info', title: 'Tidak ada data untuk diexport', showConfirmButton: false, timer: 1800 });
       return;
     }
+    
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet(sheetName);
-    sheet.columns = columns;
-    rows.forEach(r => sheet.addRow(r));
-    sheet.getRow(1).font = { bold: true };
-    sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF6366F1' } };
+    
+    // Atur ukuran kolom
+    sheet.columns = columns.map(c => ({ width: c.width || 15 }));
+    const colCount = columns.length;
+
+    // --- 1. HEADER LOGO APLIKASI (RINNET +) ---
+    sheet.mergeCells(1, 1, 1, colCount);
+    const title1 = sheet.getCell(1, 1);
+    title1.value = 'RINNET +';
+    // Menggunakan Georgia untuk kesan Mewah, Elegan, dan Profesional
+    title1.font = { name: 'Georgia', size: 26, bold: true, color: { argb: 'FF1E1B4B' } }; 
+    title1.alignment = { horizontal: 'center', vertical: 'middle' };
+    sheet.getRow(1).height = 45;
+
+    // --- 2. JUDUL MODUL HALAMAN ---
+    sheet.mergeCells(2, 1, 2, colCount);
+    const title2 = sheet.getCell(2, 1);
+    title2.value = `Laporan Data ${sheetName}`;
+    title2.font = { name: 'Trebuchet MS', size: 14, bold: true, color: { argb: 'FF374151' } };
+    title2.alignment = { horizontal: 'center', vertical: 'middle' };
+    sheet.getRow(2).height = 25;
+
+    // --- 3. WAKTU CETAK REALTIME ---
+    sheet.mergeCells(3, 1, 3, colCount);
+    const title3 = sheet.getCell(3, 1);
+    const now = new Date();
+    const opsiHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const namaHari = opsiHari[now.getDay()];
+    const tgl = String(now.getDate()).padStart(2, '0');
+    const bln = String(now.getMonth() + 1).padStart(2, '0');
+    const thn = now.getFullYear();
+    const jam = String(now.getHours()).padStart(2, '0');
+    const mnt = String(now.getMinutes()).padStart(2, '0');
+    const dtk = String(now.getSeconds()).padStart(2, '0');
+
+    // Format: "dicetak pada hari-tanggal-bulan-tahun"
+    title3.value = `dicetak pada ${namaHari}, ${tgl}-${bln}-${thn} jam ${jam}:${mnt}:${dtk} WIB`;
+    title3.font = { name: 'Arial', size: 10, italic: true, color: { argb: 'FF6B7280' } };
+    title3.alignment = { horizontal: 'center', vertical: 'middle' };
+    sheet.getRow(3).height = 20;
+
+    // --- 4. BARIS KOSONG PEMISAH ---
+    sheet.addRow([]);
+
+    // --- 5. RENDER HEADER TABEL ---
+    const headerRowNumber = 5;
+    const headerRow = sheet.getRow(headerRowNumber);
+    columns.forEach((col, index) => {
+      const cell = headerRow.getCell(index + 1);
+      cell.value = col.header;
+      cell.font = { name: 'Calibri', size: 12, bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F46E5' } };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FFD1D5DB' } }, left: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+        bottom: { style: 'thin', color: { argb: 'FFD1D5DB' } }, right: { style: 'thin', color: { argb: 'FFD1D5DB' } }
+      };
+    });
+    headerRow.height = 28;
+
+    // --- 6. RENDER DATA BARIS ---
+    rows.forEach((r, rowIndex) => {
+      const rowNumber = headerRowNumber + 1 + rowIndex;
+      const dataRow = sheet.getRow(rowNumber);
+      columns.forEach((col, colIndex) => {
+        const cell = dataRow.getCell(colIndex + 1);
+        cell.value = r[col.key];
+
+        cell.font = { name: 'Calibri', size: 11, color: { argb: 'FF1F2937' } };
+        cell.alignment = { vertical: 'middle', wrapText: true };
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFD1D5DB' } }, left: { style: 'thin', color: { argb: 'FFD1D5DB' } },
+          bottom: { style: 'thin', color: { argb: 'FFD1D5DB' } }, right: { style: 'thin', color: { argb: 'FFD1D5DB' } }
+        };
+
+        // Efek Zebra Striping
+        if (rowIndex % 2 === 0) {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } };
+        } else {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+        }
+      });
+    });
+
+    // Tambahkan Auto-Filter
+    sheet.autoFilter = {
+      from: { row: headerRowNumber, column: 1 },
+      to: { row: headerRowNumber, column: colCount }
+    };
+
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/octet-stream' });
     saveAs(blob, filename);
+    
   } catch (err) {
     console.error(err);
     Swal.fire('Gagal Export', 'Terjadi kesalahan saat membuat file Excel.', 'error');
@@ -1628,6 +1716,170 @@ function startSysPerfSimulation() {
 }
 
 // ==========================================
+// CUSTOM DELETE (DATE RANGE) MODULE
+// ==========================================
+async function showDeleteByDateRange(moduleName, tableName, refreshCallback) {
+  // 1. Munculkan Popup Form Input Tanggal
+  const { value: formValues } = await Swal.fire({
+    title: `Hapus Data ${moduleName} Custom`,
+    html:
+      `<p class="text-muted small mb-3">Pilih rentang tanggal data yang ingin dihapus permanen.</p>` +
+      `<div class="mb-3 text-start">` +
+        `<label class="form-label fw-bold">Dari Tanggal:</label>` +
+        `<input type="date" id="swal-input-start" class="form-control">` +
+      `</div>` +
+      `<div class="mb-3 text-start">` +
+        `<label class="form-label fw-bold">Sampai Tanggal:</label>` +
+        `<input type="date" id="swal-input-end" class="form-control">` +
+      `</div>`,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fa-solid fa-trash me-1"></i> Lanjut Hapus',
+    confirmButtonColor: '#dc3545',
+    cancelButtonText: 'Batal',
+    preConfirm: () => {
+      const start = document.getElementById('swal-input-start').value;
+      const end = document.getElementById('swal-input-end').value;
+      
+      if (!start || !end) {
+        Swal.showValidationMessage('Tanggal awal dan akhir harus diisi!');
+        return false;
+      }
+      if (start > end) {
+        Swal.showValidationMessage('Tanggal awal tidak boleh melebihi tanggal akhir!');
+        return false;
+      }
+      return { start, end };
+    }
+  });
+
+  // 2. Jika user mengisi tanggal dan klik Lanjut
+  if (formValues) {
+    const { start, end } = formValues;
+
+    // 3. Konfirmasi Terakhir (Mencegah Hapus Tidak Sengaja)
+    const confirm = await Swal.fire({
+      title: 'Apakah Anda Yakin?',
+      text: `Semua data ${moduleName} dari tanggal ${start} sampai ${end} akan dihapus permanen. Aksi ini tidak dapat dibatalkan!`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonText: 'Batal',
+      confirmButtonText: 'Ya, Hapus Permanen!'
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        Swal.fire({ 
+          title: 'Memproses...', 
+          text: 'Sedang menghapus data dari server.', 
+          allowOutsideClick: false, 
+          didOpen: () => { Swal.showLoading(); }
+        });
+
+        // 4. Eksekusi Hapus di Supabase (gte = Greater Than or Equal, lte = Less Than or Equal)
+        const { error } = await _supabase
+          .from(tableName)
+          .delete()
+          .gte('tanggal', start)
+          .lte('tanggal', end);
+
+        if (error) throw error;
+
+        // 5. Refresh Tabel Data
+        await refreshCallback();
+
+        Swal.fire('Berhasil!', `Data ${moduleName} dari ${start} s/d ${end} telah dihapus.`, 'success');
+      } catch (err) {
+        Swal.fire('Gagal!', err.message, 'error');
+      }
+    }
+  }
+}
+
+// ==========================================
+// CUSTOM BULK DELETE MODULE (TANGGAL)
+// ==========================================
+async function promptBulkDeleteByDate(tableName, dateColumn, refreshCallback) {
+  const { value: formValues } = await Swal.fire({
+    title: 'Hapus Data Custom',
+    html: `
+      <div class="mb-3 text-start">
+        <label class="form-label fw-bold text-secondary small">DARI TANGGAL:</label>
+        <input type="date" id="swal-start-date" class="form-control form-control-lg">
+      </div>
+      <div class="mb-3 text-start">
+        <label class="form-label fw-bold text-secondary small">SAMPAI TANGGAL:</label>
+        <input type="date" id="swal-end-date" class="form-control form-control-lg">
+      </div>
+      <div class="alert alert-danger bg-danger bg-opacity-10 border-danger text-danger p-2 small mb-0 mt-3">
+        <i class="fa-solid fa-triangle-exclamation me-1"></i> Data pada rentang tanggal ini akan dihapus permanen!
+      </div>
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fa-solid fa-trash me-1"></i> Lanjutkan',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: '#dc3545',
+    preConfirm: () => {
+      const start = document.getElementById('swal-start-date').value;
+      const end = document.getElementById('swal-end-date').value;
+      if (!start || !end) {
+        Swal.showValidationMessage('Pastikan rentang tanggal mulai dan akhir telah diisi!');
+        return false;
+      }
+      if (start > end) {
+        Swal.showValidationMessage('Tanggal "Dari" tidak boleh lebih besar dari "Sampai"!');
+        return false;
+      }
+      return { start, end };
+    }
+  });
+
+  if (formValues) {
+    const { start, end } = formValues;
+
+    // Format ke DD-MM-YYYY untuk UI Konfirmasi
+    const formatDate = (dateStr) => {
+      const [y, m, d] = dateStr.split('-');
+      return `${d}-${m}-${y}`;
+    };
+
+    const confirm = await Swal.fire({
+      title: 'Konfirmasi Hapus Permanen',
+      html: `Anda yakin ingin menghapus data <b>${tableName.toUpperCase()}</b><br>dari tanggal <b class="text-danger">${formatDate(start)}</b> sampai <b class="text-danger">${formatDate(end)}</b>?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ya, Hapus Data!',
+      cancelButtonText: 'Batal'
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        Swal.fire({ title: 'Memproses...', text: 'Sedang menghapus data', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        // Proses Delete ke Supabase (Menggunakan YYYY-MM-DD standar Database)
+        const { error } = await _supabase
+          .from(tableName)
+          .delete()
+          .gte(dateColumn, start)
+          .lte(dateColumn, end);
+
+        if (error) throw error;
+
+        Swal.fire('Terhapus!', `Data dari ${formatDate(start)} hingga ${formatDate(end)} berhasil dihapus.`, 'success');
+        if (refreshCallback) refreshCallback();
+
+      } catch (err) {
+        Swal.fire('Gagal!', 'Terjadi kesalahan: ' + err.message, 'error');
+      }
+    }
+  }
+}
+
+// ==========================================
 // GLOBAL EVENT LISTENER BINDINGS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -1747,6 +1999,22 @@ document.addEventListener('DOMContentLoaded', () => {
   if (prfAvatarFile) prfAvatarFile.addEventListener('change', handleAvatarPreview);
 
   bindExportButtons();
+// Trigger Hapus Custom Kasbon
+  const btnBulkDeleteKasbon = document.getElementById('btnBulkDeleteKasbon');
+  if (btnBulkDeleteKasbon) {
+    btnBulkDeleteKasbon.addEventListener('click', () => {
+      promptBulkDeleteByDate('kasbon', 'tanggal', fetchAndRenderKasbon);
+    });
+  }
+
+  // Trigger Hapus Custom Stok Voucher
+  const btnBulkDeleteStok = document.getElementById('btnBulkDeleteStok');
+  if (btnBulkDeleteStok) {
+    btnBulkDeleteStok.addEventListener('click', () => {
+      promptBulkDeleteByDate('stok_voucher', 'tanggal', fetchAndRenderStok);
+    });
+  }
+
 
   const btnRefreshCluster = document.getElementById('btnRefreshCluster');
   if (btnRefreshCluster) {
