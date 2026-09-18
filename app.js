@@ -944,7 +944,20 @@ function tryRestoreSession() {
     try {
       const user = JSON.parse(saved);
       if (user && user.username) {
+        // 1. Tampilkan UI seketika menggunakan data sesi lokal biar cepat
         initializeAuthenticatedUser(user);
+        
+        // 2. [FITUR BARU] Cek ke database di latar belakang untuk mendapatkan hak akses terbaru
+        _supabase.from('users').select('*').eq('id', user.id).single().then(({ data, error }) => {
+          if (data && !error) {
+            // Timpa data lama dengan data terbaru dari server
+            currentUser = data; 
+            localStorage.setItem('rinnet_user_session', JSON.stringify(currentUser));
+            
+            // Terapkan ulang perlindungan menu agar sesuai dengan hak akses terbaru
+            applyRolePermissions(); 
+          }
+        });
       }
     } catch(err) {
       localStorage.removeItem('rinnet_user_session');
