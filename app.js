@@ -211,15 +211,45 @@ function applyRolePermissions() {
   const role = currentUser?.role || 'ADMIN';
   const isSuperadmin = role === 'SUPERADMIN';
   const isManajemen = role === 'MANAJEMEN';
+  const isDataEntry = role === 'DATA ENTRY';
+  
+  const allowedModules = (isDataEntry && currentUser.akses_modul) ? currentUser.akses_modul.split(',') : [];
 
-  // 1. Tampilkan/Sembunyikan Akses Khusus Superadmin (Monitoring & User Mgmt)
+  // 1. Tampilkan/Sembunyikan Akses Khusus Superadmin
   document.querySelectorAll('.superadmin-only').forEach(el => {
     if (el.classList.contains('page-section')) return;
     if (isSuperadmin) el.classList.remove('d-none');
     else el.classList.add('d-none');
   });
 
-  // 2. Terapkan aturan Read-Only untuk MANAJEMEN (Sembunyikan Form, Lebarkan Tabel)
+  // 2. Proteksi Navigasi Sidebar Berdasarkan Role Data Entry
+  document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+    const menu = link.getAttribute('data-menu');
+    // Lewati menu umum
+    if (['dashboard', 'profil', 'about', 'serverWilayah'].includes(menu) || !menu) return;
+    
+    if (isDataEntry) {
+      if (!allowedModules.includes(menu)) link.classList.add('d-none');
+      else link.classList.remove('d-none');
+    } else {
+      if (!link.classList.contains('superadmin-only')) link.classList.remove('d-none');
+    }
+  });
+
+  // 3. Proteksi Quick Access Dashboard Berdasarkan Role Data Entry
+  document.querySelectorAll('.quick-access-card').forEach(card => {
+    const menu = card.getAttribute('data-menu');
+    if (['dashboard', 'profil', 'about', 'serverWilayah'].includes(menu) || !menu) return;
+
+    if (isDataEntry) {
+      if (!allowedModules.includes(menu)) card.parentElement.classList.add('d-none');
+      else card.parentElement.classList.remove('d-none');
+    } else {
+      if (!card.parentElement.classList.contains('superadmin-only')) card.parentElement.classList.remove('d-none');
+    }
+  });
+
+  // 4. Aturan Read-Only untuk MANAJEMEN... (Lanjutkan dengan kode formServer, formResellerMaster dsb. milik Anda)
   ['formServer', 'formResellerMaster', 'formKaryawan', 'formKasbon', 'formStokReseller'].forEach(id => {
     const formEl = document.getElementById(id);
     if (!formEl) return;
@@ -671,6 +701,7 @@ async function fetchAndRenderUsers() {
   }
 }
 
+// 1. Pada fungsi editUser(id)
 function editUser(id) {
   _supabase.from('users').select('*').eq('id', id).single().then(({ data }) => {
     if (!data) return;
@@ -679,7 +710,19 @@ function editUser(id) {
     document.getElementById('usrFullName').value = data.nama_lengkap || '';
     document.getElementById('usrEmail').value = data.email || '';
     document.getElementById('usrWA').value = data.no_wa || '';
-    document.getElementById('usrRole').value = data.role || 'ADMIN';
+    
+    const roleSelect = document.getElementById('usrRole');
+    roleSelect.value = data.role || 'ADMIN';
+    roleSelect.dispatchEvent(new Event('change')); // Trigger tampilan opsi akses
+
+    // Centang checkbox jika ada hak akses tersimpan
+    document.querySelectorAll('.module-cb').forEach(cb => cb.checked = false);
+    if (data.role === 'DATA ENTRY' && data.akses_modul) {
+      const allowed = data.akses_modul.split(',');
+      document.querySelectorAll('.module-cb').forEach(cb => {
+        if (allowed.includes(cb.value)) cb.checked = true;
+      });
+    }
 
     const title = document.getElementById('titleFormUser');
     if (title) title.innerText = 'Edit User System';
@@ -688,11 +731,15 @@ function editUser(id) {
   });
 }
 
+// 2. Pada fungsi cancelEditUser()
 function cancelEditUser() {
   const form = document.getElementById('formUserMgmt');
   if (form) form.reset();
   const idEl = document.getElementById('usrId');
   if (idEl) idEl.value = '';
+  
+  document.getElementById('dataEntryAccessContainer')?.classList.add('d-none');
+  document.querySelectorAll('.module-cb').forEach(cb => cb.checked = false);
   
   const title = document.getElementById('titleFormUser');
   if (title) title.innerText = 'Registrasi User Baru';
@@ -700,6 +747,7 @@ function cancelEditUser() {
   if (btnBatal) btnBatal.classList.add('d-none');
 }
 
+// 3. Pada fungsi handleSaveUserMgmt(e)
 async function handleSaveUserMgmt(e) {
   e.preventDefault();
   const id = document.getElementById('usrId')?.value;
@@ -710,7 +758,14 @@ async function handleSaveUserMgmt(e) {
   const no_wa = document.getElementById('usrWA')?.value.trim();
   const role = document.getElementById('usrRole')?.value;
 
-  const payload = { username, nama_lengkap, email, no_wa, role };
+  // Tangkap data checkbox jika role Data Entry
+  let akses_modul = null;
+  if (role === 'DATA ENTRY') {
+    const checkedBoxes = Array.from(document.querySelectorAll('.module-cb:checked')).map(cb => cb.value);
+    akses_modul = checkedBoxes.join(','); // Disimpan dengan format "server,karyawan,kasbon"
+  }
+
+  const payload = { username, nama_lengkap, email, no_wa, role, akses_modul };
   if (rawPass && rawPass.length >= 6) {
     payload.password_hash = await hashSHA256(rawPass);
   } else if (!id && (!rawPass || rawPass.length < 6)) {
@@ -902,13 +957,24 @@ function tryRestoreSession() {
 // ==========================================
 function switchMenu(menuKey) {
   const role = currentUser?.role || 'ADMIN';
+  const isDataEntry = role === 'DATA ENTRY';
+  const allowedModules = (isDataEntry && currentUser.akses_modul) ? currentUser.akses_modul.split(',') : [];
 
+  // Proteksi khusus Superadmin
   if ((menuKey === 'sysPerf' || menuKey === 'userMgmt') && role !== 'SUPERADMIN') {
-    if (typeof Swal !== 'undefined') {
-      Swal.fire('Akses Ditolak', 'Halaman ini hanya dapat diakses oleh Superadmin.', 'warning');
-    }
+    if (typeof Swal !== 'undefined') Swal.fire('Akses Ditolak', 'Halaman ini hanya dapat diakses oleh Superadmin.', 'warning');
     return;
   }
+
+  // Proteksi khusus Data Entry
+  if (isDataEntry && !['dashboard', 'profil', 'about', 'serverWilayah'].includes(menuKey)) {
+    if (!allowedModules.includes(menuKey)) {
+      if (typeof Swal !== 'undefined') Swal.fire('Akses Ditolak', 'Akun Data Entry Anda tidak memiliki izin untuk membuka modul ini.', 'warning');
+      return;
+    }
+  }
+
+  // (Lanjutkan dengan kode document.querySelectorAll('.page-section') dsb. seperti biasa)
 
   document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('d-none'));
   document.querySelectorAll('.sidebar .nav-link').forEach(lnk => lnk.classList.remove('active'));
@@ -1572,6 +1638,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashResellerServerFilter = document.getElementById('dashResellerServerFilter');
   if (dashResellerServerFilter) {
     dashResellerServerFilter.addEventListener('change', renderDashboardResellerRecap);
+  }
+
+  const usrRole = document.getElementById('usrRole');
+  if (usrRole) {
+    usrRole.addEventListener('change', function() {
+      const container = document.getElementById('dataEntryAccessContainer');
+      if (this.value === 'DATA ENTRY') {
+        container.classList.remove('d-none');
+      } else {
+        container.classList.add('d-none');
+      }
+    });
   }
 
   // Form Submissions & Cancel Listeners
