@@ -348,3 +348,23 @@ body {
 .tracking-tight {
   letter-spacing: -1px;
 }
+
+/* RESPONSIVE FIX UNTUK LAYAR MOBILE & TABLET (LOGIN PAGE) */
+@media (max-width: 575px) {
+  .login-wrapper {
+    padding: 1rem; /* Mengurangi jarak luar (margin) pada layar kecil */
+  }
+  
+  .login-right {
+    padding: 2.5rem 1.5rem; /* Mengurangi padding di dalam kartu login */
+  }
+  
+  .brand-subtitle {
+    font-size: 0.65rem; /* Mengecilkan teks subtitle agar tidak terpotong di kanan */
+    letter-spacing: 1px;
+  }
+  
+  .login-card-container {
+    border-radius: 16px; /* Menyesuaikan lengkungan border untuk layar kecil */
+  }
+}

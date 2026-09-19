@@ -948,13 +948,35 @@ if (!hcaptchaVal) {
   }
 }
 
-function handleLogout() {
-  currentUser = null;
-  localStorage.removeItem('rinnet_user_session');
-  document.getElementById('pageApp')?.classList.add('d-none');
-  document.getElementById('pageLogin')?.classList.remove('d-none');
-  const form = document.getElementById('formLogin');
-  if (form) form.reset();
+async function handleLogout() {
+  // 1. Tampilkan peringatan konfirmasi sebelum keluar
+  const confirm = await Swal.fire({
+    title: 'Konfirmasi Keluar',
+    text: 'Apakah Anda yakin ingin keluar dari sistem?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    confirmButtonText: 'Ya, Keluar',
+    cancelButtonText: 'Batal'
+  });
+
+  if (confirm.isConfirmed) {
+    currentUser = null;
+    localStorage.removeItem('rinnet_user_session');
+    
+    // Sembunyikan halaman app, tampilkan halaman login
+    document.getElementById('pageApp')?.classList.add('d-none');
+    document.getElementById('pageLogin')?.classList.remove('d-none');
+    
+    // Reset form login
+    const form = document.getElementById('formLogin');
+    if (form) form.reset();
+
+    // 2. Reset status centang hCaptcha secara manual
+    if (typeof hcaptcha !== 'undefined') {
+      hcaptcha.reset();
+    }
+  }
 }
 
 function tryRestoreSession() {
