@@ -896,6 +896,19 @@ async function handleAuthLogin(e) {
     return;
   }
 
+  // Tambahkan proteksi jika script hcaptcha terblokir/gagal dimuat
+if (typeof hcaptcha === 'undefined') {
+  Swal.fire('Sistem Error', 'Widget keamanan gagal dimuat. Harap matikan adblocker atau refresh halaman.', 'error');
+  return;
+}
+
+const hcaptchaVal = hcaptcha.getResponse();
+if (!hcaptchaVal) {
+  Swal.fire('Validasi Keamanan', 'Silakan centang kotak hCaptcha terlebih dahulu untuk membuktikan Anda bukan robot!', 'warning');
+  return;
+}
+  // ----------------------------------------------------------------------
+
   const userVal = document.getElementById('loginUsername')?.value.trim();
   const passVal = document.getElementById('loginPassword')?.value.trim();
 
@@ -913,6 +926,9 @@ async function handleAuthLogin(e) {
       registerFailedAttempt();
       const remaining = MAX_FAILED_ATTEMPTS - failedLoginAttempts;
       Swal.fire('Gagal Masuk', remaining > 0 ? `Username atau password salah! Sisa percobaan: ${remaining}.` : 'Akun dikunci sementara!', 'error');
+      
+      // --- 2. TAMBAHAN HCAPTCHA: Reset widget jika password salah ---
+      hcaptcha.reset(); 
       return;
     }
 
@@ -923,6 +939,9 @@ async function handleAuthLogin(e) {
   } catch(err) {
     console.error(err);
     Swal.fire('System Error', 'Gagal terhubung ke Supabase.', 'error');
+    
+    // --- 3. TAMBAHAN HCAPTCHA: Reset widget jika terjadi error ---
+    hcaptcha.reset();
   } finally {
     document.getElementById('btnLoginText')?.classList.remove('d-none');
     document.getElementById('btnLoginSpinner')?.classList.add('d-none');
