@@ -219,15 +219,30 @@
               </div>
             </div>
             <div class="col-6 col-md-4 col-xl-2">
-             <div class="quick-access-card" data-menu="kasbon">
-              <div class="quick-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-              <div><h6 class="fw-bold mb-0 text-dark fs-6">Kasbon</h6><small class="text-muted d-block" style="font-size: 11px;">Form & Rekap</small></div>
+              <div class="quick-access-card" data-menu="kasbon">
+                <div class="quick-icon-box" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                <div><h6 class="fw-bold mb-0 text-dark fs-6">Kasbon</h6><small class="text-muted d-block" style="font-size: 11px;">Form & Rekap</small></div>
+              </div>
             </div>
-          </div>
+            <!-- TAMBAHAN: NAVIGASI SUPERADMIN (USER MANAGEMENT) -->
+            <div class="col-6 col-md-4 col-xl-2 superadmin-only d-none">
+              <div class="quick-access-card" data-menu="userMgmt">
+                <div class="quick-icon-box" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="fa-solid fa-users-gear"></i></div>
+                <div><h6 class="fw-bold mb-0 text-dark fs-6">User Mgmt</h6><small class="text-muted d-block" style="font-size: 11px;">Akun System</small></div>
+              </div>
+            </div>
+            <!-- TAMBAHAN: NAVIGASI MONITORING (SUPERADMIN) -->
             <div class="col-6 col-md-4 col-xl-2 superadmin-only d-none">
               <div class="quick-access-card" data-menu="sysPerf">
                 <div class="quick-icon-box" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i class="fa-solid fa-microchip"></i></div>
                 <div><h6 class="fw-bold mb-0 text-dark fs-6">Monitoring</h6><small class="text-muted d-block" style="font-size: 11px;">System Status</small></div>
+              </div>
+            </div>
+            <!-- TAMBAHAN: NAVIGASI TENTANG RINNET+ -->
+            <div class="col-6 col-md-4 col-xl-2">
+              <div class="quick-access-card" data-menu="about">
+                <div class="quick-icon-box" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;"><i class="fa-solid fa-circle-info"></i></div>
+                <div><h6 class="fw-bold mb-0 text-dark fs-6">Tentang</h6><small class="text-muted d-block" style="font-size: 11px;">Info RINNET+</small></div>
               </div>
             </div>
           </div>
@@ -775,9 +790,10 @@
           <h1 class="fw-900 display-5 mb-1 text-dark tracking-tight">RINNET+</h1>
           <p class="text-muted fw-600 fs-6 mb-2">Enterprise Infrastructure & Voucher Management System</p>
           <div class="fw-bold text-primary mb-3">PT RINNET GLOBAL MANDIRI</div>
-          <div class="d-flex justify-content-center align-items-center gap-2">
+          <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap">
             <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">v2.5.0 Enterprise</span>
-            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">Realtime Supabase Synced</span>
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill"><i class="fa-solid fa-cloud me-1 text-primary"></i>Realtime Supabase Synced</span>
+            <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill"><i class="fa-solid fa-shield-halved me-1 text-success"></i>hCaptcha Protected</span>
           </div>
         </div>
 
@@ -785,13 +801,13 @@
         <div class="card card-custom p-4 p-md-5 mb-5 shadow-sm">
           <h4 class="fw-800 text-dark mb-4">Tentang Aplikasi</h4>
           <p class="text-secondary leading-relaxed mb-3 fs-6">
-            Pengelolaan infrastruktur server, alokasi stok voucher reseller, serta pencatatan kasbon karyawan yang dilakukan secara manual sering kali berisiko pada ketidakakuratan data dan lambatnya rekapitulasi operasional harian.
+            Pengelolaan infrastruktur server cloud, distribusi stok voucher reseller, serta pencatatan finansial/kasbon karyawan yang terdistribusi menuntut akurasi data yang tinggi, proteksi keamanan tingkat tinggi, serta rekapitulasi harian yang instan.
           </p>
           <p class="text-secondary leading-relaxed mb-4 fs-6">
-            <strong class="text-dark">RINNET+</strong> hadir sebagai solusi enterprise core system terpadu untuk membangun operasional bisnis yang terstruktur, otomatis, dan scalable. Platform ini mengintegrasikan pengawasan multi-server cloud, manajemen database realtime, kontrol SDM, hingga laporan finansial dalam satu dashboard terpusat.
+            <strong class="text-dark">RINNET+</strong> dikembangkan sebagai sistem *Enterprise Core Infrastructure* modern berbasis cloud. Aplikasi ini mengintegrasikan manajemen multi-server, alokasi voucher otomatis, pelaporan finansial kasbon, proteksi bot hCaptcha, ekspor laporan berkustomisasi, serta kontrol hak akses bertingkat dalam satu platform web responsif.
           </p>
           <div class="p-3 bg-light rounded-3 border-start border-4 border-primary">
-            <span class="fw-bold text-dark">Hasilnya:</span> Efisiensi kerja maksimal, kontrol data yang presisi, dan transparansi laporan yang dapat diakses secara instan.
+            <span class="fw-bold text-dark">Hasilnya:</span> Keamanan akses terjamin, efisiensi kerja maksimal, kontrol data presisi, dan laporan operasional yang siap cetak kapan saja.
           </div>
         </div>
 
@@ -804,8 +820,8 @@
                 <div class="d-flex align-items-center gap-3">
                   <div class="quick-icon-box bg-primary bg-opacity-10 text-primary rounded-3"><i class="fa-solid fa-server"></i></div>
                   <div>
-                    <h6 class="fw-bold mb-1 text-dark">Cloud Server Management</h6>
-                    <p class="text-muted small mb-0">Pengelolaan server terstruktur dengan pemetaan wilayah/cluster</p>
+                    <h6 class="fw-bold mb-1 text-dark">Cloud Server & Cluster</h6>
+                    <p class="text-muted small mb-0">Manajemen multi-server terstruktur dengan pemetaan wilayah cluster interaktif</p>
                   </div>
                 </div>
               </div>
@@ -816,7 +832,7 @@
                   <div class="quick-icon-box bg-info bg-opacity-10 text-info rounded-3"><i class="fa-solid fa-ticket"></i></div>
                   <div>
                     <h6 class="fw-bold mb-1 text-dark">Voucher & Stock Control</h6>
-                    <p class="text-muted small mb-0">Alokasi voucher multi-denominasi (2K-25K & HP) dan rekap harian/bulanan</p>
+                    <p class="text-muted small mb-0">Penyerahan voucher multi-nominal (2K-25K & HP) terfilter dinamik per server</p>
                   </div>
                 </div>
               </div>
@@ -827,7 +843,7 @@
                   <div class="quick-icon-box bg-success bg-opacity-10 text-success rounded-3"><i class="fa-solid fa-hand-holding-dollar"></i></div>
                   <div>
                     <h6 class="fw-bold mb-1 text-dark">Kasbon & Financial Tracker</h6>
-                    <p class="text-muted small mb-0">Pencatatan pinjaman, sumber dana server, pelunasan, & saldo karyawan</p>
+                    <p class="text-muted small mb-0">Pencatatan kasbon, integrasi sumber dana server, serta rekap pelunasan otomatis</p>
                   </div>
                 </div>
               </div>
@@ -835,10 +851,10 @@
             <div class="col-12 col-md-6 col-lg-4">
               <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
                 <div class="d-flex align-items-center gap-3">
-                  <div class="quick-icon-box bg-warning bg-opacity-10 text-warning rounded-3"><i class="fa-solid fa-microchip"></i></div>
+                  <div class="quick-icon-box bg-danger bg-opacity-10 text-danger rounded-3"><i class="fa-solid fa-calendar-xmark"></i></div>
                   <div>
-                    <h6 class="fw-bold mb-1 text-dark">Realtime System Monitoring</h6>
-                    <p class="text-muted small mb-0">Simulasi latensi database, CPU load, RAM, dan live terminal logs</p>
+                    <h6 class="fw-bold mb-1 text-dark">Custom Bulk Date Delete</h6>
+                    <p class="text-muted small mb-0">Penghapusan massal aman berbasis rentang tanggal custom dengan verifikasi ganda</p>
                   </div>
                 </div>
               </div>
@@ -848,8 +864,8 @@
                 <div class="d-flex align-items-center gap-3">
                   <div class="quick-icon-box bg-primary bg-opacity-10 text-indigo rounded-3"><i class="fa-solid fa-file-excel"></i></div>
                   <div>
-                    <h6 class="fw-bold mb-1 text-dark">Excel Data Export</h6>
-                    <p class="text-muted small mb-0">Ekspor laporan rekapitulasi cepat langsung berformat .xlsx</p>
+                    <h6 class="fw-bold mb-1 text-dark">Formatted Excel Export</h6>
+                    <p class="text-muted small mb-0">Ekspor spreadsheet .xlsx otomatis lengkap dengan header resmi, zebra-striping & waktu cetak</p>
                   </div>
                 </div>
               </div>
@@ -859,8 +875,8 @@
                 <div class="d-flex align-items-center gap-3">
                   <div class="quick-icon-box bg-secondary bg-opacity-10 text-dark rounded-3"><i class="fa-solid fa-shield-halved"></i></div>
                   <div>
-                    <h6 class="fw-bold mb-1 text-dark">RBAC & Security System</h6>
-                    <p class="text-muted small mb-0">Proteksi akun terenkripsi SHA-256 dengan hak akses Superadmin/Manajemen</p>
+                    <h6 class="fw-bold mb-1 text-dark">Granular Role RBAC</h6>
+                    <p class="text-muted small mb-0">Kontrol hak akses 4 tingkatan (Superadmin, Manajemen, Admin, & Data Entry Custom)</p>
                   </div>
                 </div>
               </div>
@@ -868,66 +884,68 @@
           </div>
         </div>
 
-        <!-- Section Keunggulan RINNET+ -->
+        <!-- Section Keunggulan System -->
         <div class="card p-4 p-md-5 mb-5 rounded-4 border-0" style="background: #eef2ff;">
-          <h4 class="fw-800 text-dark mb-4">Keunggulan Sistem RINNET+</h4>
+          <h4 class="fw-800 text-dark mb-4">Keunggulan Utama RINNET+</h4>
           <div class="d-flex flex-column gap-3">
             <div class="d-flex align-items-center gap-3">
               <i class="fa-circle-check fa-solid text-primary fs-5"></i>
-              <span class="fw-600 text-dark fs-6">Sinkronisasi data otomatis secara real-time ke cloud database</span>
+              <span class="fw-600 text-dark fs-6">Proteksi login anti-bot ganda menggunakan hCaptcha & sistem pembatasan percobaan gagal</span>
             </div>
             <div class="d-flex align-items-center gap-3">
               <i class="fa-circle-check fa-solid text-primary fs-5"></i>
-              <span class="fw-600 text-dark fs-6">Antarmuka responsif, modern, dan dioptimalkan untuk performa tinggi</span>
+              <span class="fw-600 text-dark fs-6">Sinkronisasi data otomatis secara real-time ke Supabase Cloud PostgreSQL Database</span>
             </div>
             <div class="d-flex align-items-center gap-3">
               <i class="fa-circle-check fa-solid text-primary fs-5"></i>
-              <span class="fw-600 text-dark fs-6">Pemisahan kontrol hak akses yang ketat demi keamanan data perusahaan</span>
+              <span class="fw-600 text-dark fs-6">Antarmuka responsif khusus seluler/tablet dengan navigasi Akses Cepat yang dapat disesuaikan</span>
             </div>
           </div>
         </div>
 
-        <!-- Section Teknologi yang Digunakan (Sesuai App Anda) -->
+        <!-- Section Teknologi & Engine -->
         <div class="mb-5">
-          <h4 class="fw-800 text-dark mb-4">Teknologi & Engine</h4>
+          <h4 class="fw-800 text-dark mb-4">Teknologi & Infrastructure Engine</h4>
           <div class="row g-4">
             <div class="col-12 col-md-6">
               <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
-                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Frontend & UI Architecture</h6>
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-code fa-solid me-2"></i>Frontend Architecture & UI</h6>
                 <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
-                  <li>• HTML5 & CSS3 Responsive Framework</li>
-                  <li>• Bootstrap 5.3 UI Library & Custom CSS Components</li>
-                  <li>• Font Awesome 6.4 Iconography</li>
-                  <li>• Google Fonts (Plus Jakarta Sans & Cinzel)</li>
+                  <li>• HTML5 & CSS3 Responsive Grid Layout</li>
+                  <li>• Bootstrap 5.3 Framework & Mobile Media Queries</li>
+                  <li>• Font Awesome 6.4 Free Solid & Regular Iconography</li>
+                  <li>• Google Fonts (Plus Jakarta Sans & Cinzel Typography)</li>
                 </ul>
               </div>
             </div>
             <div class="col-12 col-md-6">
               <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
-                <h6 class="fw-bold text-primary mb-3"><i class="fa-database fa-solid me-2"></i>Cloud Database & Backend Engine</h6>
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-database fa-solid me-2"></i>Cloud Database & Security Engine</h6>
                 <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
-                  <li>• Supabase JavaScript Client (Realtime Cloud Sync)</li>
+                  <li>• Supabase JS Client (Realtime Cloud Sync)</li>
                   <li>• PostgreSQL Relational Database Engine</li>
-                  <li>• Secure Password Hashing (Crypto Subtle API / SHA-256)</li>
+                  <li>• hCaptcha Security API (Human Verification & Bot Defense)</li>
+                  <li>• SHA-256 One-Way Password Hashing (Web Crypto API)</li>
                 </ul>
               </div>
             </div>
             <div class="col-12 col-md-6">
               <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
-                <h6 class="fw-bold text-primary mb-3"><i class="fa-chart-pie fa-solid me-2"></i>Analytics & Visualization</h6>
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-chart-pie fa-solid me-2"></i>Analytics & Live Monitoring</h6>
                 <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
-                  <li>• Chart.js (Interactive Bar & Line Graphs)</li>
-                  <li>• Scalable Dynamic Wrapper Engine</li>
+                  <li>• Chart.js (Interactive Bar Chart & System Latency Simulation)</li>
+                  <li>• Auto-Scalable Chart Wrapper Engine</li>
+                  <li>• Live System Health Terminal Log Simulation</li>
                 </ul>
               </div>
             </div>
             <div class="col-12 col-md-6">
               <div class="card card-custom p-4 h-100 shadow-sm border-0 bg-white">
-                <h6 class="fw-bold text-primary mb-3"><i class="fa-file-excel fa-solid me-2"></i>Utilities & Interactive Libraries</h6>
+                <h6 class="fw-bold text-primary mb-3"><i class="fa-file-excel fa-solid me-2"></i>Export & Interactive Libraries</h6>
                 <ul class="list-unstyled text-secondary small mb-0 d-flex flex-column gap-2">
-                  <li>• ExcelJS & FileSaver.js (Spreadsheet Export Generator)</li>
-                  <li>• SweetAlert2 (Modern Notification & Modal Dialogs)</li>
-                  <li>• Canvas Confetti (Interactive Celebration Effects)</li>
+                  <li>• ExcelJS & FileSaver.js (Structured .xlsx Report Generator)</li>
+                  <li>• SweetAlert2 (Interactive Dialogs & Toast Notifications)</li>
+                  <li>• Canvas Confetti (Celebration Visual Effects)</li>
                 </ul>
               </div>
             </div>
