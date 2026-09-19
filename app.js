@@ -575,9 +575,17 @@ async function deleteEmployee(id) {
 // ==========================================
 // RESELLER MANAGEMENT
 // ==========================================
+
+// Fungsi Baru: Generate Auto ID Reseller
+function generateAutoResellerID() {
+  const existingCount = window.RESELLER_CACHE.length + 1;
+  const nextID = 'RSL-' + String(existingCount).padStart(4, '0');
+  const inputEl = document.getElementById('rslID');
+  if (inputEl) inputEl.value = nextID;
+}
+
 async function fetchAndRenderResellers() {
   try {
-    // Diurutkan berdasarkan nama_server, lalu nama_reseller
     const { data, error } = await _supabase.from('reseller_master').select('*').order('nama_server', { ascending: true }).order('nama_reseller', { ascending: true });
     if (error) throw error;
     
@@ -585,17 +593,24 @@ async function fetchAndRenderResellers() {
 
     const tbody = document.getElementById('bodyMasterReseller');
     if (tbody) {
-      tbody.innerHTML = (data || []).map(r => `
+      tbody.innerHTML = (data || []).map(r => {
+        // Logika Status Aktif/Nonaktif
+        const statusBadge = r.status === 'Nonaktif' ? 'bg-danger text-danger border-danger' : 'bg-success text-success border-success';
+        
+        return `
         <tr>
-          <td><span class="badge bg-secondary bg-opacity-10 text-dark border">${escapeHTML(r.nama_server)}</span></td>
+          <td class="fw-bold text-primary">${escapeHTML(r.rsl_id || '-')}</td>
           <td class="fw-bold">${escapeHTML(r.nama_reseller)}</td>
+          <td><span class="badge bg-secondary bg-opacity-10 text-dark border">${escapeHTML(r.nama_server)}</span></td>
+          <td>${escapeHTML(r.nama_pengelola || '-')}</td>
           <td>${escapeHTML(r.no_wa)}</td>
+          <td><span class="badge ${statusBadge} bg-opacity-10 border">${escapeHTML(r.status || 'Aktif')}</span></td>
           <td class="action-col text-end">
             <button class="btn btn-sm btn-outline-primary me-1" onclick="editReseller('${r.id}')"><i class="fa-solid fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger" onclick="deleteReseller('${r.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada data reseller.</td></tr>';
+      `}).join('') || '<tr><td colspan="7" class="text-center text-muted py-3">Belum ada data reseller.</td></tr>';
     }
 
     const dashRslEl = document.getElementById('dashTotalReseller');
@@ -612,10 +627,16 @@ async function fetchAndRenderResellers() {
 function editReseller(id) {
   const r = window.RESELLER_CACHE.find(x => String(x.id) === String(id));
   if (!r) return;
-  document.getElementById('rslId').value = r.id;
+  document.getElementById('rslDbId').value = r.id; // Menyimpan UUID ke hidden field
+  document.getElementById('rslID').value = r.rsl_id || '';
   document.getElementById('rslNama').value = r.nama_reseller || '';
-  document.getElementById('rslWA').value = r.no_wa || '';
   document.getElementById('rslServer').value = r.nama_server || '';
+  document.getElementById('rslPengelola').value = r.nama_pengelola || '';
+  document.getElementById('rslWAPengelola').value = r.wa_pengelola || '';
+  document.getElementById('rslWA').value = r.no_wa || '';
+  document.getElementById('rslAlamat').value = r.alamat || '';
+  document.getElementById('rslKoordinat').value = r.koordinat || '';
+  document.getElementById('rslStatus').value = r.status || 'Aktif';
 
   const title = document.getElementById('titleFormReseller');
   if (title) title.innerText = 'Edit Data Reseller';
@@ -626,7 +647,7 @@ function editReseller(id) {
 function cancelEditReseller() {
   const form = document.getElementById('formResellerMaster');
   if (form) form.reset();
-  const idEl = document.getElementById('rslId');
+  const idEl = document.getElementById('rslDbId');
   if (idEl) idEl.value = '';
   
   const title = document.getElementById('titleFormReseller');
@@ -637,11 +658,19 @@ function cancelEditReseller() {
 
 async function handleSaveReseller(e) {
   e.preventDefault();
-  const id = document.getElementById('rslId')?.value;
+  const id = document.getElementById('rslDbId')?.value;
+  
+  // Mengambil dan menyiapkan semua value terbaru
   const payload = {
+    rsl_id: document.getElementById('rslID')?.value.trim(),
     nama_reseller: document.getElementById('rslNama')?.value.trim(),
+    nama_server: document.getElementById('rslServer')?.value,
+    nama_pengelola: document.getElementById('rslPengelola')?.value,
+    wa_pengelola: document.getElementById('rslWAPengelola')?.value,
     no_wa: document.getElementById('rslWA')?.value.trim(),
-    nama_server: document.getElementById('rslServer')?.value
+    alamat: document.getElementById('rslAlamat')?.value.trim(),
+    koordinat: document.getElementById('rslKoordinat')?.value.trim(),
+    status: document.getElementById('rslStatus')?.value
   };
 
   const { error } = id
@@ -659,16 +688,29 @@ async function handleSaveReseller(e) {
 }
 
 async function deleteReseller(id) {
-  const confirm = await Swal.fire({ title: 'Hapus Reseller?', icon: 'warning', showCancelButton: true });
+  const confirm = await Swal.fire({ 
+    title: 'Hapus Data Reseller?', 
+    text: "Data yang dihapus tidak dapat dikembalikan!", 
+    icon: 'warning', 
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    confirmButtonText: 'Ya, Hapus',
+    cancelButtonText: 'Batal'
+  });
+
   if (confirm.isConfirmed) {
     try {
+      // Menghapus data dari tabel reseller_master di Supabase
       const { error } = await _supabase.from('reseller_master').delete().eq('id', id);
       if (error) throw error;
+      
+      // Refresh tabel dan cache dropdown
       fetchAndRenderResellers();
       loadAllMasterDropdowns();
-      Swal.fire('Terhapus!', 'Data Reseller berhasil dihapus.', 'success');
+      
+      Swal.fire('Terhapus!', 'Data Reseller berhasil dihapus permanen.', 'success');
     } catch(err) {
-      Swal.fire('Gagal!', err.message, 'error');
+      Swal.fire('Gagal!', 'Terjadi kesalahan: ' + err.message, 'error');
     }
   }
 }
@@ -1190,9 +1232,15 @@ function bindExportButtons() {
   ], window.EMPLOYEE_CACHE));
 
   bind('btnExportMasterReseller', () => exportToExcel('data-reseller.xlsx', 'Reseller', [
-    { header: 'Server Utama', key: 'nama_server', width: 20 },
+    { header: 'Kode ID', key: 'rsl_id', width: 14 },
     { header: 'Nama Reseller', key: 'nama_reseller', width: 25 },
-    { header: 'WhatsApp', key: 'no_wa', width: 18 },
+    { header: 'Server Utama', key: 'nama_server', width: 20 },
+    { header: 'Pengelola Server', key: 'nama_pengelola', width: 25 },
+    { header: 'WA Pengelola', key: 'wa_pengelola', width: 18 },
+    { header: 'WA Reseller', key: 'no_wa', width: 18 },
+    { header: 'Alamat', key: 'alamat', width: 35 },
+    { header: 'Titik Koordinat', key: 'koordinat', width: 25 },
+    { header: 'Status', key: 'status', width: 12 },
   ], window.RESELLER_CACHE));
 
   bind('btnExportUsers', async () => {
@@ -1965,6 +2013,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const dashResellerServerFilter = document.getElementById('dashResellerServerFilter');
   if (dashResellerServerFilter) {
     dashResellerServerFilter.addEventListener('change', renderDashboardResellerRecap);
+
+  // Trigger Auto ID Reseller
+  const btnAutoIDReseller = document.getElementById('btnAutoIDReseller');
+  if (btnAutoIDReseller) btnAutoIDReseller.addEventListener('click', generateAutoResellerID);
+
+  // Auto-Fill Nama Pengelola & WA Pengelola saat Server Dipilih
+  const rslServerSelect = document.getElementById('rslServer');
+  if (rslServerSelect) {
+    rslServerSelect.addEventListener('change', function(e) {
+      const serverName = e.target.value;
+      const selectedServer = window.SERVER_CACHE.find(s => s.nama_server === serverName);
+      
+      if (selectedServer) {
+        document.getElementById('rslPengelola').value = selectedServer.pengelola || '';
+        document.getElementById('rslWAPengelola').value = selectedServer.no_wa || '';
+      } else {
+        document.getElementById('rslPengelola').value = '';
+        document.getElementById('rslWAPengelola').value = '';
+      }
+    });
+  }
   }
 
   const usrRole = document.getElementById('usrRole');
