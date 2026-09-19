@@ -925,7 +925,7 @@ async function initializeAuthenticatedUser(user) {
   await fetchAndRenderStok();
   populateProfilForm();
   renderServerDistributionChart();
-  startSysPerfSimulation();
+  startRealSysMonitoring();
 
   switchMenu('dashboard');
   applyRolePermissions();
@@ -1763,66 +1763,107 @@ function renderServerDistributionChart() {
   });
 }
 
-function startSysPerfSimulation() {
+// ==========================================
+// REALTIME APPLICATION PERFORMANCE MONITORING
+// ==========================================
+let realLatencyData = [0, 0, 0, 0, 0, 0];
+let latencyLabels = ['-25s', '-20s', '-15s', '-10s', '-5s', 'Sekarang'];
+
+async function startRealSysMonitoring() {
   const canvas = document.getElementById('systemPerfChart');
   if (canvas && typeof Chart !== 'undefined') {
     if (sysPerfChart) sysPerfChart.destroy();
     sysPerfChart = new Chart(canvas.getContext('2d'), {
       type: 'line',
       data: {
-        labels: ['10s lalu', '8s lalu', '6s lalu', '4s lalu', '2s lalu', 'Sekarang'],
+        labels: latencyLabels,
         datasets: [{
-          label: 'Latency DB (ms)',
-          data: [20, 25, 22, 28, 24, 21],
+          label: 'Real API Latency (ms)',
+          data: realLatencyData,
           borderColor: '#f59e0b',
-          tension: 0.3,
-          fill: false
-        }, {
-          label: 'CPU Load (%)',
-          data: [12, 15, 18, 14, 16, 14],
-          borderColor: '#6366f1',
-          tension: 0.3,
-          fill: false
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          borderWidth: 3,
+          tension: 0.4,
+          fill: true
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false }
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, suggestedMax: 200 } }
+      }
     });
   }
 
   if (livePerfInterval) clearInterval(livePerfInterval);
-  livePerfInterval = setInterval(() => {
-    const cpu = Math.floor(10 + Math.random() * 35);
-    const ram = Math.floor(30 + Math.random() * 30);
-    const latency = Math.floor(15 + Math.random() * 45);
+  
+  // Melakukan Ping Realtime setiap 5 detik
+  livePerfInterval = setInterval(async () => {
+    const startTime = performance.now();
+    let isSuccess = false;
+    let errorMsg = '';
 
-    const cpuVal = document.getElementById('sysCpuVal');
-    const cpuBar = document.getElementById('sysCpuBar');
-    const ramVal = document.getElementById('sysRamVal');
-    const ramBar = document.getElementById('sysRamBar');
+    try {
+      // Melakukan query sangat ringan ke Supabase untuk menguji koneksi nyata
+      const { error } = await _supabase.from('servers').select('id').limit(1);
+      if (error) throw error;
+      isSuccess = true;
+    } catch (err) {
+      isSuccess = false;
+      errorMsg = err.message || 'Connection Timeout';
+    }
+
+    const endTime = performance.now();
+    const latency = Math.round(endTime - startTime);
+
+    // Update UI Elements
     const latEl = document.getElementById('sysDbLatency');
+    const statusEl = document.getElementById('sysHealthStatus');
+    const badge = document.getElementById('sysLiveBadge');
+    const badgeText = document.getElementById('sysLiveText');
+    const badgeDot = document.getElementById('sysLiveDot');
 
-    if (cpuVal) cpuVal.innerText = cpu + '%';
-    if (cpuBar) cpuBar.style.width = cpu + '%';
-    if (ramVal) ramVal.innerText = ram + '%';
-    if (ramBar) ramBar.style.width = ram + '%';
-    if (latEl) latEl.innerText = latency + ' ms';
+    if (isSuccess) {
+      if (latEl) latEl.innerText = latency + ' ms';
+      if (statusEl) {
+        statusEl.innerText = 'ONLINE';
+        statusEl.className = 'metric-val text-success';
+      }
+      if (badge) badge.className = 'badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill d-flex align-items-center gap-2';
+      if (badgeText) badgeText.innerText = 'SYSTEM ONLINE';
+      if (badgeDot) badgeDot.style.backgroundColor = '#10b981';
+    } else {
+      if (latEl) latEl.innerText = 'ERR';
+      if (statusEl) {
+        statusEl.innerText = 'DISCONNECTED';
+        statusEl.className = 'metric-val text-danger';
+      }
+      if (badge) badge.className = 'badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill d-flex align-items-center gap-2';
+      if (badgeText) badgeText.innerText = 'CONNECTION ERROR';
+      if (badgeDot) badgeDot.style.backgroundColor = '#ef4444';
+    }
 
+    // Update Chart
     if (sysPerfChart) {
       sysPerfChart.data.datasets[0].data.shift();
-      sysPerfChart.data.datasets[0].data.push(latency);
-      sysPerfChart.data.datasets[1].data.shift();
-      sysPerfChart.data.datasets[1].data.push(cpu);
+      // Jika error, tampilkan lonjakan latency buatan agar terlihat di grafik
+      sysPerfChart.data.datasets[0].data.push(isSuccess ? latency : 500); 
       sysPerfChart.update();
     }
 
+    // Update Terminal Log
     const term = document.getElementById('sysLogTerminal');
     if (term) {
       const time = new Date().toLocaleTimeString('id-ID');
-      term.insertAdjacentHTML('beforeend', `<div>[${time}] Heartbeat OK — CPU ${cpu}% / RAM ${ram}% / Latency ${latency}ms</div>`);
-      term.scrollTop = term.scrollHeight;
-      while (term.children.length > 40) term.removeChild(term.firstChild);
+      if (isSuccess) {
+        term.insertAdjacentHTML('beforeend', `<div>[${time}] Ping OK — Latency ${latency}ms via ap-northeast-2</div>`);
+      } else {
+        term.insertAdjacentHTML('beforeend', `<div class="text-danger">[${time}] ERROR: ${errorMsg}</div>`);
+      }
+      term.scrollTop = term.scrollHeight; // Auto-scroll ke bawah
+      while (term.children.length > 40) term.removeChild(term.firstChild); // Batasi maksimal baris log
     }
-  }, 3000);
+  }, 5000); // 5000ms = 5 detik
 }
 
 // ==========================================

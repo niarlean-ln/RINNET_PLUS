@@ -77,10 +77,11 @@ body {
 .login-wrapper {
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Ubah dari center agar tidak terpotong di atas saat scroll */
   justify-content: center;
-  padding: 2rem;
+  padding: 2rem 1rem;
   background: radial-gradient(circle at top right, #312e81, #0f172a 80%);
+  overflow-y: auto; /* Memastikan halaman bisa discroll */
 }
 .login-card-container {
   width: 100%;
@@ -91,6 +92,7 @@ body {
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  margin: auto; /* Mengunci posisi di tengah, namun tetap aman saat discroll */
 }
 .login-grid {
   display: grid;
@@ -98,7 +100,19 @@ body {
 }
 @media (max-width: 991px) {
   .login-grid { grid-template-columns: 1fr; }
-  .login-left { display: none !important; }
+  
+  /* Memunculkan panel kiri di HP dan menyesuaikan paddingnya */
+  .login-left { 
+    display: flex !important; 
+    padding: 2.5rem 1.5rem; 
+  }
+  
+  /* Menyesuaikan teks footer pada panel kiri agar rapi di HP */
+  .login-left .border-top {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
 }
 .login-left {
   padding: 3.5rem;
