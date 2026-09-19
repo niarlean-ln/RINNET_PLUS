@@ -280,8 +280,9 @@ function applyRolePermissions() {
 
 function restoreUserAvatar() {
   if (!currentUser) return;
-  const savedAvatar = localStorage.getItem('rinnet_user_avatar_' + currentUser.username);
-  const avatarImg = savedAvatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+  
+  // Ambil data foto dari database (currentUser.avatar_url), bukan dari localStorage per-perangkat
+  const avatarImg = currentUser.avatar_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
   
   const navAvatar = document.getElementById('navUserAvatar');
   const prfAvatar = document.getElementById('prfAvatarPreview');
@@ -1627,20 +1628,40 @@ async function handleSaveProfil(e) {
   }
 }
 
-function handleAvatarPreview(e) {
+async function handleAvatarPreview(e) {
   const file = e.target.files[0];
   if (!file || !currentUser) return;
   const reader = new FileReader();
-  reader.onload = (ev) => {
+  
+  // Ubah menjadi async agar bisa memanggil Supabase
+  reader.onload = async (ev) => {
     const base64Avatar = ev.target.result;
+    
+    // 1. Update tampilan UI secara instan
     const preview = document.getElementById('prfAvatarPreview');
     const navAvatar = document.getElementById('navUserAvatar');
     if (preview) preview.src = base64Avatar;
     if (navAvatar) navAvatar.src = base64Avatar;
 
-    localStorage.setItem('rinnet_user_avatar_' + currentUser.username, base64Avatar);
-    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Foto profil diperbarui secara permanen!', showConfirmButton: false, timer: 1800 });
+    try {
+      // 2. Simpan foto ke Cloud Database Supabase agar sinkron di semua perangkat
+      const { error } = await _supabase
+        .from('users')
+        .update({ avatar_url: base64Avatar })
+        .eq('id', currentUser.id);
+
+      if (error) throw error;
+
+      // 3. Update sesi lokal agar foto tidak hilang saat halaman di-refresh
+      currentUser.avatar_url = base64Avatar;
+      localStorage.setItem('rinnet_user_session', JSON.stringify(currentUser));
+
+      Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Foto profil tersimpan di Cloud!', showConfirmButton: false, timer: 1800 });
+    } catch (err) {
+      Swal.fire('Gagal Menyimpan', 'Terjadi kesalahan saat mengunggah ke server: ' + err.message, 'error');
+    }
   };
+  
   reader.readAsDataURL(file);
 }
 
